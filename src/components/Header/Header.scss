@@ -1,0 +1,33 @@
+@import "../../styles/mixins";
+
+.header {
+  display: flex;
+  flex-direction: column;
+
+  &__coins-list {
+    background-color: black;
+    height: 1.8rem;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    font-size: 0.7rem;
+    padding: 0 5rem;
+    align-items: center;
+  }
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    align-self: center;
+    width: 100%;
+    @include respond-to(big) {
+      max-width: 700px;
+    }
+  }
+
+  &__title {
+    font-family: "MuseoModerno", sans-serif;
+  }
+}

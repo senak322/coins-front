@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'MuseoModerno';
+    src: url('./MuseoModerno-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'MuseoModerno Italic';
+    src: url('./MuseoModerno-Italic-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+  }
+  
