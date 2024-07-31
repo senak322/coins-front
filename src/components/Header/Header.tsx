@@ -15,8 +15,8 @@ export default function Header() {
       <div className="header__container">
         <h1 className="header__title">Coins Change</h1>
         <div>
-          <button>Change</button>
-          <button>Investments</button>
+          <button className="header__link">Change</button>
+          <button className="header__link">Investments</button>
         </div>
       </div>
     </header>

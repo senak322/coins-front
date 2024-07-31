@@ -28,6 +28,22 @@
   }
 
   &__title {
-    font-family: "MuseoModerno", sans-serif;
+    font-family: "MuseoModerno", Arial, Helvetica, sans-serif;
+    font-size: 48px;
+  }
+
+  &__link {
+    border: none;
+    background-color: white;
+    font-size: 16px;
+    margin-right: 4rem;
+    padding: .5rem;
+  }
+  &__link:hover {
+    background-color: #8080801a;
+    cursor: pointer;
+  }
+  &__link:last-of-type {
+    margin: 0;
   }
 }

@@ -1,14 +1,26 @@
 @font-face {
-    font-family: 'MuseoModerno';
-    src: url('./MuseoModerno-VariableFont_wght.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  @font-face {
-    font-family: 'MuseoModerno Italic';
-    src: url('./MuseoModerno-Italic-VariableFont_wght.ttf') format('truetype');
-    font-weight: normal;
-    font-style: italic;
-  }
-  
+  font-family: "MuseoModerno";
+  src: url("./MuseoModerno-VariableFont_wght.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MuseoModerno Italic";
+  src: url("./MuseoModerno-Italic-VariableFont_wght.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("./Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter Italic";
+  src: url("./Inter-Italic-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
