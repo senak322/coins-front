@@ -1,0 +1,83 @@
+.container {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.exchangeBlock {
+  display: flex;
+  justify-content: space-between;
+  background-color: #444;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input {
+  background-color: #555;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  color: #fff;
+  width: 100px;
+}
+
+.coinSelect {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+}
+
+.coinButton {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.exchangeButton {
+  background-color: #ffb300;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #ffa000;
+  }
+}
+
+.exchangeRate {
+  font-size: 12px;
+  margin-top: 10px;
+  color: #ccc;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
