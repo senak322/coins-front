@@ -1,9 +1,8 @@
 .container {
   background-color: #333;
-  padding: 20px;
+  padding: 64px 20px 20px;
   border-radius: 10px;
-  max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
   color: #fff;
 }
 
@@ -17,15 +16,16 @@
   margin-bottom: 20px;
 }
 
-.exchangeBlock {
+.exchange-block {
   display: flex;
   justify-content: space-between;
   background-color: #444;
   padding: 20px;
   border-radius: 10px;
+  margin-bottom: 1rem;
 }
 
-.inputContainer {
+.input-container {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -40,14 +40,14 @@
   width: 100px;
 }
 
-.coinSelect {
+.coin-select {
   display: flex;
   align-items: center;
   gap: 5px;
   color: #fff;
 }
 
-.coinButton {
+.coin-button {
   background-color: transparent;
   border: none;
   color: #fff;
@@ -76,8 +76,15 @@
   color: #ccc;
 }
 
-.iconWrapper {
+.icon-wrapper {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.you-p {
+  text-align: start;
+  color: #e6e6e6;
+  font-size: 16px;
+  line-height: 20px;
 }
