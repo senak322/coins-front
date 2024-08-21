@@ -22,7 +22,7 @@ export interface ExchangeState {
   alert: {
     [key in "paid" | "receive"]: {
       message: string;
-      severity: "error" | "info" | "success" | "warning";
+      severity: "error" | "info" | "success" | "warning" | undefined;
     };
   };
 }
@@ -65,8 +65,8 @@ const initialState: ExchangeState = {
   },
 };
 
-const currencySlice = createSlice({
-  name: "currency",
+const exchangeSlice = createSlice({
+  name: "exchange",
   initialState,
   // ... другие связанные состояния
 
@@ -81,7 +81,9 @@ const currencySlice = createSlice({
       if (instance && currencies[lowerCurrency]) {
         // Проверка на наличие ключа
         instance.selectedCurrency = currency;
-        instance.selectedIcon = currencies.find((el) => el === currencies.symbol.);
+        const curr = currencies.find((el) => el.symbol === currency);
+        
+        instance.selectedIcon = curr?.icon || "No data";
         instance.limitFrom =
           currency === "RUB"
             ? 5000
@@ -107,28 +109,22 @@ const currencySlice = createSlice({
     reverseCurrencies: (state) => {
       // Сохраняем текущие значения для инстанса "give"
       const giveCurrency = state.instances.give.selectedCurrency;
-      const giveBanks = state.instances.give.correctBanks;
-      const giveBank = state.instances.give.selectedBank;
-      const giveBankIcon = state.instances.give.selectedBankIcon;
+      const giveBankIcon = state.instances.give.selectedIcon;
       const giveLimitFrom = state.instances.give.limitFrom;
       const giveLimitTO = state.instances.give.limitTo;
 
       // Обновляем инстанс "give" значениями из инстанса "receive"
       state.instances.give.selectedCurrency =
         state.instances.receive.selectedCurrency;
-      state.instances.give.correctBanks = state.instances.receive.correctBanks;
-      state.instances.give.selectedBank = state.instances.receive.selectedBank;
-      state.instances.give.selectedBankIcon =
-        state.instances.receive.selectedBankIcon;
+      state.instances.give.selectedIcon =
+        state.instances.receive.selectedIcon;
       state.instances.give.limitFrom = state.instances.receive.limitFrom;
       state.instances.give.limitTo = state.instances.receive.limitTo;
       state.instances.give.inputError = "";
 
       // Обновляем инстанс "receive" сохраненными ранее значениями инстанса "give"
       state.instances.receive.selectedCurrency = giveCurrency;
-      state.instances.receive.correctBanks = giveBanks;
-      state.instances.receive.selectedBank = giveBank;
-      state.instances.receive.selectedBankIcon = giveBankIcon;
+      state.instances.receive.selectedIcon = giveBankIcon;
       state.instances.receive.limitFrom = giveLimitFrom;
       state.instances.receive.limitTo = giveLimitTO;
       state.instances.receive.inputError = "";
@@ -137,17 +133,17 @@ const currencySlice = createSlice({
       state.sumGive = 0;
       state.sumReceive = 0;
     },
-    setBank: (
-      state,
-      action: PayloadAction<{ instanceId: string; bank: string }>
-    ) => {
-      const { instanceId, bank } = action.payload;
-      const bankName = state.instances[instanceId].correctBanks.find(
-        (b) => b.name === bank
-      );
-      state.instances[instanceId].selectedBank = bank;
-      state.instances[instanceId].selectedBankIcon = bankName.icon;
-    },
+    // setBank: (
+    //   state,
+    //   action: PayloadAction<{ instanceId: string; bank: string }>
+    // ) => {
+    //   const { instanceId, bank } = action.payload;
+    //   const bankName = state.instances[instanceId].correctBanks.find(
+    //     (b) => b.name === bank
+    //   );
+    //   state.instances[instanceId].selectedBank = bank;
+    //   state.instances[instanceId].selectedBankIcon = bankName.icon;
+    // },
 
     setSumGive: (state, action: PayloadAction<number>) => {
       state.sumGive = action.payload;
@@ -202,7 +198,6 @@ const currencySlice = createSlice({
 export const {
   setCurrency,
   reverseCurrencies,
-  setBank,
   setSumGive,
   setSumReceive,
   setInputError,
@@ -210,8 +205,8 @@ export const {
   setName,
   setBankAccount,
   setAlert,
-} = currencySlice.actions;
+} = exchangeSlice.actions;
 
 // export const {currencyGive} = currencySlice.
 
-export default currencySlice.reducer;
+export default exchangeSlice.reducer;

@@ -2,28 +2,41 @@
 import { useDispatch, useSelector } from "react-redux";
 import "./ExchangeWidget.scss";
 import { RootState } from "../../store/store";
-import { changeAmount, changeCurrency } from "../../store/exchangeSlice";
+import {
+  setCurrency,
+  reverseCurrencies,
+  setSumGive,
+  setSumReceive,
+  setInputError,
+  setStep,
+  setName,
+  setBankAccount,
+  setAlert,
+} from "../../store/exchangeSlice";
 import arrow from "../../images/exchange.svg";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { currencies } from "../../utils/config";
 
 // Валюты для выбора
 
-
 export default function ExchangeWidget() {
-  const dispatch = useDispatch();
-  const {
-    amount,
-    selectedCurrency,
-    outputCurrency,
-    outputAmount,
-    exchangeRate,
-  } = useSelector((state: RootState) => state.exchange);
+  const dispatch = useAppDispatch();
+  const { instances, sumGive, sumReceive, step } = useSelector(
+    (state: RootState) => state.exchange
+  );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(changeAmount(parseFloat(e.target.value)));
+  const handleGiveInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setSumGive(parseFloat(e.target.value)));
+  };
+  const handleReceiveInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setSumReceive(parseFloat(e.target.value)));
   };
 
-  const handleCurrencyChange = () => {
-    dispatch(changeCurrency());
+  const handleGiveCurrencyChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const currency = e.target.value;
+    dispatch(setCurrency({ instanceId: "give", currency: currency }));
   };
   return (
     <div className={"container"}>
@@ -34,18 +47,28 @@ export default function ExchangeWidget() {
             <input
               className={"input"}
               type="number"
-              value={amount}
-              onChange={handleInputChange}
+              value={sumGive}
+              onChange={handleGiveInputChange}
             />
             <div className={"coin-select"}>
-              <select>
-                <option>BTC</option>
+              
+              <select
+                className={"select"}
+                value={instances.give.selectedCurrency}
+                onChange={handleGiveCurrencyChange}
+              >
+                {currencies.map((currency) => (
+                  <option key={currency.symbol} value={currency.symbol}>
+                    <img src={currency.icon} alt={currency.symbol} />
+                    {currency.symbol}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
         </div>
 
-        <button className={"coin-button"} onClick={handleCurrencyChange}>
+        <button className={"coin-button"}>
           <img src={arrow} alt="Поменять местами валюты" />
         </button>
         <div>
@@ -54,7 +77,7 @@ export default function ExchangeWidget() {
             <input
               className={"input"}
               type="number"
-              value={outputAmount.toFixed(8)}
+              value={sumReceive}
               readOnly
             />
             <div className={"coin-select"}>
@@ -68,7 +91,8 @@ export default function ExchangeWidget() {
 
       <button className={"exchange-button"}>CHANGE</button>
       <p className={"exchange-rate"}>
-        exchange rate: 1 {selectedCurrency} ~ {exchangeRate} {outputCurrency}
+        exchange rate: 1 {instances.give.selectedCurrency} ~ {"хз сколько"}{" "}
+        {instances.receive.selectedCurrency}
       </p>
     </div>
   );
