@@ -1,16 +1,12 @@
 // import { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { FaBitcoin, FaEthereum } from "react-icons/fa";
 import "./ExchangeWidget.scss";
 import { RootState } from "../../store/store";
 import { changeAmount, changeCurrency } from "../../store/exchangeSlice";
 import arrow from "../../images/exchange.svg";
 
 // Валюты для выбора
-const currencies = [
-  { symbol: "BTC", name: "Bitcoin", icon: <FaBitcoin /> },
-  { symbol: "ETH", name: "Ethereum", icon: <FaEthereum /> },
-];
+
 
 export default function ExchangeWidget() {
   const dispatch = useDispatch();
@@ -70,8 +66,8 @@ export default function ExchangeWidget() {
         </div>
       </div>
 
-      <button className={"exchangeButton"}>CHANGE</button>
-      <p className={"exchangeRate"}>
+      <button className={"exchange-button"}>CHANGE</button>
+      <p className={"exchange-rate"}>
         exchange rate: 1 {selectedCurrency} ~ {exchangeRate} {outputCurrency}
       </p>
     </div>

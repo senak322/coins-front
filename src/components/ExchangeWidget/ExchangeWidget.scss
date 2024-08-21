@@ -1,5 +1,5 @@
 .container {
-  background-color: #333;
+  background-color: #3A3A3A;
   padding: 64px 20px 20px;
   border-radius: 10px;
   width: 100%;
@@ -19,8 +19,6 @@
 .exchange-block {
   display: flex;
   justify-content: space-between;
-  background-color: #444;
-  padding: 20px;
   border-radius: 10px;
   margin-bottom: 1rem;
 }
@@ -29,15 +27,22 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 5px 7px;
+  background-color: #5A5A5A;
+  border-radius: 15px;
 }
 
 .input {
-  background-color: #555;
+  background-color: #424242;
   border: none;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 15px;
   color: #fff;
   width: 100px;
+  font-size: 20px;
+  line-height: 24px;
+  height: 80px;
+  width: 250px;
 }
 
 .coin-select {
@@ -55,14 +60,15 @@
   cursor: pointer;
 }
 
-.exchangeButton {
+.exchange-button {
   background-color: #ffb300;
   border: none;
   color: #fff;
   padding: 10px 20px;
   font-size: 16px;
-  border-radius: 5px;
+  border-radius: 25px;
   cursor: pointer;
+  width: 100%;
   transition: background-color 0.3s;
 
   &:hover {
@@ -70,7 +76,7 @@
   }
 }
 
-.exchangeRate {
+.exchange-rate {
   font-size: 12px;
   margin-top: 10px;
   color: #ccc;
@@ -87,4 +93,5 @@
   color: #e6e6e6;
   font-size: 16px;
   line-height: 20px;
+  padding-bottom: 0.2rem;
 }
