@@ -6,6 +6,10 @@
   color: #fff;
 }
 
+.item {
+  position: relative;
+}
+
 .exchange-block {
   display: flex;
   justify-content: space-between;
@@ -17,12 +21,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #424242;
   border: none;
   padding: 10px;
   border-radius: 15px;
   color: #fff;
-  width: 250px;
   font-size: 20px;
   line-height: 24px;
   height: 80px;
@@ -34,10 +36,13 @@
   padding: 10px;
   border-radius: 15px;
   color: #fff;
-  width: 250px;
   font-size: 20px;
   line-height: 24px;
   height: 80px; /* Убедитесь, что высота одинакова для input и select */
+
+  &input-container {
+    background-color: #000000;
+  }
 }
 
 .custom-select {
@@ -90,7 +95,7 @@
 
 .MuiMenuItem-root {
   &:hover {
-    background-color: #000000; 
+    background-color: #000000;
   }
 }
 
@@ -122,6 +127,9 @@
   font-size: 16px;
   line-height: 20px;
   padding-bottom: 0.2rem;
+  position: absolute;
+  top: -25px;
+  left: 10px;
 }
 
 .coin-button {
