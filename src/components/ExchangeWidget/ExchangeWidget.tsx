@@ -16,6 +16,8 @@ import {
 import arrow from "../../images/exchange.svg";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { currencies } from "../../utils/config";
+import { MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from "@mui/material";
+import { ReactNode } from "react";
 
 // Валюты для выбора
 
@@ -33,7 +35,7 @@ export default function ExchangeWidget() {
   };
 
   const handleGiveCurrencyChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: SelectChangeEvent<string>, child: ReactNode
   ) => {
     const currency = e.target.value;
     dispatch(setCurrency({ instanceId: "give", currency: currency }));
@@ -50,20 +52,42 @@ export default function ExchangeWidget() {
               value={sumGive}
               onChange={handleGiveInputChange}
             />
-            <div className={"coin-select"}>
-              
-              <select
-                className={"select"}
-                value={instances.give.selectedCurrency}
-                onChange={handleGiveCurrencyChange}
-              >
-                {currencies.map((currency) => (
-                  <option key={currency.symbol} value={currency.symbol}>
-                    <img src={currency.icon} alt={currency.symbol} />
-                    {currency.symbol}
-                  </option>
-                ))}
-              </select>
+            <div className={"input-container "}>
+              <FormControl>
+                
+                <Select
+                  displayEmpty
+                  value={instances.give.selectedCurrency}
+                  onChange={handleGiveCurrencyChange}
+                  label="Currency"
+                  className="custom-select"
+                  renderValue={(value) => (
+                    <div className="selected-item">
+                      <img
+                        src={
+                          currencies.find((currency) => currency.symbol === value)?.icon
+                        }
+                        alt={value}
+                        className="currency-icon"
+                      />
+                      {value}
+                    </div>
+                  )}
+                >
+                  {currencies.map((currency) => (
+                    <MenuItem key={currency.symbol} value={currency.symbol}>
+                      <div className="menu-item">
+                        <img
+                          src={currency.icon}
+                          alt={currency.symbol}
+                          className="currency-icon"
+                        />
+                        {currency.symbol}
+                      </div>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </div>
           </div>
         </div>
