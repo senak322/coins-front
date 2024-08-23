@@ -31,7 +31,7 @@ export default function ExchangeItem({
         styleOverrides: {
           input: {
             padding: "0px", // Убираем padding
-            borderRadius: "15px"
+            
           },
         },
       },
@@ -46,6 +46,9 @@ export default function ExchangeItem({
           type="number"
           value={sumGive}
           onChange={handleInputChange}
+          style={{
+            paddingLeft: "10px"
+          }}
         />
         <div className={"input"}>
           <ThemeProvider theme={theme}>

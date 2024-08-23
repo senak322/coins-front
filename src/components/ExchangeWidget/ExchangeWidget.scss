@@ -34,17 +34,18 @@
 .input {
   background-color: #424242;
   border: none;
-  padding: 10px;
+  // padding-left: .5rem;
   border-radius: 15px;
   color: #fff;
   font-size: 20px;
   line-height: 24px;
   height: 80px;
-  // box-sizing: border-box;
+  
 
   &:focus-visible {
     outline: 1px solid black;
   }
+
 }
 
 .custom-select {
@@ -94,6 +95,10 @@
   color: #fff;
   background-color: #3a3a3a;
   width: 100%;
+}
+
+.MuiInputBase-root {
+  border-radius: 15px !important;
 }
 
 .MuiPaper-root {
