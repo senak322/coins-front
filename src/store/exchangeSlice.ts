@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { currencies } from "../utils/config";
+import { banks, coins } from "../utils/config";
 import { ICurrency } from "../types/types";
 
 export interface ExchangeState {
@@ -10,6 +10,7 @@ export interface ExchangeState {
       limitFrom: number;
       limitTo: number;
       inputError: string;
+      currencies: ICurrency[];
     };
   };
   sumGive: number;
@@ -30,20 +31,22 @@ export interface ExchangeState {
 const initialState: ExchangeState = {
   instances: {
     give: {
-      selectedCurrency: currencies[0].symbol,
+      selectedCurrency: coins[0].symbol,
       // correctBanks: banks.rub,
       // selectedBank: banks.rub[0].name,
-      selectedIcon: currencies[0].icon,
+      selectedIcon: coins[0].icon,
       limitFrom: 0.005,
       limitTo: 1,
       inputError: "",
+      currencies: coins
     },
     receive: {
-      selectedCurrency: currencies[1].symbol,
-      selectedIcon: currencies[1].icon,
+      selectedCurrency: banks[0].symbol,
+      selectedIcon: banks[0].icon,
       limitFrom: 30000,
       limitTo: 5000000,
       inputError: "",
+      currencies: banks
     },
   },
   sumGive: 0,
@@ -76,13 +79,13 @@ const exchangeSlice = createSlice({
       action: PayloadAction<{ instanceId: string; currency: string }>
     ) => {
       const { instanceId, currency } = action.payload;
-      const lowerCurrency = currency.toLowerCase() as keyof typeof currencies; // Утверждение типа
+      // const lowerCurrency = currency.toLowerCase() as ICurrency; // Утверждение типа
       const instance = state.instances[instanceId];
-      if (instance && currencies[lowerCurrency]) {
+      if (instance && currency) {
         // Проверка на наличие ключа
         instance.selectedCurrency = currency;
-        const curr = currencies.find((el) => el.symbol === currency);
-        
+        const curr = instance.currencies.find((el) => el.symbol === currency);
+
         instance.selectedIcon = curr?.icon || "No data";
         instance.limitFrom =
           currency === "RUB"
@@ -116,8 +119,7 @@ const exchangeSlice = createSlice({
       // Обновляем инстанс "give" значениями из инстанса "receive"
       state.instances.give.selectedCurrency =
         state.instances.receive.selectedCurrency;
-      state.instances.give.selectedIcon =
-        state.instances.receive.selectedIcon;
+      state.instances.give.selectedIcon = state.instances.receive.selectedIcon;
       state.instances.give.limitFrom = state.instances.receive.limitFrom;
       state.instances.give.limitTo = state.instances.receive.limitTo;
       state.instances.give.inputError = "";

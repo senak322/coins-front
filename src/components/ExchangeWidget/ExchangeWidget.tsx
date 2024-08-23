@@ -15,7 +15,7 @@ import {
 } from "../../store/exchangeSlice";
 import arrow from "../../images/exchange.svg";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { currencies } from "../../utils/config";
+import { coins, banks } from "../../utils/config";
 import {
   MenuItem,
   Select,
@@ -52,6 +52,7 @@ export default function ExchangeWidget() {
           title="You send"
           handleInputChange={handleGiveInputChange}
           handleCurrencyChange={handleGiveCurrencyChange}
+          way="give"
         />
 
         <button className={"coin-button"}>
@@ -61,6 +62,7 @@ export default function ExchangeWidget() {
           title="You get"
           handleInputChange={handleGiveInputChange}
           handleCurrencyChange={handleGiveCurrencyChange}
+          way="receive"
         />
       </div>
 
