@@ -1,4 +1,6 @@
+import Contact from "../Contact/Contact";
 import ExchangeWidget from "../ExchangeWidget/ExchangeWidget";
+import Latest from "../Latest/Latest";
 import Qa from "../Qa/Qa";
 import "./MainExchange.scss";
 
@@ -11,6 +13,8 @@ export default function MainExchange() {
       </div>
       <ExchangeWidget />
       <Qa />
+      <Contact />
+      <Latest />
     </main>
   );
 }
