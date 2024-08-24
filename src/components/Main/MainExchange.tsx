@@ -1,4 +1,5 @@
 import ExchangeWidget from "../ExchangeWidget/ExchangeWidget";
+import Qa from "../Qa/Qa";
 import "./MainExchange.scss";
 
 export default function MainExchange() {
@@ -9,6 +10,7 @@ export default function MainExchange() {
         <p>Our project helps with buy, sell and change cryptocurrency</p>
       </div>
       <ExchangeWidget />
+      <Qa />
     </main>
   );
 }
