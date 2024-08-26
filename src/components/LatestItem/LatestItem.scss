@@ -1,0 +1,16 @@
+.latest-item {
+  max-width: 470px;
+  background-color: #D8D8D8;
+  border-radius: 12px;
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem .4rem;
+    background-color: #ECECEC;
+    border-radius: 12px;
+    gap: 1rem;
+  }
+  &__date {
+    padding: .5rem;
+  }
+}

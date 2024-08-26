@@ -23,7 +23,7 @@ import {
   InputLabel,
   SelectChangeEvent,
 } from "@mui/material";
-import { ReactNode } from "react";
+// import { ReactNode } from "react";
 import ExchangeItem from "../ExchangeItem/ExchangeItem";
 
 // Валюты для выбора
