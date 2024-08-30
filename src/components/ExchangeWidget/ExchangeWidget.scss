@@ -1,9 +1,15 @@
+@import "../../styles/mixins";
+
 .container {
   background-color: #3a3a3a;
   padding: 64px 20px 20px;
   border-radius: 15px;
-  width: 100%;
+  width: fit-content;
   color: #fff;
+  align-self: center;
+  @include respond-to(big) {
+   padding: 64px 40px 20px;
+  }
 }
 
 .item {
@@ -15,11 +21,16 @@
   justify-content: space-between;
   border-radius: 10px;
   margin-bottom: 1rem;
+  @include respond-to(big) {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .input-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   border: none;
   padding: .2rem .5rem;
@@ -29,6 +40,9 @@
   line-height: 24px;
   height: 90px;
   background-color: #5A5A5A;
+  @include respond-to(large) {
+    flex-grow: 2;
+  }
 }
 
 .input {
@@ -148,4 +162,5 @@
   background: #3a3a3a;
   border: none;
   cursor: pointer;
+  margin: 1rem;
 }

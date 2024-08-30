@@ -13,7 +13,7 @@ export default function MainExchange() {
         <h2 className="main__title">
           A new and easy way to change your coins!
         </h2>
-        <p>Our project helps with buy, sell and change cryptocurrency</p>
+        <p className="main__title">Our project helps with buy, sell and change cryptocurrency</p>
       </div>
       <ExchangeWidget />
       <Qa />

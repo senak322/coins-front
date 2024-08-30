@@ -1,18 +1,30 @@
+@import "../../styles/mixins";
+
 .footer {
   background-color: black;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 5rem;
+  @include respond-to(big) {
+    padding-top: 3rem;
+  }
   &__container {
     display: flex;
     justify-content: space-between;
     width: 800px;
     padding-bottom: 4rem;
+    @include respond-to(big) {
+        flex-direction: column;
+        width: 100%;
+      }
   }
   &__li {
     color: white;
     font-size: 24px;
+    @include respond-to(big) {
+        margin-top: 1rem;
+      }
   }
   &__rights {
     color: #838383;
