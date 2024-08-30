@@ -3,15 +3,20 @@ import "./CoinItem.scss";
 interface CoinItemProps {
   title: string;
   sum: number;
+  image: string;
 }
 
-export default function CoinItem({ title, sum }: CoinItemProps) {
+export default function CoinItem({ title, sum, image }: CoinItemProps) {
   return (
     <div className="coin-item">
-      <img src="" alt="" />
-      <p>{title}</p>
-      <p>{sum}</p>
-      <p>{title}</p>
+      <div className="coin-item__container">
+        <img src={image} className="coin-item__image" alt={title} />
+        <p className="coin-item__title">{title}</p>
+      </div>
+      <div className="coin-item__container">
+        <p className="coin-item__text">{sum}</p>
+        <p className="coin-item__text">{title}</p>
+      </div>
     </div>
   );
 }

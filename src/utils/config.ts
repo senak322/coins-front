@@ -2,7 +2,7 @@ import btc from "../images/btc.png";
 import eth from "../images/eth.svg";
 import usdt from "../images/usdt.png";
 import sber from "../images/sber.png";
-import tinkof from "../images/tink.png";
+import tbank from "../images/t-bank.png";
 import { ICurrency } from "../types/types";
 
 export const coins: ICurrency[] = [
@@ -13,5 +13,5 @@ export const coins: ICurrency[] = [
 
 export const banks: ICurrency[] = [
   { symbol: "Sber", icon: sber, isBank: true },
-  { symbol: "T-Bank", icon: tinkof, isBank: true },
+  { symbol: "T-Bank", icon: tbank, isBank: true },
 ];
