@@ -1,5 +1,5 @@
 import Contact from "../Contact/Contact";
-import Cooperate from "../Cooperate/Cooperate";
+// import Cooperate from "../Cooperate/Cooperate";
 import ExchangeWidget from "../ExchangeWidget/ExchangeWidget";
 
 import Latest from "../Latest/Latest";
@@ -19,7 +19,7 @@ export default function MainExchange() {
       <Qa />
       <Contact />
       <Latest />
-      <Cooperate />
+      {/* <Cooperate /> */}
     </main>
   );
 }
