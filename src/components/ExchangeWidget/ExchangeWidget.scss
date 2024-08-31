@@ -8,7 +8,11 @@
   color: #fff;
   align-self: center;
   @include respond-to(big) {
-   padding: 64px 40px 20px;
+    padding: 64px 40px 20px;
+  }
+  @include respond-to(small) {
+    padding: 3rem 2rem 1rem;
+    width: 100%;
   }
 }
 
@@ -33,15 +37,15 @@
   justify-content: space-between;
   gap: 10px;
   border: none;
-  padding: .2rem .5rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 15px;
   color: #fff;
   font-size: 20px;
   line-height: 24px;
   height: 90px;
-  background-color: #5A5A5A;
-  @include respond-to(large) {
-    flex-grow: 2;
+  background-color: #5a5a5a;
+  @include respond-to(small) {
+    height: max-content;
   }
 }
 
@@ -54,12 +58,13 @@
   font-size: 20px;
   line-height: 24px;
   height: 80px;
-  
+  @include respond-to(small) {
+    height: 60px;
+  }
 
   &:focus-visible {
     outline: 1px solid black;
   }
-
 }
 
 .custom-select {
@@ -69,7 +74,9 @@
   border-radius: 15px; /* Делаем border-radius такой же как у инпута */
   width: 150px;
   height: 80px; /* Устанавливаем такую же высоту как у инпута */
-
+  @include respond-to(small) {
+    height: 60px;
+  }
   & .MuiSelect-icon {
     color: #fff; /* Стрелка select */
   }
@@ -91,12 +98,21 @@
   color: white;
   font-size: 1.2rem;
   font-weight: 500;
+  @include respond-to(small) {
+    height: max-content;
+    width: fit-content;
+    font-size: 1rem;
+  }
 }
 
 .currency-icon {
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  @include respond-to(small) {
+    width: 25px;
+    height: 25px;
+  }
 }
 
 .menu-item {
@@ -109,6 +125,10 @@
   color: #fff;
   background-color: #3a3a3a;
   width: 100%;
+  @include respond-to(small) {
+    height: max-content;
+    font-size: 1rem;
+  }
 }
 
 .MuiInputBase-root {
@@ -135,6 +155,10 @@
   cursor: pointer;
   width: 100%;
   transition: background-color 0.3s;
+  @include respond-to(small) {
+    width: 80%;
+    margin: 1rem;
+  }
 
   &:hover {
     background-color: #ffa000;
@@ -163,4 +187,11 @@
   border: none;
   cursor: pointer;
   margin: 1rem;
+
+  &__img {
+    @include respond-to(small) {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
 }

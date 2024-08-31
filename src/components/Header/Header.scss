@@ -15,6 +15,7 @@
     align-items: center;
     @include respond-to(large) {
       padding: 0;
+      font-size: 0.6rem;
     }
   }
 
@@ -42,6 +43,11 @@
       margin-left: 1rem;
       margin-right: 0;
     }
+    @include respond-to(small) {
+      text-align: start;
+      font-size: 40px;
+    }
+    
   }
 
   &__link {

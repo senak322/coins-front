@@ -56,7 +56,7 @@ export default function ExchangeWidget() {
         />
 
         <button className={"coin-button"}>
-          <img src={arrow} alt="Поменять местами валюты" />
+          <img className="coin-button__img" src={arrow} alt="Поменять местами валюты" />
         </button>
         <ExchangeItem
           title="You get"

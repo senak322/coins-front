@@ -1,6 +1,15 @@
+@import "../../styles/mixins";
+
 .qa {
   margin-top: 5rem;
   margin-bottom: 5rem;
+  @include respond-to(big) {
+    margin: auto;
+  }
+  @include respond-to(large) {
+    margin: auto 1rem;
+  }
+
 
   &__container {
     display: flex;
