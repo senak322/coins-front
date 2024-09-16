@@ -9,7 +9,7 @@ export default function LatestItem() {
     <div className="latest-item">
       <div className="latest-item__container">
         <CoinItem title="ETH" sum={8.012} image={eth}/>
-        <img src={change} alt="change" />
+        <img className="latest-item__img" src={change} alt="change" />
         <CoinItem title="Sber" sum={240000} image={sber}/>
       </div>
       <p className="latest-item__date">24.06.2024, 04:16</p>

@@ -25,6 +25,9 @@
     @include respond-to(big) {
         margin-top: 1rem;
       }
+      @include respond-to(small) {
+        font-size: 20px;
+      }
   }
   &__rights {
     color: #838383;

@@ -13,6 +13,7 @@
   @include respond-to(small) {
     padding: 3rem 2rem 1rem;
     width: 100%;
+    box-sizing: border-box;
   }
 }
 
@@ -60,6 +61,7 @@
   height: 80px;
   @include respond-to(small) {
     height: 60px;
+    max-width: 160px;
   }
 
   &:focus-visible {
@@ -76,6 +78,8 @@
   height: 80px; /* Устанавливаем такую же высоту как у инпута */
   @include respond-to(small) {
     height: 60px;
+    width: fit-content;
+  
   }
   & .MuiSelect-icon {
     color: #fff; /* Стрелка select */
@@ -89,6 +93,11 @@
   &:hover {
     background-color: #383838;
   }
+}
+
+.MuiSelect-select {
+  padding-right: 1rem !important; /* Применение нужного паддинга */
+  width: fit-content;
 }
 
 .selected-item {
@@ -124,10 +133,13 @@
   font-weight: 500;
   color: #fff;
   background-color: #3a3a3a;
+  
   width: 100%;
+  justify-content: space-between;
   @include respond-to(small) {
     height: max-content;
     font-size: 1rem;
+    
   }
 }
 
@@ -137,6 +149,7 @@
 
 .MuiPaper-root {
   background-color: #3a3a3a !important; /* Фон выпадающего списка */
+  border-radius: 15px !important;
 }
 
 .MuiMenuItem-root {
@@ -187,6 +200,9 @@
   border: none;
   cursor: pointer;
   margin: 1rem;
+  @include respond-to(small) {
+    rotate: 90deg;
+  }
 
   &__img {
     @include respond-to(small) {

@@ -1,19 +1,32 @@
+@import "../../styles/mixins";
+
 .latest-item {
   max-width: 470px;
-  background-color: #D8D8D8;
+  background-color: #d8d8d8;
   border-radius: 12px;
   &__container {
     display: flex;
     justify-content: space-between;
-    padding: 1rem .4rem;
-    background-color: #ECECEC;
+    padding: 1rem 0.4rem;
+    background-color: #ececec;
     border-radius: 12px;
     gap: 1rem;
     align-items: center;
+    @include respond-to(small) {
+      box-sizing: border-box;
+      flex-direction: column;
+      width: 300px;
+    }
   }
   &__date {
-    padding: .5rem;
+    padding: 0.5rem;
     font-size: 12px;
-    
+  }
+  &__img {
+    @include respond-to(small) {
+      rotate: 90deg;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
   }
 }

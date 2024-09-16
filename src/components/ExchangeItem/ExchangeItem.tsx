@@ -31,7 +31,6 @@ export default function ExchangeItem({
         styleOverrides: {
           input: {
             padding: "0px", // Убираем padding
-            
           },
         },
       },
@@ -47,13 +46,14 @@ export default function ExchangeItem({
           value={sumGive}
           onChange={handleInputChange}
           style={{
-            paddingLeft: "10px"
+            paddingLeft: "10px",
           }}
         />
         <div className={"input"}>
           <ThemeProvider theme={theme}>
             <FormControl>
               <Select
+                
                 displayEmpty
                 value={instances[way].selectedCurrency}
                 onChange={handleCurrencyChange}
