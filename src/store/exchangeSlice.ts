@@ -115,6 +115,7 @@ const exchangeSlice = createSlice({
       const giveBankIcon = state.instances.give.selectedIcon;
       const giveLimitFrom = state.instances.give.limitFrom;
       const giveLimitTO = state.instances.give.limitTo;
+      const currencies = state.instances.give.currencies
 
       // Обновляем инстанс "give" значениями из инстанса "receive"
       state.instances.give.selectedCurrency =
@@ -123,6 +124,8 @@ const exchangeSlice = createSlice({
       state.instances.give.limitFrom = state.instances.receive.limitFrom;
       state.instances.give.limitTo = state.instances.receive.limitTo;
       state.instances.give.inputError = "";
+      state.instances.give.currencies = state.instances.receive.currencies
+
 
       // Обновляем инстанс "receive" сохраненными ранее значениями инстанса "give"
       state.instances.receive.selectedCurrency = giveCurrency;
@@ -130,6 +133,7 @@ const exchangeSlice = createSlice({
       state.instances.receive.limitFrom = giveLimitFrom;
       state.instances.receive.limitTo = giveLimitTO;
       state.instances.receive.inputError = "";
+      state.instances.receive.currencies = currencies
 
       // Обнуляем суммы
       state.sumGive = 0;

@@ -8,10 +8,11 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { useCallback } from "react";
 
 interface ExchangeItemProps {
   title: string;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleInputChange: (value: number) => void;
   handleCurrencyChange: (e: SelectChangeEvent<string>) => void;
   way: string;
 }
@@ -36,6 +37,21 @@ export default function ExchangeItem({
       },
     },
   });
+
+  const handleChangeSum = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Получаем значение из инпута
+      const value = e.target.value;
+
+      // Проверяем, пустая ли строка, и приводим к 0, если да.
+      // Если нет, преобразуем строку в число
+      const numberValue = value === "" ? 0 : parseFloat(value);
+
+      // Обновляем состояние с помощью значения numberValue
+      handleInputChange(numberValue);
+    },
+    [handleInputChange]
+  );
   return (
     <div className="item">
       <p className="you-p">{title}:</p>
@@ -43,8 +59,8 @@ export default function ExchangeItem({
         <input
           className={"input"}
           type="number"
-          value={sumGive}
-          onChange={handleInputChange}
+          value={way === "give" ? sumGive : sumReceive}
+          onChange={handleChangeSum}
           style={{
             paddingLeft: "10px",
           }}
@@ -53,7 +69,6 @@ export default function ExchangeItem({
           <ThemeProvider theme={theme}>
             <FormControl>
               <Select
-                
                 displayEmpty
                 value={instances[way].selectedCurrency}
                 onChange={handleCurrencyChange}

@@ -15,18 +15,14 @@ import {
 } from "../../store/exchangeSlice";
 import arrow from "../../images/exchange.svg";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { coins, banks } from "../../utils/config";
+// import { coins, banks } from "../../utils/config";
 import {
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
+ 
   SelectChangeEvent,
 } from "@mui/material";
 // import { ReactNode } from "react";
 import ExchangeItem from "../ExchangeItem/ExchangeItem";
 
-// Валюты для выбора
 
 export default function ExchangeWidget() {
   const dispatch = useAppDispatch();
@@ -34,17 +30,25 @@ export default function ExchangeWidget() {
     (state: RootState) => state.exchange
   );
 
-  const handleGiveInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setSumGive(parseFloat(e.target.value)));
+  const handleGiveInputChange = (value: number) => {
+    dispatch(setSumGive(value));
   };
-  const handleReceiveInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setSumReceive(parseFloat(e.target.value)));
+  const handleReceiveInputChange = (value: number) => {
+    dispatch(setSumReceive(value));
   };
 
   const handleGiveCurrencyChange = (e: SelectChangeEvent<string>) => {
     const currency = e.target.value;
     dispatch(setCurrency({ instanceId: "give", currency: currency }));
   };
+  const handleReceiveCurrencyChange = (e: SelectChangeEvent<string>) => {
+    const currency = e.target.value;
+    dispatch(setCurrency({ instanceId: "receive", currency: currency }));
+  };
+
+  const reverse = () => {
+    dispatch(reverseCurrencies())
+  }
   return (
     <div className={"container"}>
       <div className={"exchange-block"}>
@@ -55,13 +59,13 @@ export default function ExchangeWidget() {
           way="give"
         />
 
-        <button className={"coin-button"}>
+        <button className={"coin-button"} onClick={reverse} type="button">
           <img className="coin-button__img" src={arrow} alt="Поменять местами валюты" />
         </button>
         <ExchangeItem
           title="You get"
-          handleInputChange={handleGiveInputChange}
-          handleCurrencyChange={handleGiveCurrencyChange}
+          handleInputChange={handleReceiveInputChange}
+          handleCurrencyChange={handleReceiveCurrencyChange}
           way="receive"
         />
       </div>
