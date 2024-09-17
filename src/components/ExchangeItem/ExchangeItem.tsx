@@ -12,7 +12,7 @@ import { useCallback } from "react";
 
 interface ExchangeItemProps {
   title: string;
-  handleInputChange: (value: number) => void;
+  handleInputChange: (value: number | "") => void;
   handleCurrencyChange: (e: SelectChangeEvent<string>) => void;
   way: string;
 }
@@ -40,17 +40,21 @@ export default function ExchangeItem({
 
   const handleChangeSum = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Получаем значение из инпута
       const value = e.target.value;
+      const isSelectedCurrencyBank = instances[way].isBank;
 
-      // Проверяем, пустая ли строка, и приводим к 0, если да.
-      // Если нет, преобразуем строку в число
-      const numberValue = value === "" ? 0 : parseFloat(value);
-
-      // Обновляем состояние с помощью значения numberValue
-      handleInputChange(numberValue);
+      // Проверяем, является ли валюта рублем (целые значения) или криптовалютой (дробные)
+      if (isSelectedCurrencyBank) {
+        // Разрешаем только целые числа для рубля
+        const intValue = Math.floor(Number(value));
+        handleInputChange(intValue);
+      } else {
+        // Разрешаем дробные значения для криптовалют
+        const numberValue = parseFloat(value.replace(",", "."));
+        handleInputChange(numberValue);
+      }
     },
-    [handleInputChange]
+    [handleInputChange, instances, way]
   );
   return (
     <div className="item">

@@ -29,7 +29,7 @@ export default function ExchangeWidget() {
     (state: RootState) => state.exchange
   );
 
-  const handleGiveInputChange = (value: number) => {
+  const handleGiveInputChange = (value: number | "") => {
     if (value > 0 && rate > 0) {
       dispatch(setSumGive(value));
       // const resSum = value * rate
