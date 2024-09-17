@@ -6,6 +6,7 @@ export interface ExchangeState {
   instances: {
     [key: string]: {
       selectedCurrency: string;
+      isBank: boolean;
       selectedIcon: string;
       limitFrom: number;
       limitTo: number;
@@ -32,6 +33,7 @@ const initialState: ExchangeState = {
   instances: {
     give: {
       selectedCurrency: coins[0].symbol,
+      isBank: coins[0].isBank,
       // correctBanks: banks.rub,
       // selectedBank: banks.rub[0].name,
       selectedIcon: coins[0].icon,
@@ -42,6 +44,7 @@ const initialState: ExchangeState = {
     },
     receive: {
       selectedCurrency: banks[0].symbol,
+      isBank: banks[0].isBank,
       selectedIcon: banks[0].icon,
       limitFrom: 30000,
       limitTo: 5000000,
@@ -116,6 +119,7 @@ const exchangeSlice = createSlice({
       const giveLimitFrom = state.instances.give.limitFrom;
       const giveLimitTO = state.instances.give.limitTo;
       const currencies = state.instances.give.currencies
+      const isBank = state.instances.give.isBank
 
       // Обновляем инстанс "give" значениями из инстанса "receive"
       state.instances.give.selectedCurrency =
@@ -125,6 +129,7 @@ const exchangeSlice = createSlice({
       state.instances.give.limitTo = state.instances.receive.limitTo;
       state.instances.give.inputError = "";
       state.instances.give.currencies = state.instances.receive.currencies
+      state.instances.give.isBank = state.instances.receive.isBank
 
 
       // Обновляем инстанс "receive" сохраненными ранее значениями инстанса "give"
@@ -134,6 +139,7 @@ const exchangeSlice = createSlice({
       state.instances.receive.limitTo = giveLimitTO;
       state.instances.receive.inputError = "";
       state.instances.receive.currencies = currencies
+      state.instances.receive.isBank = isBank
 
       // Обнуляем суммы
       state.sumGive = 0;

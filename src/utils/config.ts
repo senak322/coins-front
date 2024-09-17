@@ -15,3 +15,5 @@ export const banks: ICurrency[] = [
   { symbol: "Sber", icon: sber, isBank: true },
   { symbol: "T-Bank", icon: tbank, isBank: true },
 ];
+
+export const baseCurrencyUrl = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/";
