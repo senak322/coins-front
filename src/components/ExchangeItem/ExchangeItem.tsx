@@ -9,6 +9,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useCallback } from "react";
+import { setInputError } from "../../store/exchangeSlice";
 
 interface ExchangeItemProps {
   title: string;
@@ -42,12 +43,14 @@ export default function ExchangeItem({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       let value = e.target.value;
       const isSelectedCurrencyBank = instances[way].isBank;
+      const errText = "Укажите корректную сумму"
 
       const regex = isSelectedCurrencyBank
         ? /^\d*$/ // Для банковских валют — только целые числа
         : /^[0-9]*[.,]?[0-9]*$/; // Для криптовалют — разрешаем дробные значения
 
       if (!regex.test(value)) {
+        setInputError({instanceId: way, message: errText});
         return; // Если значение не соответствует правилам ввода, не обновляем состояние
       }
 

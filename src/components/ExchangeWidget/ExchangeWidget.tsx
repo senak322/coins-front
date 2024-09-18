@@ -89,7 +89,7 @@ export default function ExchangeWidget() {
   }, [getRate]);
 
   return (
-    <div className={"container"}>
+    <div className={"container"} id="widget">
       <div className={"exchange-block"}>
         <ExchangeItem
           title="You send"
