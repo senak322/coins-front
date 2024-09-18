@@ -12,7 +12,7 @@ import { useCallback } from "react";
 
 interface ExchangeItemProps {
   title: string;
-  handleInputChange: (value: number | "") => void;
+  handleInputChange: (value: string) => void;
   handleCurrencyChange: (e: SelectChangeEvent<string>) => void;
   way: string;
 }
@@ -43,43 +43,30 @@ export default function ExchangeItem({
       let value = e.target.value;
       const isSelectedCurrencyBank = instances[way].isBank;
 
-      // Проверяем на ввод только чисел и запятую/точку для дробей
       const regex = isSelectedCurrencyBank
-        ? /^\d*$/ // Для банковских валют (рубли) — только целые числа
+        ? /^\d*$/ // Для банковских валют — только целые числа
         : /^[0-9]*[.,]?[0-9]*$/; // Для криптовалют — разрешаем дробные значения
-      // Проверяем, является ли валюта рублем (целые значения) или криптовалютой (дробные)
 
-      if (value === "") {
-        handleInputChange(""); // Если поле пустое, передаем пустую строку
-        return;
-      }
-      // Проверяем значение по регулярному выражению
       if (!regex.test(value)) {
-        return; // Если значение не соответствует правилам ввода — ничего не делаем
+        return; // Если значение не соответствует правилам ввода, не обновляем состояние
       }
-      // Преобразуем строку в число (с учётом запятой)
+
       if (!isSelectedCurrencyBank) {
-        value = value.replace(",", "."); // Заменяем запятую на точку для корректного парсинга дробных значений
+        value = value.replace(",", ".");
       }
 
-      const numericValue = isSelectedCurrencyBank
-        ? Math.floor(Number(value)) // Округляем до целого для банковских валют
-        : Number(value); // Дробные значения для криптовалют
-
-      if (!isNaN(numericValue)) {
-        handleInputChange(numericValue); // Передаем обработанное числовое значение
-      }
-     
+      handleInputChange(value); // Передаем строковое значение
     },
     [handleInputChange, instances, way]
   );
+
   return (
     <div className="item">
       <p className="you-p">{title}:</p>
-      <div className={"input-container"}>
+      <div className="input-container">
         <input
-          className={"input"}
-          type="number"
+          className="input"
+          type="text"
           value={way === "give" ? sumGive : sumReceive}
           onChange={handleChangeSum}
           style={{

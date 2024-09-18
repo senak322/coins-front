@@ -29,17 +29,24 @@ export default function ExchangeWidget() {
     (state: RootState) => state.exchange
   );
 
-  const handleGiveInputChange = (value: number | "") => {
-    const numValue = Number(value)
-    if (numValue > 0 && rate > 0) {
-      dispatch(setSumGive(numValue));
-      // const resSum = value * rate
-      dispatch(setSumReceive(numValue * rate));
+  const handleGiveInputChange = (value: string) => {
+    dispatch(setSumGive(value));
+    const numValue = Number(value.replace(",", "."));
+    if (!isNaN(numValue) && rate > 0) {
+      dispatch(setSumReceive((numValue * rate).toString()));
+    } else {
+      dispatch(setSumReceive(""));
     }
   };
-  const handleReceiveInputChange = (value: number | "") => {
-    const numValue = Number(value)
-    dispatch(setSumReceive(numValue));
+  const handleReceiveInputChange = (value: string) => {
+    dispatch(setSumReceive(value));
+
+    const numValue = Number(value.replace(",", "."));
+    if (!isNaN(numValue) && rate > 0) {
+      dispatch(setSumGive((numValue / rate).toString()));
+    } else {
+      dispatch(setSumGive(""));
+    }
   };
 
   const handleGiveCurrencyChange = (e: SelectChangeEvent<string>) => {

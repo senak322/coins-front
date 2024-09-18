@@ -14,8 +14,8 @@ export interface ExchangeState {
       currencies: ICurrency[];
     };
   };
-  sumGive: number;
-  sumReceive: number;
+  sumGive: string;
+  sumReceive: string;
   step: number;
   firstName: string;
   lastName: string;
@@ -52,8 +52,8 @@ const initialState: ExchangeState = {
       currencies: banks
     },
   },
-  sumGive: 0,
-  sumReceive: 0,
+  sumGive: "",
+  sumReceive: "",
   step: 1,
   firstName: "",
   lastName: "",
@@ -107,8 +107,8 @@ const exchangeSlice = createSlice({
             ? 50000
             : 0;
         instance.inputError = "";
-        state.sumGive = 0;
-        state.sumReceive = 0;
+        state.sumGive = "0";
+        state.sumReceive = "0";
       }
     },
 
@@ -142,8 +142,8 @@ const exchangeSlice = createSlice({
       state.instances.receive.isBank = isBank
 
       // Обнуляем суммы
-      state.sumGive = 0;
-      state.sumReceive = 0;
+      state.sumGive = "0";
+      state.sumReceive = "0";
     },
     // setBank: (
     //   state,
@@ -157,10 +157,10 @@ const exchangeSlice = createSlice({
     //   state.instances[instanceId].selectedBankIcon = bankName.icon;
     // },
 
-    setSumGive: (state, action: PayloadAction<number>) => {
+    setSumGive: (state, action: PayloadAction<string>) => {
       state.sumGive = action.payload;
     },
-    setSumReceive: (state, action: PayloadAction<number>) => {
+    setSumReceive: (state, action: PayloadAction<string>) => {
       state.sumReceive = action.payload;
     },
     setInputError: (
