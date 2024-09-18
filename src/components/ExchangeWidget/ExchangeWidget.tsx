@@ -30,14 +30,16 @@ export default function ExchangeWidget() {
   );
 
   const handleGiveInputChange = (value: number | "") => {
-    if (value > 0 && rate > 0) {
-      dispatch(setSumGive(value));
+    const numValue = Number(value)
+    if (numValue > 0 && rate > 0) {
+      dispatch(setSumGive(numValue));
       // const resSum = value * rate
-      dispatch(setSumReceive(value * rate));
+      dispatch(setSumReceive(numValue * rate));
     }
   };
-  const handleReceiveInputChange = (value: number) => {
-    dispatch(setSumReceive(value));
+  const handleReceiveInputChange = (value: number | "") => {
+    const numValue = Number(value)
+    dispatch(setSumReceive(numValue));
   };
 
   const handleGiveCurrencyChange = (e: SelectChangeEvent<string>) => {

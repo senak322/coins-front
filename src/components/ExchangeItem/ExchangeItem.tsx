@@ -40,19 +40,36 @@ export default function ExchangeItem({
 
   const handleChangeSum = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
+      let value = e.target.value;
       const isSelectedCurrencyBank = instances[way].isBank;
 
+      // Проверяем на ввод только чисел и запятую/точку для дробей
+      const regex = isSelectedCurrencyBank
+        ? /^\d*$/ // Для банковских валют (рубли) — только целые числа
+        : /^[0-9]*[.,]?[0-9]*$/; // Для криптовалют — разрешаем дробные значения
       // Проверяем, является ли валюта рублем (целые значения) или криптовалютой (дробные)
-      if (isSelectedCurrencyBank) {
-        // Разрешаем только целые числа для рубля
-        const intValue = Math.floor(Number(value));
-        handleInputChange(intValue);
-      } else {
-        // Разрешаем дробные значения для криптовалют
-        const numberValue = parseFloat(value.replace(",", "."));
-        handleInputChange(numberValue);
+
+      if (value === "") {
+        handleInputChange(""); // Если поле пустое, передаем пустую строку
+        return;
       }
+      // Проверяем значение по регулярному выражению
+      if (!regex.test(value)) {
+        return; // Если значение не соответствует правилам ввода — ничего не делаем
+      }
+      // Преобразуем строку в число (с учётом запятой)
+      if (!isSelectedCurrencyBank) {
+        value = value.replace(",", "."); // Заменяем запятую на точку для корректного парсинга дробных значений
+      }
+
+      const numericValue = isSelectedCurrencyBank
+        ? Math.floor(Number(value)) // Округляем до целого для банковских валют
+        : Number(value); // Дробные значения для криптовалют
+
+      if (!isNaN(numericValue)) {
+        handleInputChange(numericValue); // Передаем обработанное числовое значение
+      }
+     
     },
     [handleInputChange, instances, way]
   );
