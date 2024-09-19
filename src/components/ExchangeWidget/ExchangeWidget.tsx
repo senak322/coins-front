@@ -25,15 +25,24 @@ import { getExchangeRate } from "../../utils/api";
 export default function ExchangeWidget() {
   const [rate, setRate] = useState<number>(0);
   const dispatch = useAppDispatch();
-  const { instances, sumGive, sumReceive } = useSelector(
-    (state: RootState) => state.exchange
-  );
+  const { instances } = useSelector((state: RootState) => state.exchange);
 
   const handleGiveInputChange = (value: string) => {
     dispatch(setSumGive(value));
     const numValue = Number(value.replace(",", "."));
     if (!isNaN(numValue) && rate > 0) {
-      dispatch(setSumReceive((numValue * rate).toString()));
+      const result = numValue * rate;
+      // Получаем допустимое количество знаков после запятой для валюты "receive"
+      const receiveCurrency = instances.receive.selectedCurrency;
+      const receiveCurrencyObj = instances.receive.currencies.find(
+        (c) => c.symbol === receiveCurrency
+      );
+      const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
+
+      // Форматируем результат
+      const formattedResult = result.toFixed(allowedDecimalPlaces);
+
+      dispatch(setSumReceive(formattedResult));
     } else {
       dispatch(setSumReceive(""));
     }
@@ -42,8 +51,20 @@ export default function ExchangeWidget() {
     dispatch(setSumReceive(value));
 
     const numValue = Number(value.replace(",", "."));
+
     if (!isNaN(numValue) && rate > 0) {
-      dispatch(setSumGive((numValue / rate).toString()));
+      const result = numValue / rate;
+      // Получаем допустимое количество знаков после запятой для валюты "give"
+      const giveCurrency = instances.give.selectedCurrency;
+      const giveCurrencyObj = instances.give.currencies.find(
+        (c) => c.symbol === giveCurrency
+      );
+      const allowedDecimalPlaces = giveCurrencyObj?.decimalPlaces ?? 8;
+
+      // Форматируем результат
+      const formattedResult = result.toFixed(allowedDecimalPlaces);
+
+      dispatch(setSumGive(formattedResult));
     } else {
       dispatch(setSumGive(""));
     }
@@ -60,6 +81,7 @@ export default function ExchangeWidget() {
 
   const reverse = () => {
     dispatch(reverseCurrencies());
+    getRate();
   };
 
   const getRate = useCallback(async () => {

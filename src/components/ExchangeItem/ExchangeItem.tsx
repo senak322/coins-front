@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useCallback } from "react";
 import { setInputError } from "../../store/exchangeSlice";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
 
 interface ExchangeItemProps {
   title: string;
@@ -27,6 +28,39 @@ export default function ExchangeItem({
   const { instances, sumGive, sumReceive } = useSelector(
     (state: RootState) => state.exchange
   );
+  const dispatch = useAppDispatch();
+
+  const handleChangeSum = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      let value = e.target.value;
+      // const isSelectedCurrencyBank = instances[way].isBank;
+      const errText = "Укажите корректную сумму";
+
+      // Получаем выбранную валюту
+      const selectedCurrency = instances[way].currencies.find(
+        (c) => c.symbol === instances[way].selectedCurrency
+      );
+
+      const allowedDecimalPlaces = selectedCurrency?.decimalPlaces ?? 8; // По умолчанию 8
+
+      const regex =
+        allowedDecimalPlaces === 0
+          ? /^\d*$/
+          : new RegExp(`^\\d*(?:[.,]\\d{0,${allowedDecimalPlaces}})?$`);
+
+      if (!regex.test(value)) {
+        dispatch(setInputError({ instanceId: way, message: errText }));
+        return; // Если значение не соответствует правилам ввода, не обновляем состояние
+      }
+
+      value = value.replace(",", ".");
+
+      dispatch(setInputError({ instanceId: way, message: "" })); // Сбрасываем ошибку
+      handleInputChange(value); // Передаем строковое значение
+    },
+    [handleInputChange, instances, way, dispatch]
+  );
+
   const theme = createTheme({
     components: {
       MuiOutlinedInput: {
@@ -38,30 +72,6 @@ export default function ExchangeItem({
       },
     },
   });
-
-  const handleChangeSum = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      let value = e.target.value;
-      const isSelectedCurrencyBank = instances[way].isBank;
-      const errText = "Укажите корректную сумму"
-
-      const regex = isSelectedCurrencyBank
-        ? /^\d*$/ // Для банковских валют — только целые числа
-        : /^[0-9]*[.,]?[0-9]*$/; // Для криптовалют — разрешаем дробные значения
-
-      if (!regex.test(value)) {
-        setInputError({instanceId: way, message: errText});
-        return; // Если значение не соответствует правилам ввода, не обновляем состояние
-      }
-
-      if (!isSelectedCurrencyBank) {
-        value = value.replace(",", ".");
-      }
-
-      handleInputChange(value); // Передаем строковое значение
-    },
-    [handleInputChange, instances, way]
-  );
 
   return (
     <div className="item">
