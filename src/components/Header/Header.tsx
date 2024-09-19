@@ -22,9 +22,15 @@ export default function Header() {
         },
       });
       
+      const rubRes = await axios.get('https://min-api.cryptocompare.com/data/pricemulti', {
+        params: {
+          fsyms: 'BTC,ETH,LTC,USDT,XMR,TON',
+          tsyms: 'RUB',
+        },
+      });
 
       const data = response.data;
-      console.log(data);
+      console.log(rubRes.data);
       
       // Обновляем состояние с полученными курсами
       setRateData({

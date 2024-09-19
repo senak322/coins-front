@@ -24,11 +24,16 @@ import { getExchangeRate } from "../../utils/api";
 
 export default function ExchangeWidget() {
   const [rate, setRate] = useState<number>(0);
+  const [lastChangedInput, setLastChangedInput] = useState<
+    "give" | "receive" | null
+  >(null);
+
   const dispatch = useAppDispatch();
-  const { instances } = useSelector((state: RootState) => state.exchange);
+  const { instances, sumGive, sumReceive  } = useSelector((state: RootState) => state.exchange);
 
   const handleGiveInputChange = (value: string) => {
     dispatch(setSumGive(value));
+    setLastChangedInput("give");
     const numValue = Number(value.replace(",", "."));
     if (!isNaN(numValue) && rate > 0) {
       const result = numValue * rate;
@@ -49,7 +54,7 @@ export default function ExchangeWidget() {
   };
   const handleReceiveInputChange = (value: string) => {
     dispatch(setSumReceive(value));
-
+    setLastChangedInput("receive");
     const numValue = Number(value.replace(",", "."));
 
     if (!isNaN(numValue) && rate > 0) {
@@ -73,24 +78,31 @@ export default function ExchangeWidget() {
   const handleGiveCurrencyChange = (e: SelectChangeEvent<string>) => {
     const currency = e.target.value;
     dispatch(setCurrency({ instanceId: "give", currency: currency }));
+    // getRate(); // Обновляем курс при изменении валюты
   };
   const handleReceiveCurrencyChange = (e: SelectChangeEvent<string>) => {
     const currency = e.target.value;
     dispatch(setCurrency({ instanceId: "receive", currency: currency }));
+    // getRate(); // Обновляем курс при изменении валюты
   };
 
   const reverse = () => {
     dispatch(reverseCurrencies());
-    getRate();
+    // getRate();
   };
 
   const getRate = useCallback(async () => {
-    const giveCurrency = instances.give.isBank
-      ? "rub"
-      : instances.give.selectedCurrency;
-    const receiveCurrency = instances.receive.isBank
-      ? "rub"
-      : instances.receive.selectedCurrency;
+    const symbolMap: { [key: string]: string } = {
+      Sber: "RUB",
+      "T-Bank": "RUB",
+      RUB: "RUB",
+    };
+    const giveCurrency =
+      symbolMap[instances.give.selectedCurrency] ||
+      instances.give.selectedCurrency.toUpperCase();
+    const receiveCurrency =
+      symbolMap[instances.receive.selectedCurrency] ||
+      instances.receive.selectedCurrency.toUpperCase();
 
     try {
       const exchangeRate = await getExchangeRate(giveCurrency, receiveCurrency);
@@ -99,16 +111,51 @@ export default function ExchangeWidget() {
       console.error("Error fetching exchange rate:", error);
       setRate(0); // В случае ошибки сбрасываем курс
     }
-  }, [
-    instances.give.isBank,
-    instances.receive.isBank,
-    instances.give.selectedCurrency,
-    instances.receive.selectedCurrency,
-  ]);
+  }, [instances.give.selectedCurrency, instances.receive.selectedCurrency]);
 
   useEffect(() => {
     getRate();
   }, [getRate]);
+
+  // useEffect(() => {
+  //   if (instances.give.selectedCurrency && instances.receive.selectedCurrency && rate > 0) {
+  //     handleGiveInputChange(sumGive);
+  //   }
+  // }, [rate, instances.give.selectedCurrency, instances.receive.selectedCurrency, handleGiveInputChange, sumGive]);
+
+  useEffect(() => {
+    if (lastChangedInput === "give" && sumGive !== "") {
+      const numValue = Number(sumGive.replace(",", "."));
+      if (!isNaN(numValue) && rate > 0) {
+        const result = numValue * rate;
+        const receiveCurrencyObj = instances.receive.currencies.find(
+          (c) => c.symbol === instances.receive.selectedCurrency
+        );
+        const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
+        const formattedResult = result.toFixed(allowedDecimalPlaces);
+        dispatch(setSumReceive(formattedResult));
+      } else {
+        dispatch(setSumReceive(""));
+      }
+    } else if (lastChangedInput === "receive" && sumReceive !== "") {
+      const numValue = Number(sumReceive.replace(",", "."));
+      if (!isNaN(numValue) && rate > 0) {
+        const result = numValue / rate;
+        const giveCurrencyObj = instances.give.currencies.find(
+          (c) => c.symbol === instances.give.selectedCurrency
+        );
+        const allowedDecimalPlaces = giveCurrencyObj?.decimalPlaces ?? 8;
+        const formattedResult = result.toFixed(allowedDecimalPlaces);
+        dispatch(setSumGive(formattedResult));
+      } else {
+        dispatch(setSumGive(""));
+      }
+    }
+  }, [
+    rate,
+    instances.give.selectedCurrency,
+    instances.receive.selectedCurrency,
+  ]);
 
   return (
     <div className={"container"} id="widget">

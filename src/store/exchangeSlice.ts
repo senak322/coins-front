@@ -40,7 +40,7 @@ const initialState: ExchangeState = {
       limitFrom: 0.005,
       limitTo: 1,
       inputError: "",
-      currencies: coins
+      currencies: coins,
     },
     receive: {
       selectedCurrency: banks[0].symbol,
@@ -49,7 +49,7 @@ const initialState: ExchangeState = {
       limitFrom: 30000,
       limitTo: 5000000,
       inputError: "",
-      currencies: banks
+      currencies: banks,
     },
   },
   sumGive: "",
@@ -118,8 +118,8 @@ const exchangeSlice = createSlice({
       const giveBankIcon = state.instances.give.selectedIcon;
       const giveLimitFrom = state.instances.give.limitFrom;
       const giveLimitTO = state.instances.give.limitTo;
-      const currencies = state.instances.give.currencies
-      const isBank = state.instances.give.isBank
+      const currencies = state.instances.give.currencies;
+      const isBank = state.instances.give.isBank;
 
       // Обновляем инстанс "give" значениями из инстанса "receive"
       state.instances.give.selectedCurrency =
@@ -128,9 +128,8 @@ const exchangeSlice = createSlice({
       state.instances.give.limitFrom = state.instances.receive.limitFrom;
       state.instances.give.limitTo = state.instances.receive.limitTo;
       state.instances.give.inputError = "";
-      state.instances.give.currencies = state.instances.receive.currencies
-      state.instances.give.isBank = state.instances.receive.isBank
-
+      state.instances.give.currencies = state.instances.receive.currencies;
+      state.instances.give.isBank = state.instances.receive.isBank;
 
       // Обновляем инстанс "receive" сохраненными ранее значениями инстанса "give"
       state.instances.receive.selectedCurrency = giveCurrency;
@@ -138,12 +137,15 @@ const exchangeSlice = createSlice({
       state.instances.receive.limitFrom = giveLimitFrom;
       state.instances.receive.limitTo = giveLimitTO;
       state.instances.receive.inputError = "";
-      state.instances.receive.currencies = currencies
-      state.instances.receive.isBank = isBank
+      state.instances.receive.currencies = currencies;
+      state.instances.receive.isBank = isBank;
 
       // Обнуляем суммы
       state.sumGive = "0";
       state.sumReceive = "0";
+      // const tempSumGive = state.sumGive;
+      // state.sumGive = state.sumReceive;
+      // state.sumReceive = tempSumGive;
     },
     // setBank: (
     //   state,
