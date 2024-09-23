@@ -26,7 +26,7 @@ import { getExchangeRate } from "../../utils/api";
 const commissionTiers = [
   { min: 1000, max: 15000, commission: 0.03 }, // 3% комиссия
   { min: 15000, max: 100000, commission: 0.02 }, // 2% комиссия
-  { min: 100000, max: 10000000, commission: 0.01 }, // 1% комиссия
+  { min: 100000, max: 10000000, commission: 0.1 }, // 1% комиссия
 ];
 
 function getCommission(amount: number): number {
@@ -62,6 +62,8 @@ export default function ExchangeWidget() {
         instances.give.selectedCurrency === "T-bank"
       ) {
         const commissionRate = getCommission(numValue);
+        console.log(commissionRate);
+        
         // Вычитаем комиссию из курса
         adjustedRate = rate * (1 - commissionRate);
         console.log("rate" + rate);
@@ -73,6 +75,7 @@ export default function ExchangeWidget() {
         // Если пользователь получает рубли, комиссия рассчитывается на основе суммы в рублях, которую он получит
         const estimatedRubAmount = numValue * rate;
         const commissionRate = getCommission(estimatedRubAmount);
+        console.log(commissionRate);
         // Прибавляем комиссию к курсу
         adjustedRate = rate * (1 + commissionRate);
       }
@@ -196,42 +199,19 @@ export default function ExchangeWidget() {
 
   useEffect(() => {
     if (lastChangedInput === "give" && sumGive !== "") {
-      const numValue = Number(sumGive.replace(",", "."));
-      if (!isNaN(numValue) && rate > 0) {
-        const result = numValue * rate;
-        const receiveCurrencyObj = instances.receive.currencies.find(
-          (c) => c.symbol === instances.receive.selectedCurrency
-        );
-        const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
-        const formattedResult = result.toFixed(allowedDecimalPlaces);
-        dispatch(setSumReceive(formattedResult));
-      } else {
-        dispatch(setSumReceive(""));
-      }
+      handleGiveInputChange(sumGive);
     } else if (lastChangedInput === "receive" && sumReceive !== "") {
-      const numValue = Number(sumReceive.replace(",", "."));
-      if (!isNaN(numValue) && rate > 0) {
-        const result = numValue / rate;
-        const giveCurrencyObj = instances.give.currencies.find(
-          (c) => c.symbol === instances.give.selectedCurrency
-        );
-        const allowedDecimalPlaces = giveCurrencyObj?.decimalPlaces ?? 8;
-        const formattedResult = result.toFixed(allowedDecimalPlaces);
-        dispatch(setSumGive(formattedResult));
-      } else {
-        dispatch(setSumGive(""));
-      }
+      handleReceiveInputChange(sumReceive);
     }
   }, [
     rate,
     instances.give.selectedCurrency,
     instances.receive.selectedCurrency,
-    dispatch,
-    instances.give.currencies,
-    instances.receive.currencies,
     lastChangedInput,
     sumGive,
     sumReceive,
+    handleGiveInputChange,
+    handleReceiveInputChange
   ]);
 
   return (
