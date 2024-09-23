@@ -7,11 +7,11 @@ import {
   reverseCurrencies,
   setSumGive,
   setSumReceive,
-  setInputError,
-  setStep,
-  setName,
-  setBankAccount,
-  setAlert,
+  // setInputError,
+  // setStep,
+  // setName,
+  // setBankAccount,
+  // setAlert,
 } from "../../store/exchangeSlice";
 import arrow from "../../images/exchange.svg";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -22,6 +22,22 @@ import ExchangeItem from "../ExchangeItem/ExchangeItem";
 
 import { getExchangeRate } from "../../utils/api";
 
+// Commission tiers
+const commissionTiers = [
+  { min: 1000, max: 15000, commission: 0.03 }, // 3% комиссия
+  { min: 15000, max: 100000, commission: 0.02 }, // 2% комиссия
+  { min: 100000, max: 10000000, commission: 0.01 }, // 1% комиссия
+];
+
+function getCommission(amount: number): number {
+  for (const tier of commissionTiers) {
+    if (amount >= tier.min && amount < tier.max) {
+      return tier.commission;
+    }
+  }
+  return 0; // Если сумма не попадает ни в один диапазон, комиссия 0%
+}
+
 export default function ExchangeWidget() {
   const [rate, setRate] = useState<number>(0);
   const [lastChangedInput, setLastChangedInput] = useState<
@@ -29,22 +45,45 @@ export default function ExchangeWidget() {
   >(null);
 
   const dispatch = useAppDispatch();
-  const { instances, sumGive, sumReceive  } = useSelector((state: RootState) => state.exchange);
+  const { instances, sumGive, sumReceive } = useSelector(
+    (state: RootState) => state.exchange
+  );
 
   const handleGiveInputChange = (value: string) => {
     dispatch(setSumGive(value));
     setLastChangedInput("give");
     const numValue = Number(value.replace(",", "."));
     if (!isNaN(numValue) && rate > 0) {
-      const result = numValue * rate;
-      // Получаем допустимое количество знаков после запятой для валюты "receive"
-      const receiveCurrency = instances.receive.selectedCurrency;
+      let adjustedRate = rate;
+
+      // Проверяем, отправляет ли пользователь рубли
+      if (
+        instances.give.selectedCurrency === "Sber" ||
+        instances.give.selectedCurrency === "T-bank"
+      ) {
+        const commissionRate = getCommission(numValue);
+        // Вычитаем комиссию из курса
+        adjustedRate = rate * (1 - commissionRate);
+        console.log("rate" + rate);
+        console.log("adjustedRate" + adjustedRate);
+      } else if (
+        instances.receive.selectedCurrency === "Sber" ||
+        instances.receive.selectedCurrency === "T-bank"
+      ) {
+        // Если пользователь получает рубли, комиссия рассчитывается на основе суммы в рублях, которую он получит
+        const estimatedRubAmount = numValue * rate;
+        const commissionRate = getCommission(estimatedRubAmount);
+        // Прибавляем комиссию к курсу
+        adjustedRate = rate * (1 + commissionRate);
+      }
+
+      const result = numValue * adjustedRate;
+
       const receiveCurrencyObj = instances.receive.currencies.find(
-        (c) => c.symbol === receiveCurrency
+        (c) => c.symbol === instances.receive.selectedCurrency
       );
       const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
 
-      // Форматируем результат
       const formattedResult = result.toFixed(allowedDecimalPlaces);
 
       dispatch(setSumReceive(formattedResult));
@@ -58,15 +97,34 @@ export default function ExchangeWidget() {
     const numValue = Number(value.replace(",", "."));
 
     if (!isNaN(numValue) && rate > 0) {
-      const result = numValue / rate;
-      // Получаем допустимое количество знаков после запятой для валюты "give"
-      const giveCurrency = instances.give.selectedCurrency;
+      let adjustedRate = rate;
+
+      // Проверяем, получает ли пользователь рубли
+      if (
+        instances.receive.selectedCurrency === "Sber" ||
+        instances.receive.selectedCurrency === "T-bank"
+      ) {
+        const commissionRate = getCommission(numValue);
+        // Прибавляем комиссию к курсу
+        adjustedRate = rate * (1 + commissionRate);
+      } else if (
+        instances.give.selectedCurrency === "Sber" ||
+        instances.give.selectedCurrency === "T-bank"
+      ) {
+        // Если пользователь отправляет рубли, комиссия рассчитывается на основе суммы в рублях, которую он отправляет
+        const estimatedRubAmount = numValue / rate;
+        const commissionRate = getCommission(estimatedRubAmount);
+        // Вычитаем комиссию из курса
+        adjustedRate = rate * (1 - commissionRate);
+      }
+
+      const result = numValue / adjustedRate;
+
       const giveCurrencyObj = instances.give.currencies.find(
-        (c) => c.symbol === giveCurrency
+        (c) => c.symbol === instances.give.selectedCurrency
       );
       const allowedDecimalPlaces = giveCurrencyObj?.decimalPlaces ?? 8;
 
-      // Форматируем результат
       const formattedResult = result.toFixed(allowedDecimalPlaces);
 
       dispatch(setSumGive(formattedResult));
@@ -95,7 +153,6 @@ export default function ExchangeWidget() {
     const symbolMap: { [key: string]: string } = {
       Sber: "RUB",
       "T-Bank": "RUB",
-      RUB: "RUB",
     };
     const giveCurrency =
       symbolMap[instances.give.selectedCurrency] ||
@@ -112,6 +169,20 @@ export default function ExchangeWidget() {
       setRate(0); // В случае ошибки сбрасываем курс
     }
   }, [instances.give.selectedCurrency, instances.receive.selectedCurrency]);
+
+  const getAdjustedRate = () => {
+    let adjustedRate = rate;
+    if (instances.give.selectedCurrency === "RUB") {
+      const rubAmount = Number(sumGive) || 0;
+      const commissionRate = getCommission(rubAmount);
+      adjustedRate = rate * (1 - commissionRate);
+    } else if (instances.receive.selectedCurrency === "RUB") {
+      const rubAmount = Number(sumReceive) || 0;
+      const commissionRate = getCommission(rubAmount);
+      adjustedRate = rate * (1 + commissionRate);
+    }
+    return adjustedRate;
+  };
 
   useEffect(() => {
     getRate();
@@ -155,6 +226,12 @@ export default function ExchangeWidget() {
     rate,
     instances.give.selectedCurrency,
     instances.receive.selectedCurrency,
+    dispatch,
+    instances.give.currencies,
+    instances.receive.currencies,
+    lastChangedInput,
+    sumGive,
+    sumReceive,
   ]);
 
   return (
@@ -185,7 +262,7 @@ export default function ExchangeWidget() {
       <button className={"exchange-button"}>CHANGE</button>
       <p className="exchange-rate">
         exchange rate: 1 {instances.give.selectedCurrency} ~{" "}
-        {rate ? rate.toFixed(2) : "Не удалось загрузить курс"}{" "}
+        {rate ? getAdjustedRate().toFixed(4) : "Не удалось загрузить курс"}{" "}
         {instances.receive.selectedCurrency}
       </p>
     </div>
