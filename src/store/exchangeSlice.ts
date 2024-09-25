@@ -46,8 +46,8 @@ const initialState: ExchangeState = {
       selectedCurrency: banks[0].symbol,
       isBank: banks[0].isBank,
       selectedIcon: banks[0].icon,
-      limitFrom: 30000,
-      limitTo: 5000000,
+      limitFrom: 5000,
+      limitTo: 10000000,
       inputError: "",
       currencies: banks,
     },
@@ -93,18 +93,22 @@ const exchangeSlice = createSlice({
         instance.limitFrom =
           currency === "RUB"
             ? 5000
-            : currency === "CNY"
-            ? 400
-            : currency === "UAH"
-            ? 2000
+            : currency === "BTC"
+            ? 0.005
+            : currency === "ETH"
+            ? 0.02
+            : currency === "USTD"
+            ? 50
             : 0;
         instance.limitTo =
           currency === "RUB"
-            ? 300000
-            : currency === "CNY"
-            ? 25000
-            : currency === "UAH"
-            ? 50000
+            ? 10000000
+            : currency === "BTC"
+            ? 1.7
+            : currency === "ETH"
+            ? 42
+            : currency === "USTD"
+            ? 100000
             : 0;
         instance.inputError = "";
         state.sumGive = "0";
@@ -114,35 +118,21 @@ const exchangeSlice = createSlice({
 
     reverseCurrencies: (state) => {
       // Сохраняем текущие значения для инстанса "give"
-      const giveCurrency = state.instances.give.selectedCurrency;
-      const giveBankIcon = state.instances.give.selectedIcon;
-      const giveLimitFrom = state.instances.give.limitFrom;
-      const giveLimitTO = state.instances.give.limitTo;
-      const currencies = state.instances.give.currencies;
-      const isBank = state.instances.give.isBank;
+      const tempInstance = { ...state.instances.give };
+      // const tempSumGive = state.sumGive;
 
       // Обновляем инстанс "give" значениями из инстанса "receive"
-      state.instances.give.selectedCurrency =
-        state.instances.receive.selectedCurrency;
-      state.instances.give.selectedIcon = state.instances.receive.selectedIcon;
-      state.instances.give.limitFrom = state.instances.receive.limitFrom;
-      state.instances.give.limitTo = state.instances.receive.limitTo;
-      state.instances.give.inputError = "";
-      state.instances.give.currencies = state.instances.receive.currencies;
-      state.instances.give.isBank = state.instances.receive.isBank;
+      state.instances.give = { ...state.instances.receive };
 
       // Обновляем инстанс "receive" сохраненными ранее значениями инстанса "give"
-      state.instances.receive.selectedCurrency = giveCurrency;
-      state.instances.receive.selectedIcon = giveBankIcon;
-      state.instances.receive.limitFrom = giveLimitFrom;
-      state.instances.receive.limitTo = giveLimitTO;
-      state.instances.receive.inputError = "";
-      state.instances.receive.currencies = currencies;
-      state.instances.receive.isBank = isBank;
+      state.instances.receive = tempInstance;
 
-      // Обнуляем суммы
+      // Обмениваем суммы
       state.sumGive = "0";
       state.sumReceive = "0";
+      // Обнуляем суммы
+      // state.sumGive = "0";
+      // state.sumReceive = "0";
       // const tempSumGive = state.sumGive;
       // state.sumGive = state.sumReceive;
       // state.sumReceive = tempSumGive;

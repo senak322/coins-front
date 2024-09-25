@@ -31,9 +31,9 @@ import { getExchangeRate } from "../../utils/api";
 
 // Commission tiers
 const commissionTiers = [
-  { min: 5000, max: 15000, commission: 0.03 }, // 3% комиссия
-  { min: 15000, max: 100000, commission: 0.02 }, // 2% комиссия
-  { min: 100000, max: 10000000, commission: 0.1 }, // 1% комиссия
+  { min: 5000, max: 14999, commission: 0.03 }, // 3% комиссия
+  { min: 15000, max: 99999, commission: 0.02 }, // 2% комиссия
+  { min: 100000, max: 10000000, commission: 0.01 }, // 1% комиссия
 ];
 
 function getCommission(amount: number): number {
@@ -125,7 +125,7 @@ export default function ExchangeWidget() {
         // Проверяем, отправляет ли пользователь рубли
         if (
           instances.give.selectedCurrency === "Sber" ||
-          instances.give.selectedCurrency === "T-bank"
+          instances.give.selectedCurrency === "T-Bank"
         ) {
           const commissionRate = getCommission(numValue);
           console.log(commissionRate);
@@ -136,7 +136,7 @@ export default function ExchangeWidget() {
           console.log("adjustedRate" + adjustedRate);
         } else if (
           instances.receive.selectedCurrency === "Sber" ||
-          instances.receive.selectedCurrency === "T-bank"
+          instances.receive.selectedCurrency === "T-Bank"
         ) {
           // Если пользователь получает рубли, комиссия рассчитывается на основе суммы в рублях, которую он получит
           const estimatedRubAmount = numValue * rate;
@@ -180,14 +180,14 @@ export default function ExchangeWidget() {
         // Проверяем, получает ли пользователь рубли
         if (
           instances.receive.selectedCurrency === "Sber" ||
-          instances.receive.selectedCurrency === "T-bank"
+          instances.receive.selectedCurrency === "T-Bank"
         ) {
           const commissionRate = getCommission(numValue);
           // Прибавляем комиссию к курсу
           adjustedRate = rate * (1 + commissionRate);
         } else if (
           instances.give.selectedCurrency === "Sber" ||
-          instances.give.selectedCurrency === "T-bank"
+          instances.give.selectedCurrency === "T-Bank"
         ) {
           // Если пользователь отправляет рубли, комиссия рассчитывается на основе суммы в рублях, которую он отправляет
           const estimatedRubAmount = numValue / rate;
@@ -237,7 +237,7 @@ export default function ExchangeWidget() {
 
   const getRate = async () => {
     const symbolMap: { [key: string]: string } = {
-      Sber: "RUB",
+      "Sber": "RUB",
       "T-Bank": "RUB",
     };
     const giveCurrency =
@@ -316,16 +316,15 @@ export default function ExchangeWidget() {
   // }, [rate, instances.give.selectedCurrency, instances.receive.selectedCurrency, handleGiveInputChange, sumGive]);
 
   useEffect(() => {
-    if (lastChangedInput === "give" && sumGive !== "") {
+    if (sumGive !== "" && sumGive !== "0") {
       handleGiveInputChange(sumGive);
-    } else if (lastChangedInput === "receive" && sumReceive !== "") {
+    } else if (sumReceive !== "" && sumReceive !== "0") {
       handleReceiveInputChange(sumReceive);
     }
   }, [
     rate,
     instances.give.selectedCurrency,
     instances.receive.selectedCurrency,
-    lastChangedInput,
     sumGive,
     sumReceive,
     handleGiveInputChange,
