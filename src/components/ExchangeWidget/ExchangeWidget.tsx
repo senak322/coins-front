@@ -37,6 +37,8 @@ const commissionTiers = [
   { min: 100000, max: 10000000, commission: 0.1 }, // 1% комиссия
 ];
 
+const profitMargin = 0.01; // 1% маржа
+
 function getCommission(amount: number): number {
   for (const tier of commissionTiers) {
     if (amount >= tier.min && amount < tier.max) {
@@ -84,7 +86,7 @@ const useStyles = makeStyles({
 
 export default function ExchangeWidget() {
   const classes = useStyles();
-  const [rate, setRate] = useState<number>(0);
+  // const [rate, setRate] = useState<number>(0);
   const [rates, setRates] = useState<{ [key: string]: number }>({});
   // const [lastChangedInput, setLastChangedInput] = useState<
   //   "give" | "receive" | null
@@ -150,13 +152,13 @@ export default function ExchangeWidget() {
       dispatch(setLastChangedInput("give"));
       const numValue = Number(value.replace(",", "."));
       if (!isNaN(numValue) && rates) {
-        let adjustedRate = 0;
         let rate = getRateForCurrencies(
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
-        // console.log(rate);
-        
+  
+        let adjustedRate = rate;
+  
         // Проверяем, отправляет ли пользователь рубли
         if (
           instances.give.selectedCurrency === "Sber" ||
@@ -164,9 +166,9 @@ export default function ExchangeWidget() {
         ) {
           const commissionRate = getCommission(numValue);
           console.log(commissionRate);
-
+  
           // Вычитаем комиссию из курса
-          adjustedRate = rate * (1 - commissionRate);
+          adjustedRate = adjustedRate * (1 - commissionRate);
         } else if (
           instances.receive.selectedCurrency === "Sber" ||
           instances.receive.selectedCurrency === "T-Bank"
@@ -176,18 +178,34 @@ export default function ExchangeWidget() {
           const commissionRate = getCommission(estimatedRubAmount);
           console.log(commissionRate);
           // Прибавляем комиссию к курсу
-          adjustedRate = rate * (1 + commissionRate);
+          adjustedRate = adjustedRate * (1 + commissionRate);
         }
-
+  
+        // Добавляем маржу
+        const giveIsFiat =
+          instances.give.selectedCurrency === "Sber" ||
+          instances.give.selectedCurrency === "T-Bank";
+        const receiveIsFiat =
+          instances.receive.selectedCurrency === "Sber" ||
+          instances.receive.selectedCurrency === "T-Bank";
+  
+        if (giveIsFiat && !receiveIsFiat) {
+          // Пользователь покупает криптовалюту за рубли
+          adjustedRate = adjustedRate * (1 + profitMargin);
+        } else if (!giveIsFiat && receiveIsFiat) {
+          // Пользователь продаёт криптовалюту за рубли
+          adjustedRate = adjustedRate * (1 - profitMargin);
+        }
+  
         const result = numValue * adjustedRate;
-
+  
         const receiveCurrencyObj = instances.receive.currencies.find(
           (c) => c.symbol === instances.receive.selectedCurrency
         );
         const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
-
+  
         const formattedResult = result.toFixed(allowedDecimalPlaces);
-
+  
         dispatch(setSumReceive(formattedResult));
       } else {
         dispatch(setSumReceive(""));
@@ -207,13 +225,15 @@ export default function ExchangeWidget() {
       dispatch(setSumReceive(value));
       dispatch(setLastChangedInput("receive"));
       const numValue = Number(value.replace(",", "."));
-
+  
       if (!isNaN(numValue) && rates) {
-        let adjustedRate = 0;
         let rate = getRateForCurrencies(
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
+  
+        let adjustedRate = rate;
+  
         // Проверяем, получает ли пользователь рубли
         if (
           instances.receive.selectedCurrency === "Sber" ||
@@ -221,7 +241,7 @@ export default function ExchangeWidget() {
         ) {
           const commissionRate = getCommission(numValue);
           // Прибавляем комиссию к курсу
-          adjustedRate = rate * (1 + commissionRate);
+          adjustedRate = adjustedRate * (1 + commissionRate);
         } else if (
           instances.give.selectedCurrency === "Sber" ||
           instances.give.selectedCurrency === "T-Bank"
@@ -230,18 +250,34 @@ export default function ExchangeWidget() {
           const estimatedRubAmount = numValue / rate;
           const commissionRate = getCommission(estimatedRubAmount);
           // Вычитаем комиссию из курса
-          adjustedRate = rate * (1 - commissionRate);
+          adjustedRate = adjustedRate * (1 - commissionRate);
         }
-
+  
+        // Добавляем маржу
+        const giveIsFiat =
+          instances.give.selectedCurrency === "Sber" ||
+          instances.give.selectedCurrency === "T-Bank";
+        const receiveIsFiat =
+          instances.receive.selectedCurrency === "Sber" ||
+          instances.receive.selectedCurrency === "T-Bank";
+  
+        if (giveIsFiat && !receiveIsFiat) {
+          // Пользователь покупает криптовалюту за рубли
+          adjustedRate = adjustedRate * (1 + profitMargin);
+        } else if (!giveIsFiat && receiveIsFiat) {
+          // Пользователь продаёт криптовалюту за рубли
+          adjustedRate = adjustedRate * (1 - profitMargin);
+        }
+  
         const result = numValue / adjustedRate;
-
+  
         const giveCurrencyObj = instances.give.currencies.find(
           (c) => c.symbol === instances.give.selectedCurrency
         );
         const allowedDecimalPlaces = giveCurrencyObj?.decimalPlaces ?? 8;
-
+  
         const formattedResult = result.toFixed(allowedDecimalPlaces);
-
+  
         dispatch(setSumGive(formattedResult));
       } else {
         dispatch(setSumGive(""));
@@ -288,26 +324,45 @@ export default function ExchangeWidget() {
   };
 
   const getAdjustedRate = () => {
-    let adjustedRate = 0;
     let rate = getRateForCurrencies(
       instances.give.selectedCurrency,
       instances.receive.selectedCurrency
     );
+  
+    let adjustedRate = rate;
+  
     if (
       instances.give.selectedCurrency === "Sber" ||
       instances.give.selectedCurrency === "T-Bank"
     ) {
       const rubAmount = Number(sumGive.replace(",", ".")) || 0;
       const commissionRate = getCommission(rubAmount);
-      adjustedRate = rate * (1 - commissionRate);
+      adjustedRate = adjustedRate * (1 - commissionRate);
     } else if (
       instances.receive.selectedCurrency === "Sber" ||
       instances.receive.selectedCurrency === "T-Bank"
     ) {
       const rubAmount = Number(sumReceive.replace(",", ".")) || 0;
       const commissionRate = getCommission(rubAmount);
-      adjustedRate = rate * (1 + commissionRate);
+      adjustedRate = adjustedRate * (1 + commissionRate);
     }
+  
+    // Добавляем маржу
+    const giveIsFiat =
+      instances.give.selectedCurrency === "Sber" ||
+      instances.give.selectedCurrency === "T-Bank";
+    const receiveIsFiat =
+      instances.receive.selectedCurrency === "Sber" ||
+      instances.receive.selectedCurrency === "T-Bank";
+  
+    if (giveIsFiat && !receiveIsFiat) {
+      // Пользователь покупает криптовалюту за рубли
+      adjustedRate = adjustedRate * (1 + profitMargin);
+    } else if (!giveIsFiat && receiveIsFiat) {
+      // Пользователь продаёт криптовалюту за рубли
+      adjustedRate = adjustedRate * (1 - profitMargin);
+    }
+  
     return adjustedRate;
   };
 
@@ -397,7 +452,7 @@ export default function ExchangeWidget() {
       </button>
       <p className="exchange-rate">
         exchange rate: 1 {instances.give.selectedCurrency} ~{" "}
-        {rate ? getAdjustedRate().toFixed(4) : "Не удалось загрузить курс"}{" "}
+        {rates ? getAdjustedRate().toFixed(4) : "Не удалось загрузить курс"}{" "}
         {instances.receive.selectedCurrency}
       </p>
       {/* Всплывающее окно с данными об обмене */}
