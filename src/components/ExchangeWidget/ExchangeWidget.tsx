@@ -28,13 +28,13 @@ import {
   Button,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { getExchangeRate } from "../../utils/api";
+import { getExchangeRates } from "../../utils/api";
 
 // Commission tiers
 const commissionTiers = [
   { min: 5000, max: 14999, commission: 0.03 }, // 3% комиссия
   { min: 15000, max: 99999, commission: 0.02 }, // 2% комиссия
-  { min: 100000, max: 10000000, commission: 0.01 }, // 1% комиссия
+  { min: 100000, max: 10000000, commission: 0.1 }, // 1% комиссия
 ];
 
 function getCommission(amount: number): number {
@@ -85,6 +85,7 @@ const useStyles = makeStyles({
 export default function ExchangeWidget() {
   const classes = useStyles();
   const [rate, setRate] = useState<number>(0);
+  const [rates, setRates] = useState<{ [key: string]: number }>({});
   // const [lastChangedInput, setLastChangedInput] = useState<
   //   "give" | "receive" | null
   // >(null);
@@ -115,14 +116,47 @@ export default function ExchangeWidget() {
     setOpen(false);
   };
 
+  const getRateForCurrencies = useCallback((fromCurrency: string, toCurrency: string) => {
+    const symbolMap: { [key: string]: string } = {
+      Sber: "RUB",
+      "T-Bank": "RUB",
+    };
+
+    const fromSymbol = symbolMap[fromCurrency] || fromCurrency;
+    const toSymbol = symbolMap[toCurrency] || toCurrency;
+    console.log('fromSymbol:', fromSymbol);
+    console.log('toSymbol:', toSymbol);
+
+    const fromRate = rates[fromSymbol];
+    const toRate = rates[toSymbol];
+    console.log('fromRate:', fromRate);
+    console.log('toRate:', toRate);
+    
+    
+
+    if (fromRate && toRate) {
+      // Поскольку курсы даны относительно RUB, вычисляем отношение
+      // return toRate / fromRate;
+      return fromRate / toRate;
+    } else {
+      console.error("Rates not available for selected currencies.");
+      return 0;
+    }
+  }, [rates])
+
   const handleGiveInputChange = useCallback(
     (value: string) => {
       dispatch(setSumGive(value));
       dispatch(setLastChangedInput("give"));
       const numValue = Number(value.replace(",", "."));
-      if (!isNaN(numValue) && rate > 0) {
-        let adjustedRate = rate;
-
+      if (!isNaN(numValue) && rates) {
+        let adjustedRate = 0;
+        let rate = getRateForCurrencies(
+          instances.give.selectedCurrency,
+          instances.receive.selectedCurrency
+        );
+        // console.log(rate);
+        
         // Проверяем, отправляет ли пользователь рубли
         if (
           instances.give.selectedCurrency === "Sber" ||
@@ -133,8 +167,6 @@ export default function ExchangeWidget() {
 
           // Вычитаем комиссию из курса
           adjustedRate = rate * (1 - commissionRate);
-          console.log("rate" + rate);
-          console.log("adjustedRate" + adjustedRate);
         } else if (
           instances.receive.selectedCurrency === "Sber" ||
           instances.receive.selectedCurrency === "T-Bank"
@@ -166,7 +198,8 @@ export default function ExchangeWidget() {
       instances.give.selectedCurrency,
       instances.receive.currencies,
       instances.receive.selectedCurrency,
-      rate,
+      rates,
+      getRateForCurrencies,
     ]
   );
   const handleReceiveInputChange = useCallback(
@@ -175,9 +208,12 @@ export default function ExchangeWidget() {
       dispatch(setLastChangedInput("receive"));
       const numValue = Number(value.replace(",", "."));
 
-      if (!isNaN(numValue) && rate > 0) {
-        let adjustedRate = rate;
-
+      if (!isNaN(numValue) && rates) {
+        let adjustedRate = 0;
+        let rate = getRateForCurrencies(
+          instances.give.selectedCurrency,
+          instances.receive.selectedCurrency
+        );
         // Проверяем, получает ли пользователь рубли
         if (
           instances.receive.selectedCurrency === "Sber" ||
@@ -216,7 +252,8 @@ export default function ExchangeWidget() {
       instances.give.selectedCurrency,
       instances.receive.selectedCurrency,
       instances.give.currencies,
-      rate,
+      rates,
+      getRateForCurrencies,
     ]
   );
 
@@ -237,29 +274,25 @@ export default function ExchangeWidget() {
     // getRate();
   };
 
-  const getRate = async () => {
-    const symbolMap: { [key: string]: string } = {
-      "Sber": "RUB",
-      "T-Bank": "RUB",
-    };
-    const giveCurrency =
-      symbolMap[instances.give.selectedCurrency] ||
-      instances.give.selectedCurrency.toUpperCase();
-    const receiveCurrency =
-      symbolMap[instances.receive.selectedCurrency] ||
-      instances.receive.selectedCurrency.toUpperCase();
-
+  const getRatesFromBackend = async () => {
     try {
-      const exchangeRate = await getExchangeRate(giveCurrency, receiveCurrency);
-      setRate(exchangeRate); // Устанавливаем курс в состояние
+      const data = await getExchangeRates();
+      if (data && data.rates) {
+        setRates(data.rates);
+      } else {
+        console.error("No rates data received from backend.");
+      }
     } catch (error) {
-      console.error("Error fetching exchange rate:", error);
-      setRate(0); // В случае ошибки сбрасываем курс
+      console.error("Error fetching exchange rates:", error);
     }
   };
 
   const getAdjustedRate = () => {
-    let adjustedRate = rate;
+    let adjustedRate = 0;
+    let rate = getRateForCurrencies(
+      instances.give.selectedCurrency,
+      instances.receive.selectedCurrency
+    );
     if (
       instances.give.selectedCurrency === "Sber" ||
       instances.give.selectedCurrency === "T-Bank"
@@ -308,8 +341,8 @@ export default function ExchangeWidget() {
   };
 
   useEffect(() => {
-    getRate();
-  }, [instances.give.selectedCurrency, instances.receive.selectedCurrency]);
+    getRatesFromBackend();
+  }, []);
 
   // useEffect(() => {
   //   if (instances.give.selectedCurrency && instances.receive.selectedCurrency && rate > 0) {
@@ -324,12 +357,12 @@ export default function ExchangeWidget() {
       handleReceiveInputChange(sumReceive);
     }
   }, [
-    rate,
+    rates,
     instances.give.selectedCurrency,
     instances.receive.selectedCurrency,
     sumGive,
     sumReceive,
-    lastChangedInput, // Добавили зависимость
+    lastChangedInput,
     handleGiveInputChange,
     handleReceiveInputChange,
   ]);
