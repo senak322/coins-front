@@ -80,7 +80,7 @@ export default function ExchangeItem({
         <input
           className="input"
           type="text"
-          value={way === "give" ? sumGive : sumReceive}
+          value={way === "give" ? sumGive : sumReceive || ""}
           onChange={handleChangeSum}
           style={{
             paddingLeft: "10px",

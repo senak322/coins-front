@@ -20,7 +20,7 @@ export interface ExchangeState {
   firstName: string;
   lastName: string;
   bankAccount?: string;
-
+  lastChangedInput: "give" | "receive" | null
   alert: {
     [key in "paid" | "receive"]: {
       message: string;
@@ -58,7 +58,7 @@ const initialState: ExchangeState = {
   firstName: "",
   lastName: "",
   bankAccount: "",
-
+  lastChangedInput: null,
   alert: {
     paid: {
       message: "",
@@ -128,14 +128,16 @@ const exchangeSlice = createSlice({
       state.instances.receive = tempInstance;
 
       // Обмениваем суммы
-      state.sumGive = "0";
-      state.sumReceive = "0";
-      // Обнуляем суммы
-      // state.sumGive = "0";
-      // state.sumReceive = "0";
-      // const tempSumGive = state.sumGive;
-      // state.sumGive = state.sumReceive;
-      // state.sumReceive = tempSumGive;
+      state.sumGive = "";
+      state.sumReceive = "";
+      
+      
+    },
+    setLastChangedInput: (
+      state,
+      action: PayloadAction<"give" | "receive" | null>
+    ) => {
+      state.lastChangedInput = action.payload;
     },
     // setBank: (
     //   state,
@@ -209,6 +211,7 @@ export const {
   setName,
   setBankAccount,
   setAlert,
+  setLastChangedInput,
 } = exchangeSlice.actions;
 
 // export const {currencyGive} = currencySlice.

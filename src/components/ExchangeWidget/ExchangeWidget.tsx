@@ -7,6 +7,7 @@ import {
   reverseCurrencies,
   setSumGive,
   setSumReceive,
+  setLastChangedInput,
   // setInputError,
   // setStep,
   // setName,
@@ -84,13 +85,13 @@ const useStyles = makeStyles({
 export default function ExchangeWidget() {
   const classes = useStyles();
   const [rate, setRate] = useState<number>(0);
-  const [lastChangedInput, setLastChangedInput] = useState<
-    "give" | "receive" | null
-  >(null);
+  // const [lastChangedInput, setLastChangedInput] = useState<
+  //   "give" | "receive" | null
+  // >(null);
   const [open, setOpen] = useState(false);
 
   const dispatch = useAppDispatch();
-  const { instances, sumGive, sumReceive } = useSelector(
+  const { instances, sumGive, sumReceive, lastChangedInput } = useSelector(
     (state: RootState) => state.exchange
   );
 
@@ -107,7 +108,7 @@ export default function ExchangeWidget() {
   };
 
   const handleCreateOrder = () => {
-    // Здесь вы можете добавить логику для создания заявки
+    // Здесь можно добавить логику для создания заявки
     // Например, отправить данные на сервер или перейти на другую страницу
 
     // После создания заявки можно закрыть диалог
@@ -117,7 +118,7 @@ export default function ExchangeWidget() {
   const handleGiveInputChange = useCallback(
     (value: string) => {
       dispatch(setSumGive(value));
-      setLastChangedInput("give");
+      dispatch(setLastChangedInput("give"));
       const numValue = Number(value.replace(",", "."));
       if (!isNaN(numValue) && rate > 0) {
         let adjustedRate = rate;
@@ -171,7 +172,7 @@ export default function ExchangeWidget() {
   const handleReceiveInputChange = useCallback(
     (value: string) => {
       dispatch(setSumReceive(value));
-      setLastChangedInput("receive");
+      dispatch(setLastChangedInput("receive"));
       const numValue = Number(value.replace(",", "."));
 
       if (!isNaN(numValue) && rate > 0) {
@@ -232,6 +233,7 @@ export default function ExchangeWidget() {
 
   const reverse = () => {
     dispatch(reverseCurrencies());
+    dispatch(setLastChangedInput(null));
     // getRate();
   };
 
@@ -316,9 +318,9 @@ export default function ExchangeWidget() {
   // }, [rate, instances.give.selectedCurrency, instances.receive.selectedCurrency, handleGiveInputChange, sumGive]);
 
   useEffect(() => {
-    if (sumGive !== "" && sumGive !== "0") {
+    if (lastChangedInput === "give" && sumGive !== "") {
       handleGiveInputChange(sumGive);
-    } else if (sumReceive !== "" && sumReceive !== "0") {
+    } else if (lastChangedInput === "receive" && sumReceive !== "") {
       handleReceiveInputChange(sumReceive);
     }
   }, [
@@ -327,6 +329,7 @@ export default function ExchangeWidget() {
     instances.receive.selectedCurrency,
     sumGive,
     sumReceive,
+    lastChangedInput, // Добавили зависимость
     handleGiveInputChange,
     handleReceiveInputChange,
   ]);
