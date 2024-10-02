@@ -17,7 +17,7 @@ import {
 import arrow from "../../images/exchange.svg";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 // import { coins, banks } from "../../utils/config";
-import { SelectChangeEvent } from "@mui/material";
+import { CircularProgress, SelectChangeEvent } from "@mui/material";
 // import { ReactNode } from "react";
 import ExchangeItem from "../ExchangeItem/ExchangeItem";
 import {
@@ -82,16 +82,20 @@ const useStyles = makeStyles({
   exchangeData: {
     marginBottom: "10px",
   },
+  loaderContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
 });
 
 export default function ExchangeWidget() {
   const classes = useStyles();
-  // const [rate, setRate] = useState<number>(0);
   const [rates, setRates] = useState<{ [key: string]: number }>({});
-  // const [lastChangedInput, setLastChangedInput] = useState<
-  //   "give" | "receive" | null
-  // >(null);
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderCreated, setOrderCreated] = useState(false);
 
   const dispatch = useAppDispatch();
   const { instances, sumGive, sumReceive, lastChangedInput } = useSelector(
@@ -108,43 +112,84 @@ export default function ExchangeWidget() {
 
   const handleClose = () => {
     setOpen(false);
+    setOrderCreated(false)
+    setOrderId(null)
   };
 
-  const handleCreateOrder = () => {
-    // Здесь можно добавить логику для создания заявки
-    // Например, отправить данные на сервер или перейти на другую страницу
+  const handleContactOperator = () => {
+    const message = encodeURIComponent(
+      `Здравствуйте! Мой номер заявки: ${orderId}\n` +
+      `Я отправляю: ${sumGive} ${instances.give.selectedCurrency}\n` +
+      `Я получаю: ${sumReceive} ${instances.receive.selectedCurrency}`
+    );
+    const telegramUsername = "Coins_change"; // замените на имя пользователя оператора
+    window.open(`https://t.me/${telegramUsername}?text=${message}`, '_blank');
+    
+  }
 
-    // После создания заявки можно закрыть диалог
-    setOpen(false);
-  };
+  const handleCreateOrder = async () => {
+    setIsLoading(true); // Показать лоадер
 
-  const getRateForCurrencies = useCallback((fromCurrency: string, toCurrency: string) => {
-    const symbolMap: { [key: string]: string } = {
-      Sber: "RUB",
-      "T-Bank": "RUB",
+    const orderData = {
+      amountGive: Number(sumGive.replace(",", ".")),
+      currencyGive: instances.give.selectedCurrency,
+      amountReceive: Number(sumReceive.replace(",", ".")),
+      currencyReceive: instances.receive.selectedCurrency,
     };
 
-    const fromSymbol = symbolMap[fromCurrency] || fromCurrency;
-    const toSymbol = symbolMap[toCurrency] || toCurrency;
-    console.log('fromSymbol:', fromSymbol);
-    console.log('toSymbol:', toSymbol);
+    try {
+      const response = await fetch("http://localhost:5000/api/order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
 
-    const fromRate = rates[fromSymbol];
-    const toRate = rates[toSymbol];
-    console.log('fromRate:', fromRate);
-    console.log('toRate:', toRate);
-    
-    
+      const data = await response.json();
 
-    if (fromRate && toRate) {
-      // Поскольку курсы даны относительно RUB, вычисляем отношение
-      // return toRate / fromRate;
-      return fromRate / toRate;
-    } else {
-      console.error("Rates not available for selected currencies.");
-      return 0;
+      if (response.ok) {
+        setOrderId(data.orderId);
+        setOrderCreated(true);
+        // Здесь вы можете отправить письмо админу, вызвав соответствующую функцию на сервере
+      } else {
+        console.error("Ошибка при создании заявки:", data.message);
+      }
+    } catch (error) {
+      console.error("Ошибка при создании заявки:", error);
+    } finally {
+      setIsLoading(false); // Скрыть лоадер
     }
-  }, [rates])
+  };
+
+  const getRateForCurrencies = useCallback(
+    (fromCurrency: string, toCurrency: string) => {
+      const symbolMap: { [key: string]: string } = {
+        Sber: "RUB",
+        "T-Bank": "RUB",
+      };
+
+      const fromSymbol = symbolMap[fromCurrency] || fromCurrency;
+      const toSymbol = symbolMap[toCurrency] || toCurrency;
+      console.log("fromSymbol:", fromSymbol);
+      console.log("toSymbol:", toSymbol);
+
+      const fromRate = rates[fromSymbol];
+      const toRate = rates[toSymbol];
+      console.log("fromRate:", fromRate);
+      console.log("toRate:", toRate);
+
+      if (fromRate && toRate) {
+        // Поскольку курсы даны относительно RUB, вычисляем отношение
+        // return toRate / fromRate;
+        return fromRate / toRate;
+      } else {
+        console.error("Rates not available for selected currencies.");
+        return 0;
+      }
+    },
+    [rates]
+  );
 
   const handleGiveInputChange = useCallback(
     (value: string) => {
@@ -156,9 +201,9 @@ export default function ExchangeWidget() {
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
-  
+
         let adjustedRate = rate;
-  
+
         // Проверяем, отправляет ли пользователь рубли
         if (
           instances.give.selectedCurrency === "Sber" ||
@@ -166,7 +211,7 @@ export default function ExchangeWidget() {
         ) {
           const commissionRate = getCommission(numValue);
           console.log(commissionRate);
-  
+
           // Вычитаем комиссию из курса
           adjustedRate = adjustedRate * (1 - commissionRate);
         } else if (
@@ -180,7 +225,7 @@ export default function ExchangeWidget() {
           // Прибавляем комиссию к курсу
           adjustedRate = adjustedRate * (1 + commissionRate);
         }
-  
+
         // Добавляем маржу
         const giveIsFiat =
           instances.give.selectedCurrency === "Sber" ||
@@ -188,7 +233,7 @@ export default function ExchangeWidget() {
         const receiveIsFiat =
           instances.receive.selectedCurrency === "Sber" ||
           instances.receive.selectedCurrency === "T-Bank";
-  
+
         if (giveIsFiat && !receiveIsFiat) {
           // Пользователь покупает криптовалюту за рубли
           adjustedRate = adjustedRate * (1 + profitMargin);
@@ -196,16 +241,16 @@ export default function ExchangeWidget() {
           // Пользователь продаёт криптовалюту за рубли
           adjustedRate = adjustedRate * (1 - profitMargin);
         }
-  
+
         const result = numValue * adjustedRate;
-  
+
         const receiveCurrencyObj = instances.receive.currencies.find(
           (c) => c.symbol === instances.receive.selectedCurrency
         );
         const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
-  
+
         const formattedResult = result.toFixed(allowedDecimalPlaces);
-  
+
         dispatch(setSumReceive(formattedResult));
       } else {
         dispatch(setSumReceive(""));
@@ -225,15 +270,15 @@ export default function ExchangeWidget() {
       dispatch(setSumReceive(value));
       dispatch(setLastChangedInput("receive"));
       const numValue = Number(value.replace(",", "."));
-  
+
       if (!isNaN(numValue) && rates) {
         let rate = getRateForCurrencies(
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
-  
+
         let adjustedRate = rate;
-  
+
         // Проверяем, получает ли пользователь рубли
         if (
           instances.receive.selectedCurrency === "Sber" ||
@@ -252,7 +297,7 @@ export default function ExchangeWidget() {
           // Вычитаем комиссию из курса
           adjustedRate = adjustedRate * (1 - commissionRate);
         }
-  
+
         // Добавляем маржу
         const giveIsFiat =
           instances.give.selectedCurrency === "Sber" ||
@@ -260,7 +305,7 @@ export default function ExchangeWidget() {
         const receiveIsFiat =
           instances.receive.selectedCurrency === "Sber" ||
           instances.receive.selectedCurrency === "T-Bank";
-  
+
         if (giveIsFiat && !receiveIsFiat) {
           // Пользователь покупает криптовалюту за рубли
           adjustedRate = adjustedRate * (1 + profitMargin);
@@ -268,16 +313,16 @@ export default function ExchangeWidget() {
           // Пользователь продаёт криптовалюту за рубли
           adjustedRate = adjustedRate * (1 - profitMargin);
         }
-  
+
         const result = numValue / adjustedRate;
-  
+
         const giveCurrencyObj = instances.give.currencies.find(
           (c) => c.symbol === instances.give.selectedCurrency
         );
         const allowedDecimalPlaces = giveCurrencyObj?.decimalPlaces ?? 8;
-  
+
         const formattedResult = result.toFixed(allowedDecimalPlaces);
-  
+
         dispatch(setSumGive(formattedResult));
       } else {
         dispatch(setSumGive(""));
@@ -328,9 +373,9 @@ export default function ExchangeWidget() {
       instances.give.selectedCurrency,
       instances.receive.selectedCurrency
     );
-  
+
     let adjustedRate = rate;
-  
+
     if (
       instances.give.selectedCurrency === "Sber" ||
       instances.give.selectedCurrency === "T-Bank"
@@ -346,7 +391,7 @@ export default function ExchangeWidget() {
       const commissionRate = getCommission(rubAmount);
       adjustedRate = adjustedRate * (1 + commissionRate);
     }
-  
+
     // Добавляем маржу
     const giveIsFiat =
       instances.give.selectedCurrency === "Sber" ||
@@ -354,7 +399,7 @@ export default function ExchangeWidget() {
     const receiveIsFiat =
       instances.receive.selectedCurrency === "Sber" ||
       instances.receive.selectedCurrency === "T-Bank";
-  
+
     if (giveIsFiat && !receiveIsFiat) {
       // Пользователь покупает криптовалюту за рубли
       adjustedRate = adjustedRate * (1 + profitMargin);
@@ -362,7 +407,7 @@ export default function ExchangeWidget() {
       // Пользователь продаёт криптовалюту за рубли
       adjustedRate = adjustedRate * (1 - profitMargin);
     }
-  
+
     return adjustedRate;
   };
 
@@ -467,32 +512,77 @@ export default function ExchangeWidget() {
           Подтвердите обмен
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
-          <div className={classes.exchangeData}>
-            <strong>Вы отправляете:</strong> {sumGive}{" "}
-            {instances.give.selectedCurrency}
-          </div>
-          <div className={classes.exchangeData}>
-            <strong>Вы получаете:</strong> {sumReceive}{" "}
-            {instances.receive.selectedCurrency}
-          </div>
-          <div className={classes.exchangeData}>
-            <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
-          </div>
-          {/* Вы можете добавить дополнительные данные или стилизовать их */}
+          {isLoading ? (
+            <div className={classes.loaderContainer}>
+              <CircularProgress color="inherit" />
+              <p>Пожалуйста, подождите. Заявка создается...</p>
+            </div>
+          ) : orderCreated ? (
+            // Отображение данных заявки после создания
+            <div>
+              <p>Заявка успешно создана!</p>
+              <p>
+                Номер заявки: <strong>{orderId}</strong>
+              </p>
+              <div className={classes.exchangeData}>
+                <strong>Вы отправляете:</strong> {sumGive}{" "}
+                {instances.give.selectedCurrency}
+              </div>
+              <div className={classes.exchangeData}>
+                <strong>Вы получаете:</strong> {sumReceive}{" "}
+                {instances.receive.selectedCurrency}
+              </div>
+              <div className={classes.exchangeData}>
+                <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
+              </div>
+            </div>
+          ) : (
+            // Первоначальное отображение подтверждения обмена
+            <div>
+              <div className={classes.exchangeData}>
+                <strong>Вы отправляете:</strong> {sumGive}{" "}
+                {instances.give.selectedCurrency}
+              </div>
+              <div className={classes.exchangeData}>
+                <strong>Вы получаете:</strong> {sumReceive}{" "}
+                {instances.receive.selectedCurrency}
+              </div>
+              <div className={classes.exchangeData}>
+                <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
+              </div>
+            </div>
+          )}
         </DialogContent>
         <DialogActions className={classes.dialogActions}>
-          <Button onClick={handleClose} className={classes.button}>
-            Отмена
-          </Button>
-          <Button
-            onClick={handleCreateOrder}
-            className={classes.button}
-            variant="contained"
-            disabled={!isAmountValid()}
-          >
-            Создать заявку
-          </Button>
-          {!isAmountValid() && (
+          {orderCreated ? (
+            <>
+              <Button onClick={handleClose} className={classes.button}>
+                Закрыть
+              </Button>
+              <Button
+                onClick={handleContactOperator}
+                className={classes.button}
+                variant="contained"
+              >
+                Связаться с оператором
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={handleClose} className={classes.button}>
+                Отмена
+              </Button>
+              <Button
+                onClick={handleCreateOrder}
+                className={classes.button}
+                variant="contained"
+                disabled={!isAmountValid()}
+              >
+                Создать заявку
+              </Button>
+            </>
+          )}
+          {!isAmountValid() && !orderCreated && (
             <div style={{ color: "red", marginTop: "10px" }}>
               Сумма должна быть от {commissionTiers[0].min} до{" "}
               {commissionTiers[commissionTiers.length - 1].max} рублей.

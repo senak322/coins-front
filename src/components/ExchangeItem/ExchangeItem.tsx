@@ -78,6 +78,7 @@ export default function ExchangeItem({
       <p className="you-p">{title}:</p>
       <div className="input-container">
         <input
+        placeholder="Укажите сумму"
           className="input"
           type="text"
           value={way === "give" ? sumGive : sumReceive || ""}
