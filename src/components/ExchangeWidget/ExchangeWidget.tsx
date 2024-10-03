@@ -179,10 +179,10 @@ export default function ExchangeWidget() {
       const fromRate = rates[fromSymbol];
       const toRate = rates[toSymbol];
 
-      console.log("fromSymbol:" + fromSymbol);
-      console.log("toSymbol:" + toSymbol);
-      console.log("fromRate:" + fromRate);
-      console.log("toRate:" + toRate);
+      // console.log("fromSymbol:" + fromSymbol);
+      // console.log("toSymbol:" + toSymbol);
+      // console.log("fromRate:" + fromRate);
+      // console.log("toRate:" + toRate);
 
       if(fromSymbol === "RUB") {
         return fromRate / toRate;
@@ -282,23 +282,25 @@ export default function ExchangeWidget() {
 
         let result = 0;
 
-        if (receiveIsFiat && !giveIsFiat) {
+        if (!giveIsFiat && receiveIsFiat) {
           // Пользователь продает валюту за рубли
           const grossAmount = numValue * rate; // Сумма в рублях
           const commissionRate = getCommission(grossAmount);
           const commission = grossAmount * commissionRate;
           const netAmount = grossAmount - commission;
           result = netAmount;
-        } else if (!receiveIsFiat && giveIsFiat) {
+        } else if (giveIsFiat && !receiveIsFiat) {
           // Пользователь покупает валюту за рубли
-          const commissionRate = getCommission(numValue);
+          const grossAmount = numValue / rate;
+          const commissionRate = getCommission(grossAmount);
           const commission = numValue * commissionRate;
           const netAmount = numValue - commission;
           result = netAmount / rate;
-        } else {
-          // Обмен между двумя валютами (не RUB)
-          result = numValue / rate;
-        }
+        } 
+        // else {
+        //   // Обмен между двумя валютами (не RUB)
+        //   result = numValue / rate;
+        // }
 
         const giveCurrencyObj = instances.give.currencies.find(
           (c) => c.symbol === instances.give.selectedCurrency
@@ -343,7 +345,14 @@ export default function ExchangeWidget() {
     try {
       const data = await getExchangeRates();
       if (data && data.rates) {
+        
         setRates(data.rates);
+        // console.log(data.rates);
+        // const fixedrates = data.rates.map((el:number) => {
+        //   return el.toFixed(8)
+        // })
+        // console.log(fixedrates);
+        
       } else {
         console.error("No rates data received from backend.");
       }
