@@ -184,7 +184,7 @@ export default function ExchangeWidget() {
       // console.log("fromRate:" + fromRate);
       // console.log("toRate:" + toRate);
 
-      if(fromSymbol === "RUB") {
+      if (fromSymbol === "RUB") {
         return fromRate / toRate;
       } else {
         return toRate / fromRate;
@@ -212,7 +212,7 @@ export default function ExchangeWidget() {
           instances.receive.selectedCurrency
         );
         console.log(rate);
-        
+
         const giveIsFiat =
           instances.give.selectedCurrency === "Sber" ||
           instances.give.selectedCurrency === "T-Bank";
@@ -227,17 +227,17 @@ export default function ExchangeWidget() {
           const commissionRate = getCommission(numValue);
           const commission = numValue * commissionRate;
           const netAmount = numValue - commission;
-          result = netAmount * rate; // Делим на курс, получаем количество валюты
+          result = netAmount * rate;
         } else if (!giveIsFiat && receiveIsFiat) {
           // Пользователь продает валюту за рубли
-          const grossAmount = numValue / rate; // Умножаем на курс, получаем сумму в рублях
+          const grossAmount = numValue / rate;
           const commissionRate = getCommission(grossAmount);
           const commission = grossAmount * commissionRate;
           const netAmount = grossAmount - commission;
           result = netAmount; // Итоговая сумма в рублях
         } else {
           // Обмен между двумя валютами (не RUB)
-          result = numValue * rate;
+          result = 0;
         }
 
         const receiveCurrencyObj = instances.receive.currencies.find(
@@ -284,23 +284,27 @@ export default function ExchangeWidget() {
 
         if (!giveIsFiat && receiveIsFiat) {
           // Пользователь продает валюту за рубли
-          const grossAmount = numValue * rate; // Сумма в рублях
-          const commissionRate = getCommission(grossAmount);
-          const commission = grossAmount * commissionRate;
-          const netAmount = grossAmount - commission;
-          result = netAmount;
+          // const grossAmount = numValue * rate; // Сумма в рублях
+          // const commissionRate = getCommission(grossAmount);
+          // const commission = grossAmount * commissionRate;
+          // const netAmount = grossAmount - commission;
+          // result = netAmount;
+          const grossAmount = numValue / (1 - getCommission(numValue)); // Учитываем комиссию
+          result = grossAmount * rate;
         } else if (giveIsFiat && !receiveIsFiat) {
           // Пользователь покупает валюту за рубли
-          const grossAmount = numValue / rate;
-          const commissionRate = getCommission(grossAmount);
-          const commission = numValue * commissionRate;
-          const netAmount = numValue - commission;
-          result = netAmount / rate;
-        } 
-        // else {
-        //   // Обмен между двумя валютами (не RUB)
-        //   result = numValue / rate;
-        // }
+          // const grossAmount = numValue / rate;
+          // const commissionRate = getCommission(grossAmount);
+          // const commission = numValue * commissionRate;
+          // const netAmount = numValue - commission;
+          // result = netAmount / rate;
+          const amountInRub = numValue / rate;
+          const grossAmount = amountInRub / (1 - getCommission(amountInRub));
+          result = grossAmount;
+        } else {
+          // Обмен между двумя валютами (не RUB)
+          result = 0;
+        }
 
         const giveCurrencyObj = instances.give.currencies.find(
           (c) => c.symbol === instances.give.selectedCurrency
@@ -345,14 +349,12 @@ export default function ExchangeWidget() {
     try {
       const data = await getExchangeRates();
       if (data && data.rates) {
-        
         setRates(data.rates);
         // console.log(data.rates);
         // const fixedrates = data.rates.map((el:number) => {
         //   return el.toFixed(8)
         // })
         // console.log(fixedrates);
-        
       } else {
         console.error("No rates data received from backend.");
       }
