@@ -5,13 +5,14 @@
   background-color: #d8d8d8;
   border-radius: 12px;
   &__container {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    justify-items: center;
     padding: 1rem 0.4rem;
     background-color: #ececec;
     border-radius: 12px;
     gap: 1rem;
     align-items: center;
+    grid-template-columns: 1fr 35px 1fr;
     @include respond-to(small) {
       box-sizing: border-box;
       flex-direction: column;

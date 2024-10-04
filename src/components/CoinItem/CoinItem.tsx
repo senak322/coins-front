@@ -11,11 +11,11 @@ export default function CoinItem({ title, sum, image }: CoinItemProps) {
     <div className="coin-item">
       <div className="coin-item__container">
         <img src={image} className="coin-item__image" alt={title} />
-        <p className="coin-item__title">{title}</p>
+        {/* <p className="coin-item__title">{title}</p> */}
       </div>
       <div className="coin-item__container">
-        <p className="coin-item__text">{sum}</p>
-        <p className="coin-item__text">{title}</p>
+        <p className="coin-item__title">{sum}</p>
+        <p className="coin-item__title">{title}</p>
       </div>
     </div>
   );

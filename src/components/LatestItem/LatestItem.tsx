@@ -1,18 +1,21 @@
 import CoinItem from "../CoinItem/CoinItem";
 import change from "../../images/change.svg";
 import "./LatestItem.scss";
-// import eth from "../../images/eth.svg"
-// import sber from "../../images/sber.png"
+import eth from "../../images/eth.svg";
+import sber from "../../images/sber.png";
+import btc from "../../images/btc.png";
+import usdt from "../../images/usdt.png";
+import tbank from "../../images/t-bank.png";
 import { IOrder } from "../../types/types";
 import { format } from "date-fns";
 
 // Функция для получения изображения валюты
 const currencyImages: { [key: string]: string } = {
-  BTC: "/images/btc.svg",
-  ETH: "/images/eth.svg",
-  USDT: "/images/usdt.svg",
-  Sber: "/images/sber.png",
-  "T-Bank": "/images/t-bank.png",
+  BTC: btc,
+  ETH: eth,
+  USDT: usdt,
+  Sber: sber,
+  "T-Bank": tbank,
   // другие валюты по необходимости
 };
 
@@ -21,11 +24,10 @@ function getImage(currencySymbol: string) {
 }
 
 interface LatestItemProps {
-  order: IOrder
+  order: IOrder;
 }
 
 export default function LatestItem({ order }: LatestItemProps) {
-
   // Функция для форматирования даты
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
