@@ -1,5 +1,5 @@
 import telegram from "../../images/telegram.svg";
-import whats from "../../images/whats.svg";
+// import whats from "../../images/whats.svg";
 import "./Contact.scss";
 
 export default function Contact() {

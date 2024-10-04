@@ -284,20 +284,10 @@ export default function ExchangeWidget() {
 
         if (!giveIsFiat && receiveIsFiat) {
           // Пользователь продает валюту за рубли
-          // const grossAmount = numValue * rate; // Сумма в рублях
-          // const commissionRate = getCommission(grossAmount);
-          // const commission = grossAmount * commissionRate;
-          // const netAmount = grossAmount - commission;
-          // result = netAmount;
           const grossAmount = numValue / (1 - getCommission(numValue)); // Учитываем комиссию
           result = grossAmount * rate;
         } else if (giveIsFiat && !receiveIsFiat) {
           // Пользователь покупает валюту за рубли
-          // const grossAmount = numValue / rate;
-          // const commissionRate = getCommission(grossAmount);
-          // const commission = numValue * commissionRate;
-          // const netAmount = numValue - commission;
-          // result = netAmount / rate;
           const amountInRub = numValue / rate;
           const grossAmount = amountInRub / (1 - getCommission(amountInRub));
           result = grossAmount;
