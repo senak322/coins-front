@@ -164,7 +164,7 @@ export default function ExchangeWidget() {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/order", {
+      const response = await fetch("/api/order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
