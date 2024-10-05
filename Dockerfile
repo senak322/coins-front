@@ -1,10 +1,16 @@
 # Строим приложение
-FROM node:20 AS build
+# Строим приложение
+FROM node:18 AS build
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install
+
+# Обновляем npm до последней версии
+RUN npm install -g npm@latest
+
+# Устанавливаем зависимости с флагами
+RUN npm install --no-audit --no-fund --loglevel=error
 
 COPY . ./
 
@@ -13,10 +19,8 @@ RUN npm run build
 # Настраиваем Nginx для обслуживания статических файлов
 FROM nginx:alpine
 
-# Копируем билд в директорию, обслуживаемую Nginx
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Копируем конфигурационный файл Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
