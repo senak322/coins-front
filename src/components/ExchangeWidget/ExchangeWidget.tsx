@@ -44,7 +44,7 @@ function getCommission(amount: number): number {
       return tier.commission;
     }
   }
-  console.log(`Комиссия для суммы ${amount}: 0`);
+  // console.log(`Комиссия для суммы ${amount}: 0`);
   return 0; // Если сумма не попадает ни в один диапазон, комиссия 0%
 }
 
@@ -220,7 +220,7 @@ export default function ExchangeWidget() {
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
-        console.log(rate);
+        // console.log(rate);
 
         const giveIsFiat =
           instances.give.selectedCurrency === "Sber" ||
@@ -481,7 +481,7 @@ export default function ExchangeWidget() {
       </button>
       {/* <p className="exchange-rate"> */}
       {/* exchange rate: 1 {instances.give.selectedCurrency} ~{" "} */}
-      {/* {rates ? getAdjustedRate().toFixed(4) : "Не удалось загрузить курс"}{" "} */}
+      {/* {rates ? getRateForCurrencies(instances.give.selectedCurrency, instances.receive.selectedCurrency).toFixed(4) : "Не удалось загрузить курс"}{" "} */}
       {/* {rates ? firstRate.toFixed(4) : "Не удалось загрузить курс"}{" "} */}
       {/* {instances.receive.selectedCurrency} */}
       {/* </p> */}
