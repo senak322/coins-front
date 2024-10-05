@@ -5,7 +5,7 @@ import axios from "axios";
 
 export async function getExchangeRates() {
   try {
-    const response = await axios.get('http://localhost:5000/api/exchange-rate');
+    const response = await axios.get('http://51.250.18.31/api/exchange-rate');
     return response.data;
   } catch (error) {
     console.error('Error fetching exchange rates from backend:', error);
