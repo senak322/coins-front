@@ -104,6 +104,7 @@ export default function ExchangeWidget() {
   const [orderCreated, setOrderCreated] = useState(false);
   const [telegramNickname, setTelegramNickname] = useState("");
   const [nicknameError, setNicknameError] = useState("");
+  // const [firstRate, setFirstRate] = useState(0);
 
   const dispatch = useAppDispatch();
   const { instances, sumGive, sumReceive, lastChangedInput } = useSelector(
@@ -200,24 +201,11 @@ export default function ExchangeWidget() {
       const fromRate = rates[fromSymbol];
       const toRate = rates[toSymbol];
 
-      // console.log("fromSymbol:" + fromSymbol);
-      // console.log("toSymbol:" + toSymbol);
-      // console.log("fromRate:" + fromRate);
-      // console.log("toRate:" + toRate);
-
       if (fromSymbol === "RUB") {
         return fromRate / toRate;
       } else {
         return toRate / fromRate;
       }
-
-      // if (fromRate && toRate) {
-      //   // Правильное вычисление курса
-      //   return fromRate / toRate;
-      // } else {
-      //   console.error("Rates not available for selected currencies.");
-      //   return 0;
-      // }
     },
     [rates]
   );
@@ -435,8 +423,10 @@ export default function ExchangeWidget() {
   }, []);
 
   // useEffect(() => {
+  //   const rate = getAdjustedRate()
+  //   setFirstRate(rate)
 
-  // }, [])
+  // }, [getAdjustedRate])
 
   // useEffect(() => {
   //   if (instances.give.selectedCurrency && instances.receive.selectedCurrency && rate > 0) {
@@ -489,11 +479,12 @@ export default function ExchangeWidget() {
       <button className="exchange-button" onClick={handleClickOpen}>
         CHANGE
       </button>
-      <p className="exchange-rate">
-        exchange rate: 1 {instances.give.selectedCurrency} ~{" "}
-        {rates ? getAdjustedRate().toFixed(4) : "Не удалось загрузить курс"}{" "}
-        {instances.receive.selectedCurrency}
-      </p>
+      {/* <p className="exchange-rate"> */}
+      {/* exchange rate: 1 {instances.give.selectedCurrency} ~{" "} */}
+      {/* {rates ? getAdjustedRate().toFixed(4) : "Не удалось загрузить курс"}{" "} */}
+      {/* {rates ? firstRate.toFixed(4) : "Не удалось загрузить курс"}{" "} */}
+      {/* {instances.receive.selectedCurrency} */}
+      {/* </p> */}
       {/* Всплывающее окно с данными об обмене */}
       <Dialog
         open={open}
@@ -529,9 +520,9 @@ export default function ExchangeWidget() {
                 <strong>Вы получаете:</strong> {sumReceive}{" "}
                 {instances.receive.selectedCurrency}
               </div>
-              <div className={classes.exchangeData}>
+              {/* <div className={classes.exchangeData}>
                 <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
-              </div>
+              </div> */}
             </div>
           ) : (
             // Первоначальное отображение подтверждения обмена
@@ -544,20 +535,27 @@ export default function ExchangeWidget() {
                 <strong>Вы получаете:</strong> {sumReceive}{" "}
                 {instances.receive.selectedCurrency}
               </div>
-              <div className={classes.exchangeData}>
+              {/* <div className={classes.exchangeData}>
                 <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
-              </div>
-              <TextField
-              // className={classes.exchangeData}
-                label="Ваш ник в Telegram"
-                value={telegramNickname}
-                onChange={handleTelegramNicknameChange}
-                fullWidth
-                margin="normal"
-                error={!!nicknameError}
-                helperText={nicknameError}
-                required
-              />
+              </div> */}
+              
+                <TextField
+                  // className={classes.exchangeData}
+                  label="Ваш ник в Telegram"
+                  value={telegramNickname}
+                  onChange={handleTelegramNicknameChange}
+                  fullWidth
+                  margin="normal"
+                  error={!!nicknameError}
+                  helperText={nicknameError}
+                  required
+                  sx={{
+                    input: { color: '#fff' },
+                    label: { color: '#fff' },
+                    '.MuiFormHelperText-root': { color: '#fff' },
+                  }}
+                />
+              
             </div>
           )}
         </DialogContent>
