@@ -10,7 +10,7 @@ export default function Latest() {
 
   const fetchLatestOrders = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/order/latest");
+      const response = await fetch("http://51.250.18.31/api/order/latest");
       const data: { orders: IOrder[] } = await response.json();
       setOrders(data.orders);
     } catch (error) {
