@@ -11,5 +11,6 @@ export interface IOrder {
   currencyGive: string;
   amountReceive: number;
   currencyReceive: string;
+  telegramNickname: string;
   createdAt: string;
 }

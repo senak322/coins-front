@@ -17,7 +17,7 @@ import {
 import arrow from "../../images/exchange.svg";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 // import { coins, banks } from "../../utils/config";
-import { CircularProgress, SelectChangeEvent } from "@mui/material";
+import { CircularProgress, SelectChangeEvent, TextField } from "@mui/material";
 // import { ReactNode } from "react";
 import ExchangeItem from "../ExchangeItem/ExchangeItem";
 import {
@@ -36,8 +36,6 @@ const commissionTiers = [
   { min: 15000, max: 99999, commission: 0.02 }, // 2% комиссия
   { min: 100000, max: 10000000, commission: 0.01 }, // 1% комиссия
 ];
-
-// const profitMargin = 0.01; // 1% маржа
 
 function getCommission(amount: number): number {
   for (const tier of commissionTiers) {
@@ -92,6 +90,9 @@ const useStyles = makeStyles({
   text: {
     marginBottom: "10px",
   },
+  // telegramData: {
+  //   color: "#fff"
+  // }
 });
 
 export default function ExchangeWidget() {
@@ -101,11 +102,24 @@ export default function ExchangeWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [orderCreated, setOrderCreated] = useState(false);
+  const [telegramNickname, setTelegramNickname] = useState("");
+  const [nicknameError, setNicknameError] = useState("");
 
   const dispatch = useAppDispatch();
   const { instances, sumGive, sumReceive, lastChangedInput } = useSelector(
     (state: RootState) => state.exchange
   );
+
+  const handleTelegramNicknameChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setTelegramNickname(e.target.value);
+    if (e.target.value.trim() === "") {
+      setNicknameError("Пожалуйста, введите ваш ник в Telegram");
+    } else {
+      setNicknameError("");
+    }
+  };
 
   // Функции для открытия и закрытия диалога
   const handleClickOpen = () => {
@@ -132,6 +146,12 @@ export default function ExchangeWidget() {
   };
 
   const handleCreateOrder = async () => {
+    // Проверяем, что ник заполнен
+    if (telegramNickname.trim() === "") {
+      setNicknameError("Пожалуйста, введите ваш ник в Telegram");
+      return;
+    }
+
     setIsLoading(true); // Показать лоадер
 
     const orderData = {
@@ -139,6 +159,7 @@ export default function ExchangeWidget() {
       currencyGive: instances.give.selectedCurrency,
       amountReceive: Number(sumReceive.replace(",", ".")),
       currencyReceive: instances.receive.selectedCurrency,
+      telegramNickname: telegramNickname.trim(), // Добавляем ник в данные заявки
     };
 
     try {
@@ -360,6 +381,7 @@ export default function ExchangeWidget() {
     );
 
     let adjustedRate = rate;
+    console.log(adjustedRate);
 
     // const giveIsFiat =
     //   instances.give.selectedCurrency === "Sber" ||
@@ -411,6 +433,10 @@ export default function ExchangeWidget() {
   useEffect(() => {
     getRatesFromBackend();
   }, []);
+
+  // useEffect(() => {
+
+  // }, [])
 
   // useEffect(() => {
   //   if (instances.give.selectedCurrency && instances.receive.selectedCurrency && rate > 0) {
@@ -493,6 +519,9 @@ export default function ExchangeWidget() {
                 Номер заявки: <strong>{orderId}</strong>
               </p>
               <div className={classes.exchangeData}>
+                <strong>Ваш ник в Telegram:</strong> {telegramNickname}
+              </div>
+              <div className={classes.exchangeData}>
                 <strong>Вы отправляете:</strong> {sumGive}{" "}
                 {instances.give.selectedCurrency}
               </div>
@@ -518,6 +547,17 @@ export default function ExchangeWidget() {
               <div className={classes.exchangeData}>
                 <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
               </div>
+              <TextField
+              // className={classes.exchangeData}
+                label="Ваш ник в Telegram"
+                value={telegramNickname}
+                onChange={handleTelegramNicknameChange}
+                fullWidth
+                margin="normal"
+                error={!!nicknameError}
+                helperText={nicknameError}
+                required
+              />
             </div>
           )}
         </DialogContent>
