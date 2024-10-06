@@ -164,7 +164,9 @@ export default function ExchangeWidget() {
     };
 
     try {
-      const response = await fetch("/api/order", {
+      const baseURL =
+        process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const response = await fetch(`${baseURL}/api/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -481,7 +483,7 @@ export default function ExchangeWidget() {
       </button>
       {/* <p className="exchange-rate"> */}
       {/* exchange rate: 1 {instances.give.selectedCurrency} ~{" "} */}
-      {/* {rates ? getRateForCurrencies(instances.give.selectedCurrency, instances.receive.selectedCurrency).toFixed(4) : "Не удалось загрузить курс"}{" "} */}
+      {/* {rates ? getAdjustedRate() : "Не удалось загрузить курс"}{" "} */}
       {/* {rates ? firstRate.toFixed(4) : "Не удалось загрузить курс"}{" "} */}
       {/* {instances.receive.selectedCurrency} */}
       {/* </p> */}
@@ -538,24 +540,23 @@ export default function ExchangeWidget() {
               {/* <div className={classes.exchangeData}>
                 <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
               </div> */}
-              
-                <TextField
-                  // className={classes.exchangeData}
-                  label="Ваш ник в Telegram"
-                  value={telegramNickname}
-                  onChange={handleTelegramNicknameChange}
-                  fullWidth
-                  margin="normal"
-                  error={!!nicknameError}
-                  helperText={nicknameError}
-                  required
-                  sx={{
-                    input: { color: '#fff' },
-                    label: { color: '#fff' },
-                    '.MuiFormHelperText-root': { color: '#fff' },
-                  }}
-                />
-              
+
+              <TextField
+                // className={classes.exchangeData}
+                label="Ваш ник в Telegram"
+                value={telegramNickname}
+                onChange={handleTelegramNicknameChange}
+                fullWidth
+                margin="normal"
+                error={!!nicknameError}
+                helperText={nicknameError}
+                required
+                sx={{
+                  input: { color: "#fff" },
+                  label: { color: "#fff" },
+                  ".MuiFormHelperText-root": { color: "#fff" },
+                }}
+              />
             </div>
           )}
         </DialogContent>

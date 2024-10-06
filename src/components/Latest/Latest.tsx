@@ -10,7 +10,9 @@ export default function Latest() {
 
   const fetchLatestOrders = async () => {
     try {
-      const response = await fetch("/api/order/latest");
+      const baseURL =
+        process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const response = await fetch(`${baseURL}/api/order/latest`);
       const data: { orders: IOrder[] } = await response.json();
       setOrders(data.orders);
     } catch (error) {
