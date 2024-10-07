@@ -7,10 +7,10 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Обновляем npm до последней версии
-RUN npm install -g npm@latest
+# RUN npm install -g npm@latest
 
 # Устанавливаем зависимости с флагами
-RUN npm install --no-audit --no-fund --loglevel=error
+RUN npm install --no-audit --no-fund
 
 COPY . ./
 
