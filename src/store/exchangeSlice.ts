@@ -8,8 +8,6 @@ export interface ExchangeState {
       selectedCurrency: string;
       isBank: boolean;
       selectedIcon: string;
-      limitFrom: number;
-      limitTo: number;
       inputError: string;
       currencies: ICurrency[];
     };
@@ -34,11 +32,7 @@ const initialState: ExchangeState = {
     give: {
       selectedCurrency: coins[0].symbol,
       isBank: coins[0].isBank,
-      // correctBanks: banks.rub,
-      // selectedBank: banks.rub[0].name,
       selectedIcon: coins[0].icon,
-      limitFrom: 0.005,
-      limitTo: 1,
       inputError: "",
       currencies: coins,
     },
@@ -46,8 +40,6 @@ const initialState: ExchangeState = {
       selectedCurrency: banks[0].symbol,
       isBank: banks[0].isBank,
       selectedIcon: banks[0].icon,
-      limitFrom: 5000,
-      limitTo: 10000000,
       inputError: "",
       currencies: banks,
     },
@@ -90,26 +82,6 @@ const exchangeSlice = createSlice({
         const curr = instance.currencies.find((el) => el.symbol === currency);
 
         instance.selectedIcon = curr?.icon || "No data";
-        instance.limitFrom =
-          currency === "RUB"
-            ? 5000
-            : currency === "BTC"
-            ? 0.005
-            : currency === "ETH"
-            ? 0.02
-            : currency === "USTD"
-            ? 50
-            : 0;
-        instance.limitTo =
-          currency === "RUB"
-            ? 10000000
-            : currency === "BTC"
-            ? 1.7
-            : currency === "ETH"
-            ? 42
-            : currency === "USTD"
-            ? 100000
-            : 0;
         instance.inputError = "";
         state.sumGive = "0";
         state.sumReceive = "0";

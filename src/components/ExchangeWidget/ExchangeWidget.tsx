@@ -41,7 +41,7 @@ const commissionTiers = [
 function getCommission(amount: number): number {
   for (const tier of commissionTiers) {
     if (amount >= tier.min && amount < tier.max) {
-      console.log(`Комиссия для суммы ${amount}: ${tier.commission}`);
+      // console.log(`Комиссия для суммы ${amount}: ${tier.commission}`);
       return tier.commission;
     }
   }
@@ -91,9 +91,7 @@ const useStyles = makeStyles({
   text: {
     marginBottom: "10px",
   },
-  // telegramData: {
-  //   color: "#fff"
-  // }
+  
 });
 
 export default function ExchangeWidget() {
@@ -113,13 +111,38 @@ export default function ExchangeWidget() {
   );
 
   const isRuble = (currency: string) => {
-    const rubCurrencies = ["Сбер", "Т-Банк", "Альфа", "СБП", "ВТБ", "Райф", "Газпром", "Росбанк", "МТС", "ОЗОН", "Уралсиб", "Ак барс", "РСХБ", "Промсвязь", "Ю мани", "PAYEER"];
+    const rubCurrencies = [
+      "Сбер",
+      "Т-Банк",
+      "Альфа",
+      "СБП",
+      "ВТБ",
+      "Райф",
+      "Газпром",
+      "Росбанк",
+      "МТС",
+      "ОЗОН",
+      "Уралсиб",
+      "Ак барс",
+      "РСХБ",
+      "Промсвязь",
+      "Ю мани",
+      "PAYEER",
+    ];
     return rubCurrencies.includes(currency);
   };
-  
 
   const isFiatCurrency = (currency: string) => {
     return banks.some((bank) => bank.symbol === currency);
+  };
+
+  const getRubEquivalent = (currency: string, amount: number) => {
+    const curr = isFiatCurrency(currency);
+    if (curr) {
+      return amount;
+    }
+    const rate = rates[currency];
+    return rate ? amount * rate : 0;
   };
 
   const handleTelegramNicknameChange = (
@@ -190,7 +213,7 @@ export default function ExchangeWidget() {
       if (response.ok) {
         setOrderId(data.orderId);
         setOrderCreated(true);
-        // Здесь вы можете отправить письмо админу, вызвав соответствующую функцию на сервере
+        // Здесь отправить письмо админу, вызвав соответствующую функцию на сервере
       } else {
         console.error("Ошибка при создании заявки:", data.message);
       }
@@ -203,11 +226,8 @@ export default function ExchangeWidget() {
 
   const getRateForCurrencies = useCallback(
     (fromCurrency: string, toCurrency: string) => {
-      const isFromFiat = isFiatCurrency(fromCurrency) ? "RUB" : fromCurrency
-      const isToFiat = isFiatCurrency(toCurrency) ? "RUB" : toCurrency
-
-      console.log(isFromFiat);
-      console.log(isToFiat);
+      const isFromFiat = isFiatCurrency(fromCurrency) ? "RUB" : fromCurrency;
+      const isToFiat = isFiatCurrency(toCurrency) ? "RUB" : toCurrency;
 
       const fromRate = rates[isFromFiat];
       const toRate = rates[isToFiat];
@@ -217,7 +237,7 @@ export default function ExchangeWidget() {
       } else {
         return toRate / fromRate;
       }
-    },  
+    },
     [rates]
   );
 
@@ -227,20 +247,14 @@ export default function ExchangeWidget() {
       dispatch(setLastChangedInput("give"));
       const numValue = Number(value.replace(",", "."));
       if (!isNaN(numValue) && rates) {
-        console.log(instances.give.selectedCurrency);
-        console.log(instances.receive.selectedCurrency);
-        
         const rate = getRateForCurrencies(
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
-        console.log(rate);
 
-        const giveIsFiat = isRuble(instances.give.selectedCurrency)
-          
-        const receiveIsFiat = isRuble(instances.receive.selectedCurrency)
-         console.log(giveIsFiat);
-         console.log(receiveIsFiat);
+        const giveIsFiat = isRuble(instances.give.selectedCurrency);
+
+        const receiveIsFiat = isRuble(instances.receive.selectedCurrency);
 
         let result = 0;
 
@@ -295,12 +309,8 @@ export default function ExchangeWidget() {
           instances.receive.selectedCurrency
         );
 
-        const giveIsFiat = isRuble(instances.give.selectedCurrency)
-          // instances.give.selectedCurrency === "Sber" ||
-          // instances.give.selectedCurrency === "T-Bank";
-        const receiveIsFiat = isRuble(instances.receive.selectedCurrency)
-          // instances.receive.selectedCurrency === "Sber" ||
-          // instances.receive.selectedCurrency === "T-Bank";
+        const giveIsFiat = isRuble(instances.give.selectedCurrency);
+        const receiveIsFiat = isRuble(instances.receive.selectedCurrency);
 
         let result = 0;
 
@@ -362,11 +372,6 @@ export default function ExchangeWidget() {
       const data = await getExchangeRates();
       if (data && data.rates) {
         setRates(data.rates);
-        // console.log(data.rates);
-        // const fixedrates = data.rates.map((el:number) => {
-        //   return el.toFixed(8)
-        // })
-        // console.log(fixedrates);
       } else {
         console.error("No rates data received from backend.");
       }
@@ -375,77 +380,18 @@ export default function ExchangeWidget() {
     }
   };
 
-  const getAdjustedRate = () => {
-    let rate = getRateForCurrencies(
+  const isAmountValid = () => {
+    const rubEquivalentGive = getRubEquivalent(
       instances.give.selectedCurrency,
-      instances.receive.selectedCurrency
+      Number(sumGive.replace(",", "."))
     );
 
-    let adjustedRate = rate;
-    console.log(adjustedRate);
-
-    // const giveIsFiat =
-    //   instances.give.selectedCurrency === "Sber" ||
-    //   instances.give.selectedCurrency === "T-Bank";
-    // const receiveIsFiat =
-    //   instances.receive.selectedCurrency === "Sber" ||
-    //   instances.receive.selectedCurrency === "T-Bank";
-
-    // if (giveIsFiat && !receiveIsFiat) {
-    //   // Пользователь покупает криптовалюту за рубли
-    //   // adjustedRate = adjustedRate * (1 + profitMargin);
-    // } else if (!giveIsFiat && receiveIsFiat) {
-    //   // Пользователь продаёт криптовалюту за рубли
-    //   // adjustedRate = adjustedRate * (1 - profitMargin);
-    // }
-
-    return adjustedRate;
-  };
-
-  const isAmountValid = () => {
-    let rubAmount = 0;
-    if (
-      instances.give.selectedCurrency === "Sber" ||
-      instances.give.selectedCurrency === "T-Bank"
-    ) {
-      rubAmount = Number(sumGive.replace(",", "."));
-    } else if (
-      instances.receive.selectedCurrency === "Sber" ||
-      instances.receive.selectedCurrency === "T-Bank"
-    ) {
-      rubAmount = Number(sumReceive.replace(",", "."));
-    } else {
-      // Если рубли не участвуют, считаем сумму валидной
-      return true;
-    }
-
-    if (isNaN(rubAmount)) return false;
-
-    // Проверяем, попадает ли сумма в диапазон комиссий
-    for (const tier of commissionTiers) {
-      if (rubAmount >= tier.min && rubAmount <= tier.max) {
-        return true;
-      }
-    }
-
-    return false;
+    return rubEquivalentGive >= 5000 && rubEquivalentGive <= 10000000;
   };
 
   useEffect(() => {
     getRatesFromBackend();
   }, []);
-
-  // useEffect(() => {
-  //   const rate = getAdjustedRate()
-  //   setFirstRate(rate)
-
-  // }, [getAdjustedRate])
-
-  // useEffect(() => {
-  //   if (instances.give.selectedCurrency && instances.receive.selectedCurrency && rate > 0) {
-  //     handleGiveInputChange(sumGive);
-  //   }
-  // }, [rate, instances.give.selectedCurrency, instances.receive.selectedCurrency, handleGiveInputChange, sumGive]);
 
   useEffect(() => {
     if (lastChangedInput === "give" && sumGive !== "") {
