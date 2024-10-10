@@ -29,6 +29,7 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { getExchangeRates } from "../../utils/api";
+import { banks } from "../../utils/config";
 
 // Commission tiers
 const commissionTiers = [
@@ -111,6 +112,16 @@ export default function ExchangeWidget() {
     (state: RootState) => state.exchange
   );
 
+  const isRuble = (currency: string) => {
+    const rubCurrencies = ["Сбер", "Т-Банк", "Альфа", "СБП", "ВТБ", "Райф", "Газпром", "Росбанк", "МТС", "ОЗОН", "Уралсиб", "Ак барс", "РСХБ", "Промсвязь", "Ю мани", "PAYEER"];
+    return rubCurrencies.includes(currency);
+  };
+  
+
+  const isFiatCurrency = (currency: string) => {
+    return banks.some((bank) => bank.symbol === currency);
+  };
+
   const handleTelegramNicknameChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -192,23 +203,21 @@ export default function ExchangeWidget() {
 
   const getRateForCurrencies = useCallback(
     (fromCurrency: string, toCurrency: string) => {
-      const symbolMap: { [key: string]: string } = {
-        Sber: "RUB",
-        "T-Bank": "RUB",
-      };
+      const isFromFiat = isFiatCurrency(fromCurrency) ? "RUB" : fromCurrency
+      const isToFiat = isFiatCurrency(toCurrency) ? "RUB" : toCurrency
 
-      const fromSymbol = symbolMap[fromCurrency] || fromCurrency;
-      const toSymbol = symbolMap[toCurrency] || toCurrency;
+      console.log(isFromFiat);
+      console.log(isToFiat);
 
-      const fromRate = rates[fromSymbol];
-      const toRate = rates[toSymbol];
+      const fromRate = rates[isFromFiat];
+      const toRate = rates[isToFiat];
 
-      if (fromSymbol === "RUB") {
+      if (isFromFiat === "RUB") {
         return fromRate / toRate;
       } else {
         return toRate / fromRate;
       }
-    },
+    },  
     [rates]
   );
 
@@ -218,18 +227,20 @@ export default function ExchangeWidget() {
       dispatch(setLastChangedInput("give"));
       const numValue = Number(value.replace(",", "."));
       if (!isNaN(numValue) && rates) {
+        console.log(instances.give.selectedCurrency);
+        console.log(instances.receive.selectedCurrency);
+        
         const rate = getRateForCurrencies(
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
-        // console.log(rate);
+        console.log(rate);
 
-        const giveIsFiat =
-          instances.give.selectedCurrency === "Sber" ||
-          instances.give.selectedCurrency === "T-Bank";
-        const receiveIsFiat =
-          instances.receive.selectedCurrency === "Sber" ||
-          instances.receive.selectedCurrency === "T-Bank";
+        const giveIsFiat = isRuble(instances.give.selectedCurrency)
+          
+        const receiveIsFiat = isRuble(instances.receive.selectedCurrency)
+         console.log(giveIsFiat);
+         console.log(receiveIsFiat);
 
         let result = 0;
 
@@ -248,7 +259,7 @@ export default function ExchangeWidget() {
           result = netAmount; // Итоговая сумма в рублях
         } else {
           // Обмен между двумя валютами (не RUB)
-          result = 0;
+          result = numValue * rate;
         }
 
         const receiveCurrencyObj = instances.receive.currencies.find(
@@ -284,12 +295,12 @@ export default function ExchangeWidget() {
           instances.receive.selectedCurrency
         );
 
-        const giveIsFiat =
-          instances.give.selectedCurrency === "Sber" ||
-          instances.give.selectedCurrency === "T-Bank";
-        const receiveIsFiat =
-          instances.receive.selectedCurrency === "Sber" ||
-          instances.receive.selectedCurrency === "T-Bank";
+        const giveIsFiat = isRuble(instances.give.selectedCurrency)
+          // instances.give.selectedCurrency === "Sber" ||
+          // instances.give.selectedCurrency === "T-Bank";
+        const receiveIsFiat = isRuble(instances.receive.selectedCurrency)
+          // instances.receive.selectedCurrency === "Sber" ||
+          // instances.receive.selectedCurrency === "T-Bank";
 
         let result = 0;
 
