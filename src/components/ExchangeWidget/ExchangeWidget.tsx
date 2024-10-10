@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import "./ExchangeWidget.scss";
 import { RootState } from "../../store/store";
+
 import {
   setCurrency,
   reverseCurrencies,
@@ -17,7 +18,13 @@ import {
 import arrow from "../../images/exchange.svg";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 // import { coins, banks } from "../../utils/config";
-import { CircularProgress, SelectChangeEvent, TextField } from "@mui/material";
+import {
+  CircularProgress,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 // import { ReactNode } from "react";
 import ExchangeItem from "../ExchangeItem/ExchangeItem";
 import {
@@ -91,8 +98,19 @@ const useStyles = makeStyles({
   text: {
     marginBottom: "10px",
   },
-  
 });
+
+const networkOptions: { [key: string]: string[] } = {
+  BTC: ["BTC", "BTC BEP20"],
+  ETH: ["ETH", "ETH BEP20"],
+  USDT: [
+    "Tether TRC20",
+    "Tether BEP20",
+    "Tether ERC20",
+    "Tether SOL",
+    "Tether Polygon",
+  ],
+};
 
 export default function ExchangeWidget() {
   const classes = useStyles();
@@ -103,7 +121,9 @@ export default function ExchangeWidget() {
   const [orderCreated, setOrderCreated] = useState(false);
   const [telegramNickname, setTelegramNickname] = useState("");
   const [nicknameError, setNicknameError] = useState("");
-  // const [firstRate, setFirstRate] = useState(0);
+  const [selectedNetworkGive, setSelectedNetworkGive] = useState("");
+  const [selectedNetworkReceive, setSelectedNetworkReceive] = useState("");
+  const [networkError, setNetworkError] = useState("");
 
   const dispatch = useAppDispatch();
   const { instances, sumGive, sumReceive, lastChangedInput } = useSelector(
@@ -145,6 +165,16 @@ export default function ExchangeWidget() {
     return rate ? amount * rate : 0;
   };
 
+  const handleNetworkChangeGive = (event: SelectChangeEvent<string>) => {
+    setSelectedNetworkGive(event.target.value);
+    setNetworkError(""); // Очистить ошибку при выборе сети
+  };
+
+  const handleNetworkChangeReceive = (event: SelectChangeEvent<string>) => {
+    setSelectedNetworkReceive(event.target.value);
+    setNetworkError(""); // Очистить ошибку при выборе сети
+  };
+
   const handleTelegramNicknameChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -174,7 +204,12 @@ export default function ExchangeWidget() {
     const message = encodeURIComponent(
       `Здравствуйте! Мой номер заявки: ${orderId}\n` +
         `Я отправляю: ${sumGive} ${instances.give.selectedCurrency}\n` +
-        `Я получаю: ${sumReceive} ${instances.receive.selectedCurrency}`
+        `Я получаю: ${sumReceive} ${instances.receive.selectedCurrency}\n` +
+        `${
+          selectedNetworkGive || selectedNetworkReceive
+            ? `Сеть: ${selectedNetworkGive || selectedNetworkReceive}`
+            : ""
+        }`
     );
     const telegramUsername = "Coins_change"; // замените на имя пользователя оператора
     window.open(`https://t.me/${telegramUsername}?text=${message}`, "_blank");
@@ -187,6 +222,16 @@ export default function ExchangeWidget() {
       return;
     }
 
+    if (
+      (["BTC", "ETH", "USDT"].includes(instances.give.selectedCurrency) &&
+        selectedNetworkGive === "") ||
+      (["BTC", "ETH", "USDT"].includes(instances.receive.selectedCurrency) &&
+        selectedNetworkReceive === "")
+    ) {
+      setNetworkError("Пожалуйста, выберите сеть");
+      return;
+    }
+
     setIsLoading(true); // Показать лоадер
 
     const orderData = {
@@ -195,6 +240,7 @@ export default function ExchangeWidget() {
       amountReceive: Number(sumReceive.replace(",", ".")),
       currencyReceive: instances.receive.selectedCurrency,
       telegramNickname: telegramNickname.trim(), // Добавляем ник в данные заявки
+      networkGive: selectedNetworkGive || selectedNetworkReceive, // Добавляем выбранную сеть в заявку
     };
 
     try {
@@ -213,6 +259,7 @@ export default function ExchangeWidget() {
       if (response.ok) {
         setOrderId(data.orderId);
         setOrderCreated(true);
+        setNetworkError(""); // Очистить ошибку при выборе сети
         // Здесь отправить письмо админу, вызвав соответствующую функцию на сервере
       } else {
         console.error("Ошибка при создании заявки:", data.message);
@@ -411,6 +458,7 @@ export default function ExchangeWidget() {
   ]);
 
   return (
+    
     <div className={"container"} id="widget">
       <div className={"exchange-block"}>
         <ExchangeItem
@@ -494,9 +542,73 @@ export default function ExchangeWidget() {
                 <strong>Вы получаете:</strong> {sumReceive}{" "}
                 {instances.receive.selectedCurrency}
               </div>
-              {/* <div className={classes.exchangeData}>
-                <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
-              </div> */}
+              {/* Добавляем выбор сети для BTC, ETH, USDT */}
+              {networkOptions[instances.give.selectedCurrency] && (
+                <div className={classes.exchangeData}>
+                  <strong style={{ marginBottom: "10px" }}>
+                    Выберите сеть для отправки:
+                  </strong>
+                  <Select
+                    value={selectedNetworkGive}
+                    onChange={handleNetworkChangeGive}
+                    fullWidth
+                    variant="outlined"
+                    sx={{ color: "#fff", ".MuiSelect-icon": { color: "#fff" } }}
+                    error={!!networkError}
+                  >
+                    {networkOptions[instances.give.selectedCurrency].map(
+                      (network) => (
+                        <MenuItem
+                          key={network}
+                          value={network}
+                          sx={{ color: "#fff" }}
+                        >
+                          {network}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
+                  {networkError && (
+                    <div style={{ color: "red", fontSize: "14px" }}>
+                      {networkError}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Добавляем выбор сети для получаемой валюты */}
+              {networkOptions[instances.receive.selectedCurrency] && (
+                <div className={classes.exchangeData}>
+                  <strong style={{ marginBottom: "10px" }}>
+                    Выберите сеть для получения:
+                  </strong>
+                  <Select
+                    value={selectedNetworkReceive}
+                    onChange={handleNetworkChangeReceive}
+                    fullWidth
+                    variant="outlined"
+                    sx={{ color: "#fff", ".MuiSelect-icon": { color: "#fff" } }}
+                    error={!!networkError}
+                  >
+                    {networkOptions[instances.receive.selectedCurrency].map(
+                      (network) => (
+                        <MenuItem
+                          key={network}
+                          value={network}
+                          sx={{ color: "#fff" }}
+                        >
+                          {network}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
+                  {networkError && (
+                    <div style={{ color: "red", fontSize: "14px" }}>
+                      {networkError}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <TextField
                 // className={classes.exchangeData}
@@ -555,5 +667,6 @@ export default function ExchangeWidget() {
         </DialogActions>
       </Dialog>
     </div>
+    
   );
 }

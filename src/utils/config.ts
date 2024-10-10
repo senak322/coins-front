@@ -33,15 +33,15 @@ export const coins: ICurrency[] = [
   { symbol: "BTC", icon: btc, isBank: false, decimalPlaces: 8 },
   { symbol: "ETH", icon: eth, isBank: false, decimalPlaces: 8 },
   { symbol: "USDT", icon: usdt, isBank: false, decimalPlaces: 2 },
-  { symbol: "TON", icon: ton, isBank: false, decimalPlaces: 8 },
-  { symbol: "XMR", icon: xmr, isBank: false, decimalPlaces: 8 },
-  { symbol: "TRX", icon: trx, isBank: false, decimalPlaces: 8 },
-  { symbol: "Doge", icon: doge, isBank: false, decimalPlaces: 8 },
+  { symbol: "TON", icon: ton, isBank: false, decimalPlaces: 4 },
+  { symbol: "XMR", icon: xmr, isBank: false, decimalPlaces: 4 },
+  { symbol: "TRX", icon: trx, isBank: false, decimalPlaces: 2 },
+  { symbol: "DOGE", icon: doge, isBank: false, decimalPlaces: 2 },
   { symbol: "USDC", icon: usdc, isBank: false, decimalPlaces: 2 },
   { symbol: "LTC", icon: ltc, isBank: false, decimalPlaces: 2 },
-  { symbol: "SOL", icon: sol, isBank: false, decimalPlaces: 8 },
-  { symbol: "DAI", icon: dai, isBank: false, decimalPlaces: 8 },
-  { symbol: "ADA", icon: ada, isBank: false, decimalPlaces: 8 },
+  { symbol: "SOL", icon: sol, isBank: false, decimalPlaces: 4 },
+  { symbol: "DAI", icon: dai, isBank: false, decimalPlaces: 2 },
+  { symbol: "ADA", icon: ada, isBank: false, decimalPlaces: 2 },
 ];
 
 export const banks: ICurrency[] = [
@@ -64,5 +64,4 @@ export const banks: ICurrency[] = [
   { symbol: "PAYEER", icon: pay, isBank: true, decimalPlaces: 0 },
 ];
 
-export const baseCurrencyUrl =
-  "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/";
+
