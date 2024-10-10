@@ -3,44 +3,26 @@ import "./Header.scss";
 import axios from "axios";
 
 export default function Header() {
-  const [rateData, setRateData] = useState({
-    btc: 0,
-    eth: 0,
-    ltc: 0,
-    usdt: 0,
-    xmr: 0,
-    ton: 0,
-  });
+  const [rates, setRates] = useState<{ [key: string]: number }>({});
 
   const getHeaderRate = async () => {
     try {
-      // Запрос к cryptocompare API
+      // Запрос к вашему бэкенду для получения курсов валют относительно рубля
       const response = await axios.get('https://min-api.cryptocompare.com/data/pricemulti', {
         params: {
-          fsyms: 'BTC,ETH,LTC,USDT,XMR,TON',
-          tsyms: 'USD',
+          fsyms: 'BTC,ETH,LTC,USDT,XMR,TON,DOGE,USDC,SOL,DAI,ADA',
+          tsyms: 'RUB',
         },
       });
       
-      // const rubRes = await axios.get('https://min-api.cryptocompare.com/data/pricemulti', {
-      //   params: {
-      //     fsyms: 'BTC,ETH,LTC,USDT,XMR,TON',
-      //     tsyms: 'RUB',
-      //   },
-      // });
-
       const data = response.data;
-      // console.log(rubRes.data);
       
       // Обновляем состояние с полученными курсами
-      setRateData({
-        btc: data.BTC.USD,
-        eth: data.ETH.USD,
-        ltc: data.LTC.USD,
-        usdt: data.USDT.USD,
-        xmr: data.XMR.USD,
-        ton: data.TON.USD,
+      const newRates: { [key: string]: number } = {};
+      Object.keys(data).forEach((currency) => {
+        newRates[currency] = data[currency].RUB;
       });
+      setRates(newRates);
     } catch (error) {
       console.error("Error fetching rates:", error);
     }
@@ -59,14 +41,20 @@ export default function Header() {
 
   return (
     <header className="header">
-      <ul className="header__coins-list">
-        <li>BTC ≈ {rateData.btc} USD</li>
-        <li>ETH ≈ {rateData.eth} USD</li>
-        <li>LTC ≈ {rateData.ltc} USD</li>
-        <li>USDT ≈ {rateData.usdt} USD</li>
-        {/* <li>XMR ≈ {rateData.xmr} USD</li> */}
-        <li>TON ≈ {rateData.ton} USD</li>
-      </ul>
+      <div className="header__coins-list">
+        <div className="header__coins-list__content">
+          {Object.keys(rates).map((currency) => (
+            <div key={currency} className="header__coin">
+              {currency} ≈ {rates[currency]} RUB
+            </div>
+          ))}
+          {Object.keys(rates).map((currency) => (
+            <div key={`${currency}-duplicate`} className="header__coin">
+              {currency} ≈ {rates[currency]} RUB
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="header__container">
         <h1 className="header__title">Coins Change</h1>
