@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Header.scss";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   const [rates, setRates] = useState<{ [key: string]: number }>({});
@@ -8,15 +9,18 @@ export default function Header() {
   const getHeaderRate = async () => {
     try {
       // Запрос к вашему бэкенду для получения курсов валют относительно рубля
-      const response = await axios.get('https://min-api.cryptocompare.com/data/pricemulti', {
-        params: {
-          fsyms: 'BTC,ETH,LTC,USDT,XMR,TON,DOGE,USDC,SOL,DAI,ADA',
-          tsyms: 'RUB',
-        },
-      });
-      
+      const response = await axios.get(
+        "https://min-api.cryptocompare.com/data/pricemulti",
+        {
+          params: {
+            fsyms: "BTC,ETH,LTC,USDT,XMR,TON,DOGE,USDC,SOL,DAI,ADA",
+            tsyms: "RUB",
+          },
+        }
+      );
+
       const data = response.data;
-      
+
       // Обновляем состояние с полученными курсами
       const newRates: { [key: string]: number } = {};
       Object.keys(data).forEach((currency) => {
@@ -57,7 +61,9 @@ export default function Header() {
       </div>
 
       <div className="header__container">
-        <h1 className="header__title">Coins Change</h1>
+        <Link to="/" className="header__title">
+          Coins Change
+        </Link>
         <div className="header__links">
           <a href="#widget" className="header__link">
             Change

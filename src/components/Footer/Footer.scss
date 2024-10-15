@@ -11,7 +11,8 @@
   }
   &__container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 2rem;
     width: 800px;
     padding-bottom: 4rem;
     @include respond-to(big) {
@@ -22,6 +23,7 @@
   &__li {
     color: white;
     font-size: 24px;
+    text-decoration: none;
     @include respond-to(big) {
         margin-top: 1rem;
       }
