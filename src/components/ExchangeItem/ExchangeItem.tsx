@@ -28,6 +28,9 @@ export default function ExchangeItem({
   const { instances, sumGive, sumReceive } = useSelector(
     (state: RootState) => state.exchange
   );
+  const currentLanguage = useSelector(
+    (state: RootState) => state.language.currentLanguage
+  );
   const dispatch = useAppDispatch();
 
   const handleChangeSum = useCallback(
@@ -73,12 +76,21 @@ export default function ExchangeItem({
     },
   });
 
+  const translations = {
+    ru: {
+      sum: "укажите сумму",
+    },
+    en: {
+      sum: "specify the amount",
+    },
+  };
+
   return (
     <div className="item">
       <p className="you-p">{title}:</p>
       <div className="input-container">
         <input
-        placeholder="Укажите сумму"
+          placeholder={translations[currentLanguage].sum}
           className="input"
           type="text"
           value={way === "give" ? sumGive : sumReceive || ""}

@@ -2,11 +2,28 @@ import { useEffect, useState } from "react";
 import LatestItem from "../LatestItem/LatestItem";
 import "./Latest.scss";
 import { IOrder } from "../../types/types";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 export default function Latest() {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true); // Добавляем состояние загрузки
   const [error, setError] = useState(""); // Добавляем состояние ошибки
+
+  const currentLanguage = useSelector(
+    (state: RootState) => state.language.currentLanguage
+  );
+
+  const translations = {
+    ru: {
+      latest: "Последние транзакции",
+      error: "Транзакции не найдены"
+    },
+    en: {
+      latest: "Latest transactions",
+      error: "No recent transactions"
+    },
+  };
 
   const fetchLatestOrders = async () => {
     try {
@@ -29,7 +46,7 @@ export default function Latest() {
 
   return (
     <section className="latest">
-      <h3>Latest transactions</h3>
+      <h3>{translations[currentLanguage].latest}</h3>
       <div className="latest__container">
         {loading ? (
           <p>Loading...</p>
@@ -40,7 +57,7 @@ export default function Latest() {
             <LatestItem key={order.orderId} order={order} />
           ))
         ) : (
-          <p>No recent transactions</p>
+          <p>{translations[currentLanguage].error}</p>
         )}
       </div>
     </section>

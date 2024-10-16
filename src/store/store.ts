@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import exchangeReducer from './exchangeSlice';
+import languageReducer from "./languageSlice"; 
 
 const store = configureStore({
     reducer: {
       exchange: exchangeReducer,
+      language: languageReducer, // срез языка
     },
   });
   

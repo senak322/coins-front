@@ -3,10 +3,17 @@ import "./Header.scss";
 
 import { Link } from "react-router-dom";
 import { getExchangeRates } from "../../utils/api";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { toggleLanguage } from "../../store/languageSlice";
 
 export default function Header() {
   const [rates, setRates] = useState<{ [key: string]: number }>({});
-
+  const dispatch = useAppDispatch();
+  const currentLanguage = useSelector(
+    (state: RootState) => state.language.currentLanguage
+  );
 
   const getHeaderRate = async () => {
     try {
@@ -20,8 +27,21 @@ export default function Header() {
       console.error("Error fetching exchange rates:", error);
     }
   };
-  
 
+  const translations = {
+    ru: {
+      change: "Обмен",
+      language: "RU",
+    },
+    en: {
+      change: "Change",
+      language: "EN",
+    },
+  };
+
+  const toggleLang = () => {
+    dispatch(toggleLanguage());
+  };
 
   useEffect(() => {
     getHeaderRate();
@@ -56,10 +76,12 @@ export default function Header() {
           Coins Change
         </Link>
         <div className="header__links">
-          <a href="#widget" className="header__link">
-            Change
-          </a>
-          <button className="header__link">Language</button>
+          {/* <a href="#widget" className="header__link">
+            {translations[currentLanguage].change}
+          </a> */}
+          <button onClick={toggleLang} className="header__link">
+            {translations[currentLanguage].language}
+          </button>
         </div>
       </div>
     </header>

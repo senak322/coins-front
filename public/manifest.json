@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Coins Change",
+  "name": "Coins Change - Обмен криптовалют и фиатных средств",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +8,19 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
-      "type": "image/png",
+      "src": "logo192.svg",
+      "type": "image/svg",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
-      "type": "image/png",
+      "src": "logo512.svg",
+      "type": "image/svg",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "description": "Coins Change - это новый и удобный способ обмена фиатных средств и криптовалют. Покупка, продажа и обмен криптовалюты легко и удобно."
 }

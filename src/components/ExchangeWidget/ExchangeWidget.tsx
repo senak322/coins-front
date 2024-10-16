@@ -130,6 +130,10 @@ export default function ExchangeWidget() {
     (state: RootState) => state.exchange
   );
 
+  const currentLanguage = useSelector(
+    (state: RootState) => state.language.currentLanguage
+  );
+
   const isRuble = (currency: string) => {
     const rubCurrencies = [
       "Сбер",
@@ -457,12 +461,25 @@ export default function ExchangeWidget() {
     handleReceiveInputChange,
   ]);
 
+  const translations = {
+    ru: {
+      give: "Вы отправляете",
+      receive: "Вы получаете",
+      change: "СОВЕРШИТЬ ОБМЕН"
+    },
+    en: {
+      give: "You send",
+      receive: "You get",
+      change: "CHANGE"
+    },
+  };
+
   return (
     
     <div className={"container"} id="widget">
       <div className={"exchange-block"}>
         <ExchangeItem
-          title="You send"
+          title={translations[currentLanguage].give}
           handleInputChange={handleGiveInputChange}
           handleCurrencyChange={handleGiveCurrencyChange}
           way="give"
@@ -476,7 +493,7 @@ export default function ExchangeWidget() {
           />
         </button>
         <ExchangeItem
-          title="You get"
+          title={translations[currentLanguage].receive}
           handleInputChange={handleReceiveInputChange}
           handleCurrencyChange={handleReceiveCurrencyChange}
           way="receive"
@@ -484,7 +501,7 @@ export default function ExchangeWidget() {
       </div>
 
       <button className="exchange-button" onClick={handleClickOpen}>
-        CHANGE
+      {translations[currentLanguage].change}
       </button>
       {/* <p className="exchange-rate"> */}
       {/* exchange rate: 1 {instances.give.selectedCurrency} ~{" "} */}
