@@ -8,7 +8,7 @@ export default function Footer() {
       <Link to="/about" className="footer__li">About us</Link>
       <Link to="/rules" className="footer__li">Rules</Link>
       </ul>
-      <p className="footer__rights">© All Rights Reserved. Coins Change. contact@coinschange.com</p>
+      <p className="footer__rights">© All Rights Reserved. Coins Change. Info@atababa.ru</p>
     </footer>
   );
 }
