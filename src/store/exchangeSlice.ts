@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { banks, coins } from "../utils/config";
 import { ICurrency } from "../types/types";
 
+
 export interface ExchangeState {
   instances: {
     [key: string]: {
@@ -12,6 +13,7 @@ export interface ExchangeState {
       currencies: ICurrency[];
     };
   };
+  // rates: {[key: string]: number} | null;
   sumGive: string;
   sumReceive: string;
   step: number;
@@ -44,6 +46,7 @@ const initialState: ExchangeState = {
       currencies: banks,
     },
   },
+  // rates: null,
   sumGive: "",
   sumReceive: "",
   step: 1,
@@ -63,12 +66,30 @@ const initialState: ExchangeState = {
   },
 };
 
+// export const fetchExchangeRates = createAsyncThunk(
+//   "exchange/fetchExchangeRates",
+//   async () => {
+//     const response = await axios.get(
+//       "https://min-api.cryptocompare.com/data/pricemulti",
+//       {
+//         params: {
+//           fsyms: "BTC,ETH,LTC,USDT,XMR,TON,DOGE,USDC,SOL,DAI,ADA",
+//           tsyms: "RUB",
+//         },
+//       }
+//     );
+
+//     return response.data;
+//   }
+// );
+
 const exchangeSlice = createSlice({
   name: "exchange",
   initialState,
   // ... другие связанные состояния
 
   reducers: {
+    
     setCurrency: (
       state,
       action: PayloadAction<{ instanceId: string; currency: string }>
@@ -169,6 +190,17 @@ const exchangeSlice = createSlice({
         state.alert.paid.severity = action.payload.severity;
       }
     },
+    // extraReducers: (builder) => {
+    //   builder.addCase(fetchExchangeRates.fulfilled, (state, action) => {
+    //     const rawRates = action.payload;
+    //     const rates: { [key: string]: number } = {};
+    //     for (const [currency, rateData] of Object.entries(rawRates)) {
+    //       if (typeof rateData === "object" && rateData !== null && "RUB" in rateData) {
+    //         rates[currency] = rateData["RUB"];
+    //       }
+    //     }
+    //     state.rates = rates;
+    //   });
     // ... другие редьюсеры для обновления состояния
   },
 });

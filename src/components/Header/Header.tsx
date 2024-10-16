@@ -1,36 +1,27 @@
 import { useEffect, useState } from "react";
 import "./Header.scss";
-import axios from "axios";
+
 import { Link } from "react-router-dom";
+import { getExchangeRates } from "../../utils/api";
 
 export default function Header() {
   const [rates, setRates] = useState<{ [key: string]: number }>({});
 
+
   const getHeaderRate = async () => {
     try {
-      // Запрос к вашему бэкенду для получения курсов валют относительно рубля
-      const response = await axios.get(
-        "https://min-api.cryptocompare.com/data/pricemulti",
-        {
-          params: {
-            fsyms: "BTC,ETH,LTC,USDT,XMR,TON,DOGE,USDC,SOL,DAI,ADA",
-            tsyms: "RUB",
-          },
-        }
-      );
-
-      const data = response.data;
-
-      // Обновляем состояние с полученными курсами
-      const newRates: { [key: string]: number } = {};
-      Object.keys(data).forEach((currency) => {
-        newRates[currency] = data[currency].RUB;
-      });
-      setRates(newRates);
+      const data = await getExchangeRates();
+      if (data && data.rates) {
+        setRates(data.rates);
+      } else {
+        console.error("No rates data received from backend.");
+      }
     } catch (error) {
-      console.error("Error fetching rates:", error);
+      console.error("Error fetching exchange rates:", error);
     }
   };
+  
+
 
   useEffect(() => {
     getHeaderRate();
