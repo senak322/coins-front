@@ -38,6 +38,49 @@ import { makeStyles } from "@mui/styles";
 import { getExchangeRates } from "../../utils/api";
 import { banks } from "../../utils/config";
 
+const useStyles = makeStyles({
+  dialogPaper: {
+    backgroundColor: "#3a3a3a",
+    color: "#fff",
+    width: "100%",
+    maxWidth: "600px", // Установите максимальную ширину, соответствующую ширине виджета
+    borderRadius: "15px",
+    padding: "20px",
+  },
+  dialogTitle: {
+    color: "#fff",
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    paddingBottom: "10px",
+  },
+  dialogContent: {
+    color: "#fff",
+    fontSize: "1.2rem",
+  },
+  dialogActions: {
+    justifyContent: "space-between",
+    paddingTop: "20px",
+  },
+  button: {
+    backgroundColor: "#ffb300",
+    color: "#fff",
+    "&:hover": {
+      backgroundColor: "#ffa000",
+    },
+  },
+  exchangeData: {
+    marginBottom: "10px",
+  },
+  loaderContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  text: {
+    marginBottom: "10px",
+  },
+});
+
 // Commission tiers
 // Commission tiers for USDT
 const usdtCommissionTiers = [
@@ -82,48 +125,7 @@ function getCommission(currency: string, amount: number): number {
 }
 
 // Создаем стили
-const useStyles = makeStyles({
-  dialogPaper: {
-    backgroundColor: "#3a3a3a",
-    color: "#fff",
-    width: "100%",
-    maxWidth: "600px", // Установите максимальную ширину, соответствующую ширине виджета
-    borderRadius: "15px",
-    padding: "20px",
-  },
-  dialogTitle: {
-    color: "#fff",
-    fontSize: "1.5rem",
-    fontWeight: "bold",
-    paddingBottom: "10px",
-  },
-  dialogContent: {
-    color: "#fff",
-    fontSize: "1.2rem",
-  },
-  dialogActions: {
-    justifyContent: "space-between",
-    paddingTop: "20px",
-  },
-  button: {
-    backgroundColor: "#ffb300",
-    color: "#fff",
-    "&:hover": {
-      backgroundColor: "#ffa000",
-    },
-  },
-  exchangeData: {
-    marginBottom: "10px",
-  },
-  loaderContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  text: {
-    marginBottom: "10px",
-  },
-});
+
 
 const networkOptions: { [key: string]: string[] } = {
   BTC: ["BTC", "BTC BEP20"],
@@ -138,8 +140,10 @@ const networkOptions: { [key: string]: string[] } = {
 };
 
 export default function ExchangeWidget() {
+  
   const classes = useStyles();
   const [rates, setRates] = useState<{ [key: string]: number }>({});
+  const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -448,6 +452,7 @@ export default function ExchangeWidget() {
       const data = await getExchangeRates();
       if (data && data.rates) {
         setRates(data.rates);
+        setLastUpdated(Date.now());
       } else {
         console.error("No rates data received from backend.");
       }
@@ -467,9 +472,18 @@ export default function ExchangeWidget() {
 
   useEffect(() => {
     getRatesFromBackend();
+    const interval = setInterval(() => {
+      getRatesFromBackend();
+    }, 120000); // Обновление курсов каждые 2 минуты
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
+    if (Date.now() - lastUpdated > 120000) {
+      // Проверяем, что курсы не устарели более чем на 2 минуты
+      getRatesFromBackend();
+    }
     if (lastChangedInput === "give" && sumGive !== "") {
       handleGiveInputChange(sumGive);
     } else if (lastChangedInput === "receive" && sumReceive !== "") {
@@ -484,6 +498,7 @@ export default function ExchangeWidget() {
     lastChangedInput,
     handleGiveInputChange,
     handleReceiveInputChange,
+    lastUpdated
   ]);
 
   const translations = {
@@ -525,9 +540,12 @@ export default function ExchangeWidget() {
         />
       </div>
 
-      <button className="exchange-button" onClick={handleClickOpen}>
+      <button className="exchange-button" onClick={handleClickOpen} disabled={Date.now() - lastUpdated > 120000}>
       {translations[currentLanguage].change}
       </button>
+      {Date.now() - lastUpdated > 120000 && (
+        <p style={{ color: "red" }}>Курс устарел. Пожалуйста, обновите курс для продолжения.</p>
+      )}
       {/* <p className="exchange-rate"> */}
       {/* exchange rate: 1 {instances.give.selectedCurrency} ~{" "} */}
       {/* {rates ? getAdjustedRate() : "Не удалось загрузить курс"}{" "} */}
