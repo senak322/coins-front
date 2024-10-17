@@ -29,7 +29,7 @@ export default function Footer() {
         </Link>
       </ul>
       <p className="footer__rights">
-        © All Rights Reserved. Coins Change. Info@atababa.ru
+        © All Rights Reserved. Coins Change. coins_changebtc@proton.me
       </p>
     </footer>
   );

@@ -39,13 +39,38 @@ import { getExchangeRates } from "../../utils/api";
 import { banks } from "../../utils/config";
 
 // Commission tiers
-const commissionTiers = [
-  { min: 5000, max: 14999, commission: 0.03 }, // 3% комиссия
-  { min: 15000, max: 99999, commission: 0.02 }, // 2% комиссия
-  { min: 100000, max: 10000000, commission: 0.01 }, // 1% комиссия
+// Commission tiers for USDT
+const usdtCommissionTiers = [
+  { min: 5000, max: 50000, commission: 0.04 }, // 4%
+  { min: 50001, max: 100000, commission: 0.03 }, // 3%
+  { min: 100001, max: 10000000, commission: 0.025 }, // 2.5%
 ];
 
-function getCommission(amount: number): number {
+// Commission tiers for BTC
+const btcCommissionTiers = [
+  { min: 5000, max: 50000, commission: 0.06 }, // 6%
+  { min: 50001, max: 100000, commission: 0.05 }, // 5%
+  { min: 100001, max: 10000000, commission: 0.04 }, // 4%
+];
+
+// Commission tiers for other altcoins
+const altCommissionTiers = [
+  { min: 5000, max: 100000, commission: 0.05 }, // 5%
+  { min: 100001, max: 10000000, commission: 0.06 }, // 6%
+];
+
+
+function getCommission(currency: string, amount: number): number {
+  let commissionTiers;
+
+  if (currency === "USDT") {
+    commissionTiers = usdtCommissionTiers;
+  } else if (currency === "BTC") {
+    commissionTiers = btcCommissionTiers;
+  } else {
+    commissionTiers = altCommissionTiers;
+  }
+
   for (const tier of commissionTiers) {
     if (amount >= tier.min && amount < tier.max) {
       // console.log(`Комиссия для суммы ${amount}: ${tier.commission}`);
@@ -311,14 +336,14 @@ export default function ExchangeWidget() {
 
         if (giveIsFiat && !receiveIsFiat) {
           // Пользователь покупает валюту за рубли
-          const commissionRate = getCommission(numValue);
+          const commissionRate = getCommission(instances.receive.selectedCurrency, numValue);
           const commission = numValue * commissionRate;
           const netAmount = numValue - commission;
           result = netAmount * rate;
         } else if (!giveIsFiat && receiveIsFiat) {
           // Пользователь продает валюту за рубли
           const grossAmount = numValue / rate;
-          const commissionRate = getCommission(grossAmount);
+          const commissionRate = getCommission(instances.give.selectedCurrency, grossAmount);
           const commission = grossAmount * commissionRate;
           const netAmount = grossAmount - commission;
           result = netAmount; // Итоговая сумма в рублях
@@ -367,12 +392,12 @@ export default function ExchangeWidget() {
 
         if (!giveIsFiat && receiveIsFiat) {
           // Пользователь продает валюту за рубли
-          const grossAmount = numValue / (1 - getCommission(numValue)); // Учитываем комиссию
+          const grossAmount = numValue / (1 - getCommission(instances.give.selectedCurrency, numValue)); // Учитываем комиссию
           result = grossAmount * rate;
         } else if (giveIsFiat && !receiveIsFiat) {
           // Пользователь покупает валюту за рубли
           const amountInRub = numValue / rate;
-          const grossAmount = amountInRub / (1 - getCommission(amountInRub));
+          const grossAmount = amountInRub / (1 - getCommission(instances.receive.selectedCurrency, amountInRub));
           result = grossAmount;
         } else {
           // Обмен между двумя валютами (не RUB)
@@ -677,8 +702,8 @@ export default function ExchangeWidget() {
           )}
           {!isAmountValid() && !orderCreated && (
             <div style={{ color: "red", marginTop: "10px" }}>
-              Сумма должна быть от {commissionTiers[0].min} до{" "}
-              {commissionTiers[commissionTiers.length - 1].max} рублей.
+              Сумма должна быть от 5000 до{" "}
+              10000000 рублей.
             </div>
           )}
         </DialogActions>

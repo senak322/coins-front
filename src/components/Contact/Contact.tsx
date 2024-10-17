@@ -26,7 +26,7 @@ export default function Contact() {
           <img src={telegram} alt="telegram" />
         </a>
         <span className="contact__span"></span>
-        <a className="contact__mail" href="mailto:Info@atababa.ru">
+        <a className="contact__mail" href="mailto:coins_changebtc@proton.me">
           <AlternateEmailIcon className="" />
         </a>
       </div>

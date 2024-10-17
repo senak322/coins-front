@@ -358,8 +358,8 @@ const Rules = () => {
           </li>
           <li className="rules__list-item">
             {language === "ru"
-              ? "3.22.7. В случае указания неправильных реквизитов для вывода средств на карты/кошельки клиента и т.п. Клиенту необходимо связаться с тех. поддержкой и передать корректные реквизиты для исполнения заявки. Связаться с оператором службы поддержки вы можете в онлайн чате в телеграм или по почте Info@atababa.ru Если клиент не выходит на связь в течении рабочей недели, то обменник оставляет за собой право присвоить себе активы клиента."
-              : "3.22.7. In case incorrect details are provided for withdrawing funds to the client's cards/wallets, etc., the Client must contact technical support and provide the correct details to execute the Application. You can contact the support operator in the online chat in Telegram or via email at Info@atababa.ru. If the client does not get in touch within a working week, the exchange office reserves the right to keep the client's assets."}
+              ? "3.22.7. В случае указания неправильных реквизитов для вывода средств на карты/кошельки клиента и т.п. Клиенту необходимо связаться с тех. поддержкой и передать корректные реквизиты для исполнения заявки. Связаться с оператором службы поддержки вы можете в онлайн чате в телеграм или по почте coins_changebtc@proton.me Если клиент не выходит на связь в течении рабочей недели, то обменник оставляет за собой право присвоить себе активы клиента."
+              : "3.22.7. In case incorrect details are provided for withdrawing funds to the client's cards/wallets, etc., the Client must contact technical support and provide the correct details to execute the Application. You can contact the support operator in the online chat in Telegram or via email at coins_changebtc@proton.me. If the client does not get in touch within a working week, the exchange office reserves the right to keep the client's assets."}
           </li>
         </ul>
       </section>
@@ -455,8 +455,8 @@ const Rules = () => {
         </p>
         <p className="rules__text">
           {language === "ru"
-            ? "7.5. Пользователь обязан немедленно уведомить администрацию Сервиса о любом несанкционированном использовании учетной записи Пользователя или пароля, компрометации учетных данных, предполагаемом взломе Аккаунта или любом другом нарушении безопасности по электронной почте Info@atababa.ru."
-            : "7.5. The User must immediately notify the Service administration of any unauthorized use of the User's account or password, compromise of login credentials, suspected hacking of the Account, or any other security breach via email at Info@atababa.ru."}
+            ? "7.5. Пользователь обязан немедленно уведомить администрацию Сервиса о любом несанкционированном использовании учетной записи Пользователя или пароля, компрометации учетных данных, предполагаемом взломе Аккаунта или любом другом нарушении безопасности по электронной почте coins_changebtc@proton.me."
+            : "7.5. The User must immediately notify the Service administration of any unauthorized use of the User's account or password, compromise of login credentials, suspected hacking of the Account, or any other security breach via email at coins_changebtc@proton.me."}
         </p>
         <p className="rules__text">
           {language === "ru"
@@ -604,8 +604,8 @@ const Rules = () => {
         </p>
         <p className="rules__text">
           {language === "ru"
-            ? "10.2. Вы также можете отправить письмо на адрес электронной почты: Info@atababa.ru"
-            : "10.2. You can also send an email to: Info@atababa.ru"}
+            ? "10.2. Вы также можете отправить письмо на адрес электронной почты: coins_changebtc@proton.me"
+            : "10.2. You can also send an email to: coins_changebtc@proton.me"}
         </p>
         <p className="rules__text">
           {language === "ru"

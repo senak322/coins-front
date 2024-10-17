@@ -1,5 +1,10 @@
+@import "../../styles/mixins";
+
 .contact {
   margin-bottom: 4rem;
+  @include respond-to(small) {
+    margin: 2rem 0;
+  }
   &__container {
     display: flex;
     align-items: center;
