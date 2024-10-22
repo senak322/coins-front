@@ -9,7 +9,7 @@ import { RootState } from "../../store/store";
 import { toggleLanguage } from "../../store/languageSlice";
 
 export default function Header() {
-  const [rates, setRates] = useState<{ [key: string]: number }>({});
+  const [rates, setRates] = useState<{ [key: string]: { rub: number; usd: number }  }>({});
   const dispatch = useAppDispatch();
   const currentLanguage = useSelector(
     (state: RootState) => state.language.currentLanguage
@@ -60,12 +60,12 @@ export default function Header() {
         <div className="header__coins-list__content">
           {Object.keys(rates).map((currency) => (
             <div key={currency} className="header__coin">
-              {currency} ≈ {rates[currency]} RUB
+              {currency} ≈ {rates[currency].usd} USD
             </div>
           ))}
           {Object.keys(rates).map((currency) => (
             <div key={`${currency}-duplicate`} className="header__coin">
-              {currency} ≈ {rates[currency]} RUB
+              {currency} ≈ {rates[currency].usd} USD
             </div>
           ))}
         </div>

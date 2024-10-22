@@ -1,5 +1,5 @@
 import Contact from "../Contact/Contact";
-// import Cooperate from "../Cooperate/Cooperate";
+import Cooperate from "../Cooperate/Cooperate";
 import ExchangeWidget from "../ExchangeWidget/ExchangeWidget";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
@@ -34,7 +34,7 @@ export default function MainExchange() {
       <Qa />
       <Contact />
       <Latest />
-      {/* <Cooperate /> */}
+      <Cooperate />
     </main>
   );
 }

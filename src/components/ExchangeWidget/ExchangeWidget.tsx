@@ -120,8 +120,13 @@ function getCommission(currency: string, amount: number): number {
       return tier.commission;
     }
   }
-  // console.log(`Комиссия для суммы ${amount}: 0`);
-  return 0; // Если сумма не попадает ни в один диапазон, комиссия 0%
+  
+  // Если сумма не попадает в диапазон, выбираем ближайшую комиссию
+  if (amount < 5000) {
+    return commissionTiers[0].commission;
+  } else {
+    return commissionTiers[commissionTiers.length - 1].commission;
+  }
 }
 
 // Создаем стили
@@ -142,7 +147,7 @@ const networkOptions: { [key: string]: string[] } = {
 export default function ExchangeWidget() {
   
   const classes = useStyles();
-  const [rates, setRates] = useState<{ [key: string]: number }>({});
+  const [rates, setRates] = useState<{ [key: string]: { rub: number; usd: number } }>({});
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -194,7 +199,7 @@ export default function ExchangeWidget() {
     if (curr) {
       return amount;
     }
-    const rate = rates[currency];
+    const rate = rates[currency]?.rub;
     return rate ? amount * rate : 0;
   };
 
@@ -309,8 +314,8 @@ export default function ExchangeWidget() {
       const isFromFiat = isFiatCurrency(fromCurrency) ? "RUB" : fromCurrency;
       const isToFiat = isFiatCurrency(toCurrency) ? "RUB" : toCurrency;
 
-      const fromRate = rates[isFromFiat];
-      const toRate = rates[isToFiat];
+      const fromRate = rates[isFromFiat]?.rub;
+      const toRate = rates[isToFiat]?.rub;
 
       if (isFromFiat === "RUB") {
         return fromRate / toRate;
@@ -331,6 +336,11 @@ export default function ExchangeWidget() {
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
+
+        if (!rate) {
+          dispatch(setSumReceive(""));
+          return;
+        }
 
         const giveIsFiat = isRuble(instances.give.selectedCurrency);
 
@@ -388,6 +398,11 @@ export default function ExchangeWidget() {
           instances.give.selectedCurrency,
           instances.receive.selectedCurrency
         );
+
+        if (!rate) {
+          dispatch(setSumGive(""));
+          return;
+        }
 
         const giveIsFiat = isRuble(instances.give.selectedCurrency);
         const receiveIsFiat = isRuble(instances.receive.selectedCurrency);

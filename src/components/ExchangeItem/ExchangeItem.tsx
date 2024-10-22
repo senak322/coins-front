@@ -81,7 +81,7 @@ export default function ExchangeItem({
       sum: "укажите сумму",
     },
     en: {
-      sum: "specify the amount",
+      sum: "your amount",
     },
   };
 
