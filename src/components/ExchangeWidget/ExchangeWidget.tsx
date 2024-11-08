@@ -35,7 +35,7 @@ import {
   Button,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { getExchangeRates } from "../../utils/api";
+import { calculateExchange, getExchangeRates } from "../../utils/api";
 import { banks } from "../../utils/config";
 
 const useStyles = makeStyles({
@@ -326,67 +326,91 @@ export default function ExchangeWidget() {
     [rates]
   );
 
-  const handleGiveInputChange = useCallback(
-    (value: string) => {
-      dispatch(setSumGive(value));
-      dispatch(setLastChangedInput("give"));
-      const numValue = Number(value.replace(",", "."));
-      if (!isNaN(numValue) && rates) {
-        const rate = getRateForCurrencies(
-          instances.give.selectedCurrency,
-          instances.receive.selectedCurrency
-        );
+  // const handleGiveInputChange = useCallback(
+  //   (value: string) => {
+  //     dispatch(setSumGive(value));
+  //     dispatch(setLastChangedInput("give"));
+  //     const numValue = Number(value.replace(",", "."));
+  //     if (!isNaN(numValue) && rates) {
+  //       const rate = getRateForCurrencies(
+  //         instances.give.selectedCurrency,
+  //         instances.receive.selectedCurrency
+  //       );
 
-        if (!rate) {
-          dispatch(setSumReceive(""));
-          return;
-        }
+  //       if (!rate) {
+  //         dispatch(setSumReceive(""));
+  //         return;
+  //       }
 
-        const giveIsFiat = isRuble(instances.give.selectedCurrency);
+  //       const giveIsFiat = isRuble(instances.give.selectedCurrency);
 
-        const receiveIsFiat = isRuble(instances.receive.selectedCurrency);
+  //       const receiveIsFiat = isRuble(instances.receive.selectedCurrency);
 
-        let result = 0;
+  //       let result = 0;
 
-        if (giveIsFiat && !receiveIsFiat) {
-          // Пользователь покупает валюту за рубли
-          const commissionRate = getCommission(instances.receive.selectedCurrency, numValue);
-          const commission = numValue * commissionRate;
-          const netAmount = numValue - commission;
-          result = netAmount * rate;
-        } else if (!giveIsFiat && receiveIsFiat) {
-          // Пользователь продает валюту за рубли
-          const grossAmount = numValue / rate;
-          const commissionRate = getCommission(instances.give.selectedCurrency, grossAmount);
-          const commission = grossAmount * commissionRate;
-          const netAmount = grossAmount - commission;
-          result = netAmount; // Итоговая сумма в рублях
-        } else {
-          // Обмен между двумя валютами (не RUB)
-          result = numValue * rate;
-        }
+  //       if (giveIsFiat && !receiveIsFiat) {
+  //         // Пользователь покупает валюту за рубли
+  //         const commissionRate = getCommission(instances.receive.selectedCurrency, numValue);
+  //         const commission = numValue * commissionRate;
+  //         const netAmount = numValue - commission;
+  //         result = netAmount * rate;
+  //       } else if (!giveIsFiat && receiveIsFiat) {
+  //         // Пользователь продает валюту за рубли
+  //         const grossAmount = numValue / rate;
+  //         const commissionRate = getCommission(instances.give.selectedCurrency, grossAmount);
+  //         const commission = grossAmount * commissionRate;
+  //         const netAmount = grossAmount - commission;
+  //         result = netAmount; // Итоговая сумма в рублях
+  //       } else {
+  //         // Обмен между двумя валютами (не RUB)
+  //         result = numValue * rate;
+  //       }
 
-        const receiveCurrencyObj = instances.receive.currencies.find(
-          (c) => c.symbol === instances.receive.selectedCurrency
-        );
-        const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
+  //       const receiveCurrencyObj = instances.receive.currencies.find(
+  //         (c) => c.symbol === instances.receive.selectedCurrency
+  //       );
+  //       const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
 
-        const formattedResult = result.toFixed(allowedDecimalPlaces);
+  //       const formattedResult = result.toFixed(allowedDecimalPlaces);
 
-        dispatch(setSumReceive(formattedResult));
+  //       dispatch(setSumReceive(formattedResult));
+  //     } else {
+  //       dispatch(setSumReceive(""));
+  //     }
+  //   },
+  //   [
+  //     dispatch,
+  //     instances.give.selectedCurrency,
+  //     instances.receive.currencies,
+  //     instances.receive.selectedCurrency,
+  //     rates,
+  //     getRateForCurrencies,
+  //   ]
+  // );
+
+  const isFiat = useCallback((curr: string) => {
+    return isRuble(curr) ? "RUB" : curr
+  }, [])
+  
+  const handleGiveInputChange = useCallback(async (value: string) => {
+    dispatch(setSumGive(value));
+    dispatch(setLastChangedInput("give"));
+    const numValue = Number(value.replace(",", "."));
+    if (!isNaN(numValue)) {
+      const result = await calculateExchange(
+        isFiat(instances.give.selectedCurrency),
+        isFiat(instances.receive.selectedCurrency),
+        numValue
+      );
+  
+      if (result) {
+        dispatch(setSumReceive(result.resultAmount));
       } else {
         dispatch(setSumReceive(""));
       }
-    },
-    [
-      dispatch,
-      instances.give.selectedCurrency,
-      instances.receive.currencies,
-      instances.receive.selectedCurrency,
-      rates,
-      getRateForCurrencies,
-    ]
-  );
+    }
+  }, [dispatch, instances.give.selectedCurrency, instances.receive.selectedCurrency, isFiat]);
+  
   const handleReceiveInputChange = useCallback(
     (value: string) => {
       dispatch(setSumReceive(value));
