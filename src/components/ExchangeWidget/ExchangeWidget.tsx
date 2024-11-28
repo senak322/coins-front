@@ -25,7 +25,6 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-// import { ReactNode } from "react";
 import ExchangeItem from "../ExchangeItem/ExchangeItem";
 import {
   Dialog,
@@ -81,56 +80,8 @@ const useStyles = makeStyles({
   },
 });
 
-// Commission tiers
-// Commission tiers for USDT
-const usdtCommissionTiers = [
-  { min: 5000, max: 50000, commission: 0.04 }, // 4%
-  { min: 50001, max: 100000, commission: 0.03 }, // 3%
-  { min: 100001, max: 10000000, commission: 0.025 }, // 2.5%
-];
-
-// Commission tiers for BTC
-const btcCommissionTiers = [
-  { min: 5000, max: 50000, commission: 0.06 }, // 6%
-  { min: 50001, max: 100000, commission: 0.05 }, // 5%
-  { min: 100001, max: 10000000, commission: 0.04 }, // 4%
-];
-
-// Commission tiers for other altcoins
-const altCommissionTiers = [
-  { min: 5000, max: 100000, commission: 0.05 }, // 5%
-  { min: 100001, max: 10000000, commission: 0.06 }, // 6%
-];
-
-
-function getCommission(currency: string, amount: number): number {
-  let commissionTiers;
-
-  if (currency === "USDT") {
-    commissionTiers = usdtCommissionTiers;
-  } else if (currency === "BTC") {
-    commissionTiers = btcCommissionTiers;
-  } else {
-    commissionTiers = altCommissionTiers;
-  }
-
-  for (const tier of commissionTiers) {
-    if (amount >= tier.min && amount < tier.max) {
-      // console.log(`Комиссия для суммы ${amount}: ${tier.commission}`);
-      return tier.commission;
-    }
-  }
-  
-  // Если сумма не попадает в диапазон, выбираем ближайшую комиссию
-  if (amount < 5000) {
-    return commissionTiers[0].commission;
-  } else {
-    return commissionTiers[commissionTiers.length - 1].commission;
-  }
-}
 
 // Создаем стили
-
 
 const networkOptions: { [key: string]: string[] } = {
   BTC: ["BTC", "BTC BEP20"],
@@ -145,9 +96,10 @@ const networkOptions: { [key: string]: string[] } = {
 };
 
 export default function ExchangeWidget() {
-  
   const classes = useStyles();
-  const [rates, setRates] = useState<{ [key: string]: { rub: number; usd: number } }>({});
+  const [rates, setRates] = useState<{
+    [key: string]: { rub: number; usd: number };
+  }>({});
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -309,163 +261,63 @@ export default function ExchangeWidget() {
     }
   };
 
-  const getRateForCurrencies = useCallback(
-    (fromCurrency: string, toCurrency: string) => {
-      const isFromFiat = isFiatCurrency(fromCurrency) ? "RUB" : fromCurrency;
-      const isToFiat = isFiatCurrency(toCurrency) ? "RUB" : toCurrency;
-
-      const fromRate = rates[isFromFiat]?.rub;
-      const toRate = rates[isToFiat]?.rub;
-
-      if (isFromFiat === "RUB") {
-        return fromRate / toRate;
-      } else {
-        return toRate / fromRate;
-      }
-    },
-    [rates]
-  );
-
-  // const handleGiveInputChange = useCallback(
-  //   (value: string) => {
-  //     dispatch(setSumGive(value));
-  //     dispatch(setLastChangedInput("give"));
-  //     const numValue = Number(value.replace(",", "."));
-  //     if (!isNaN(numValue) && rates) {
-  //       const rate = getRateForCurrencies(
-  //         instances.give.selectedCurrency,
-  //         instances.receive.selectedCurrency
-  //       );
-
-  //       if (!rate) {
-  //         dispatch(setSumReceive(""));
-  //         return;
-  //       }
-
-  //       const giveIsFiat = isRuble(instances.give.selectedCurrency);
-
-  //       const receiveIsFiat = isRuble(instances.receive.selectedCurrency);
-
-  //       let result = 0;
-
-  //       if (giveIsFiat && !receiveIsFiat) {
-  //         // Пользователь покупает валюту за рубли
-  //         const commissionRate = getCommission(instances.receive.selectedCurrency, numValue);
-  //         const commission = numValue * commissionRate;
-  //         const netAmount = numValue - commission;
-  //         result = netAmount * rate;
-  //       } else if (!giveIsFiat && receiveIsFiat) {
-  //         // Пользователь продает валюту за рубли
-  //         const grossAmount = numValue / rate;
-  //         const commissionRate = getCommission(instances.give.selectedCurrency, grossAmount);
-  //         const commission = grossAmount * commissionRate;
-  //         const netAmount = grossAmount - commission;
-  //         result = netAmount; // Итоговая сумма в рублях
-  //       } else {
-  //         // Обмен между двумя валютами (не RUB)
-  //         result = numValue * rate;
-  //       }
-
-  //       const receiveCurrencyObj = instances.receive.currencies.find(
-  //         (c) => c.symbol === instances.receive.selectedCurrency
-  //       );
-  //       const allowedDecimalPlaces = receiveCurrencyObj?.decimalPlaces ?? 8;
-
-  //       const formattedResult = result.toFixed(allowedDecimalPlaces);
-
-  //       dispatch(setSumReceive(formattedResult));
-  //     } else {
-  //       dispatch(setSumReceive(""));
-  //     }
-  //   },
-  //   [
-  //     dispatch,
-  //     instances.give.selectedCurrency,
-  //     instances.receive.currencies,
-  //     instances.receive.selectedCurrency,
-  //     rates,
-  //     getRateForCurrencies,
-  //   ]
-  // );
 
   const isFiat = useCallback((curr: string) => {
-    return isRuble(curr) ? "RUB" : curr
-  }, [])
-  
-  const handleGiveInputChange = useCallback(async (value: string) => {
-    dispatch(setSumGive(value));
-    dispatch(setLastChangedInput("give"));
-    const numValue = Number(value.replace(",", "."));
-    if (!isNaN(numValue)) {
-      const result = await calculateExchange(
-        isFiat(instances.give.selectedCurrency),
-        isFiat(instances.receive.selectedCurrency),
-        numValue
-      );
-  
-      if (result) {
-        dispatch(setSumReceive(result.resultAmount));
-      } else {
-        dispatch(setSumReceive(""));
-      }
-    }
-  }, [dispatch, instances.give.selectedCurrency, instances.receive.selectedCurrency, isFiat]);
-  
-  const handleReceiveInputChange = useCallback(
-    (value: string) => {
-      dispatch(setSumReceive(value));
-      dispatch(setLastChangedInput("receive"));
+    return isRuble(curr) ? "RUB" : curr;
+  }, []);
+
+  const handleGiveInputChange = useCallback(
+    async (value: string) => {
+      dispatch(setSumGive(value));
+      dispatch(setLastChangedInput("give"));
       const numValue = Number(value.replace(",", "."));
-
-      if (!isNaN(numValue) && rates) {
-        const rate = getRateForCurrencies(
-          instances.give.selectedCurrency,
-          instances.receive.selectedCurrency
+      if (!isNaN(numValue)) {
+        const result = await calculateExchange(
+          isFiat(instances.give.selectedCurrency),
+          isFiat(instances.receive.selectedCurrency),
+          numValue,
+          "give"
         );
 
-        if (!rate) {
-          dispatch(setSumGive(""));
-          return;
-        }
-
-        const giveIsFiat = isRuble(instances.give.selectedCurrency);
-        const receiveIsFiat = isRuble(instances.receive.selectedCurrency);
-
-        let result = 0;
-
-        if (!giveIsFiat && receiveIsFiat) {
-          // Пользователь продает валюту за рубли
-          const grossAmount = numValue / (1 - getCommission(instances.give.selectedCurrency, numValue)); // Учитываем комиссию
-          result = grossAmount * rate;
-        } else if (giveIsFiat && !receiveIsFiat) {
-          // Пользователь покупает валюту за рубли
-          const amountInRub = numValue / rate;
-          const grossAmount = amountInRub / (1 - getCommission(instances.receive.selectedCurrency, amountInRub));
-          result = grossAmount;
+        if (result) {
+          dispatch(setSumReceive(result.resultAmount));
         } else {
-          // Обмен между двумя валютами (не RUB)
-          result = 0;
+          dispatch(setSumReceive(""));
         }
-
-        const giveCurrencyObj = instances.give.currencies.find(
-          (c) => c.symbol === instances.give.selectedCurrency
-        );
-        const allowedDecimalPlaces = giveCurrencyObj?.decimalPlaces ?? 8;
-
-        const formattedResult = result.toFixed(allowedDecimalPlaces);
-
-        dispatch(setSumGive(formattedResult));
-      } else {
-        dispatch(setSumGive(""));
       }
     },
     [
       dispatch,
       instances.give.selectedCurrency,
       instances.receive.selectedCurrency,
-      instances.give.currencies,
-      rates,
-      getRateForCurrencies,
+      isFiat,
+    ]
+  );
+
+  const handleReceiveInputChange = useCallback(
+    async (value: string) => {
+      dispatch(setSumReceive(value));
+      dispatch(setLastChangedInput("receive"));
+      const numValue = Number(value.replace(",", "."));
+      if (!isNaN(numValue)) {
+        const result = await calculateExchange(
+          isFiat(instances.give.selectedCurrency),
+          isFiat(instances.receive.selectedCurrency),
+          numValue,
+          "receive" // Указываем направление изменения
+        );
+        if (result) {
+          dispatch(setSumGive(result.resultAmount));
+        } else {
+          dispatch(setSumGive(""));
+        }
+      }
+    },
+    [
+      dispatch,
+      instances.give.selectedCurrency,
+      instances.receive.selectedCurrency,
+      isFiat,
     ]
   );
 
@@ -537,24 +389,23 @@ export default function ExchangeWidget() {
     lastChangedInput,
     handleGiveInputChange,
     handleReceiveInputChange,
-    lastUpdated
+    lastUpdated,
   ]);
 
   const translations = {
     ru: {
       give: "Вы отправляете",
       receive: "Вы получаете",
-      change: "СОВЕРШИТЬ ОБМЕН"
+      change: "СОВЕРШИТЬ ОБМЕН",
     },
     en: {
       give: "You send",
       receive: "You get",
-      change: "CHANGE"
+      change: "CHANGE",
     },
   };
 
   return (
-    
     <div className={"container"} id="widget">
       <div className={"exchange-block"}>
         <ExchangeItem
@@ -579,18 +430,19 @@ export default function ExchangeWidget() {
         />
       </div>
 
-      <button className="exchange-button" onClick={handleClickOpen} disabled={Date.now() - lastUpdated > 120000}>
-      {translations[currentLanguage].change}
+      <button
+        className="exchange-button"
+        onClick={handleClickOpen}
+        disabled={Date.now() - lastUpdated > 120000}
+      >
+        {translations[currentLanguage].change}
       </button>
       {Date.now() - lastUpdated > 120000 && (
-        <p style={{ color: "red" }}>Курс устарел. Пожалуйста, обновите курс для продолжения.</p>
+        <p style={{ color: "red" }}>
+          Курс устарел. Пожалуйста, обновите курс для продолжения.
+        </p>
       )}
-      {/* <p className="exchange-rate"> */}
-      {/* exchange rate: 1 {instances.give.selectedCurrency} ~{" "} */}
-      {/* {rates ? getAdjustedRate() : "Не удалось загрузить курс"}{" "} */}
-      {/* {rates ? firstRate.toFixed(4) : "Не удалось загрузить курс"}{" "} */}
-      {/* {instances.receive.selectedCurrency} */}
-      {/* </p> */}
+      
       {/* Всплывающее окно с данными об обмене */}
       <Dialog
         open={open}
@@ -626,9 +478,7 @@ export default function ExchangeWidget() {
                 <strong>Вы получаете:</strong> {sumReceive}{" "}
                 {instances.receive.selectedCurrency}
               </div>
-              {/* <div className={classes.exchangeData}>
-                <strong>Курс обмена:</strong> {getAdjustedRate().toFixed(4)}
-              </div> */}
+              
             </div>
           ) : (
             // Первоначальное отображение подтверждения обмена
@@ -759,13 +609,11 @@ export default function ExchangeWidget() {
           )}
           {!isAmountValid() && !orderCreated && (
             <div style={{ color: "red", marginTop: "10px" }}>
-              Сумма должна быть от 5000 до{" "}
-              10000000 рублей.
+              Сумма должна быть от 5000 до 10000000 рублей.
             </div>
           )}
         </DialogActions>
       </Dialog>
     </div>
-    
   );
 }

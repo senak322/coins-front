@@ -18,13 +18,15 @@ export async function getExchangeRates() {
 export const calculateExchange = async (
   fromCurrency: string,
   toCurrency: string,
-  amount: number
+  amount: number,
+  lastChanged: "give" | "receive"
 ) => {
   try {
     const response = await axios.post(`${baseURL}/api/get-rate`, {
       fromCurrency,
       toCurrency,
       amount,
+      lastChanged,
     });
     return response.data;
   } catch (error) {
