@@ -1,19 +1,29 @@
 import { useEffect, useState } from "react";
 import "./Header.scss";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getExchangeRates } from "../../utils/api";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { toggleLanguage } from "../../store/languageSlice";
+import SignInModal from "../Auth/SignInModal";
+import SignUpModal from "../Auth/SignUpModal";
 
 export default function Header() {
-  const [rates, setRates] = useState<{ [key: string]: { rub: number; usd: number }  }>({});
+  const [rates, setRates] = useState<{
+    [key: string]: { rub: number; usd: number };
+  }>({});
   const dispatch = useAppDispatch();
   const currentLanguage = useSelector(
     (state: RootState) => state.language.currentLanguage
   );
+
+  // Локальные стейты для контроля открытия/закрытия попапов
+  const [isSignInOpen, setSignInOpen] = useState(false);
+  const [isSignUpOpen, setSignUpOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const getHeaderRate = async () => {
     try {
@@ -41,6 +51,20 @@ export default function Header() {
 
   const toggleLang = () => {
     dispatch(toggleLanguage());
+  };
+
+  // Callback при успешном логине
+  const handleSignInSuccess = () => {
+    setSignInOpen(false);
+    // Редирект на страницу account
+    navigate("/account");
+  };
+
+  // Callback при успешной регистрации
+  const handleSignUpSuccess = () => {
+    setSignUpOpen(false);
+    // Допустим, после регистрации тоже отправим в личный кабинет
+    navigate("/account");
   };
 
   useEffect(() => {
@@ -76,14 +100,28 @@ export default function Header() {
           Coins Change
         </Link>
         <div className="header__links">
-          {/* <a href="#widget" className="header__link">
-            {translations[currentLanguage].change}
-          </a> */}
+          <button onClick={() => setSignInOpen(true)} className="header__link">
+            Sign in
+          </button>
+          <button onClick={() => setSignUpOpen(true)} className="header__link">
+            Sign up
+          </button>
           <button onClick={toggleLang} className="header__link">
             {translations[currentLanguage].language}
           </button>
         </div>
       </div>
+      {/* Модалки: SignIn / SignUp */}
+      <SignInModal
+        open={isSignInOpen}
+        onClose={() => setSignInOpen(false)}
+        onSuccess={handleSignInSuccess}
+      />
+      <SignUpModal
+        open={isSignUpOpen}
+        onClose={() => setSignUpOpen(false)}
+        onSuccess={handleSignUpSuccess}
+      />
     </header>
   );
 }

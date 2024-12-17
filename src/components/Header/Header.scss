@@ -64,11 +64,12 @@
     border: none;
     background-color: white;
     font-size: 16px;
-    margin-right: 4rem;
+    margin-right: 1rem;
     padding: 0.5rem;
     color: black;
     text-decoration: none;
     border-radius: 6px;
+    border: 1px solid #0056D3;
     // visibility: hidden;
     @include respond-to(big) {
       margin-right: 0;
@@ -80,13 +81,14 @@
   }
   &__link:last-of-type {
     margin: 0;
-    border: 1px solid black;
+    border: 1px solid #8080801a;
   }
   &__links {
-    @include respond-to(big) {
+    @include respond-to(small) {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
+      gap: 1rem;
       margin-right: 1rem;
     }
   }
