@@ -42,11 +42,14 @@ export default function Header() {
     ru: {
       change: "Обмен",
       language: "RU",
+      sign: "Вход",
     },
     en: {
       change: "Change",
       language: "EN",
+      sign: "Sign in"
     },
+    
   };
 
   const toggleLang = () => {
@@ -101,11 +104,11 @@ export default function Header() {
         </Link>
         <div className="header__links">
           <button onClick={() => setSignInOpen(true)} className="header__link">
-            Sign in
+            {translations[currentLanguage].sign}
           </button>
-          <button onClick={() => setSignUpOpen(true)} className="header__link">
+          {/* <button onClick={() => setSignUpOpen(true)} className="header__link">
             Sign up
-          </button>
+          </button> */}
           <button onClick={toggleLang} className="header__link">
             {translations[currentLanguage].language}
           </button>
@@ -116,6 +119,10 @@ export default function Header() {
         open={isSignInOpen}
         onClose={() => setSignInOpen(false)}
         onSuccess={handleSignInSuccess}
+        onRegisterClick={() => {
+          setSignInOpen(false);
+          setSignUpOpen(true);
+        }}
       />
       <SignUpModal
         open={isSignUpOpen}

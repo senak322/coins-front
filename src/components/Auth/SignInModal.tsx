@@ -1,88 +1,87 @@
 import { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, Checkbox, FormControlLabel } from "@mui/material";
-import "./Auth.scss"; // Здесь ваш .scss, если нужен
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
+  Button,
+  Link,
+} from "@mui/material";
+import "./Auth.scss";
 
 interface SignInModalProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void; // Callback после успешного входа
+  onSuccess: () => void;
+  onRegisterClick: () => void; // Новый проп для открытия регистрации
 }
 
-export default function SignInModal({ open, onClose, onSuccess }: SignInModalProps) {
+export default function SignInModal({
+  open,
+  onClose,
+  onSuccess,
+  onRegisterClick,
+}: SignInModalProps) {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [twoFA, setTwoFA] = useState("");
-  const [has2FA, setHas2FA] = useState(false); 
-  // Допустим, мы заранее не знаем, есть ли у пользователя 2FA.
-  // В реальном сценарии это обычно приходит с бэкенда при попытке входа.
 
   const handleSubmit = () => {
-    // Валидация полей (простейший вариант)
     if (!login.trim() || !password.trim()) {
       alert("Логин и пароль обязательны.");
       return;
     }
 
-    // Если у пользователя 2FA включена, проверяем поле twoFA
-    if (has2FA && !twoFA.trim()) {
-      alert("Необходимо ввести код двухфакторной аутентификации.");
-      return;
-    }
-
-    // Здесь делаем реальный запрос на бэкенд (fetch/axios), передаём login, password, twoFA...
-    // Если всё ок — выполняем onSuccess, чтобы закрыть модал и перейти в личный кабинет
     onSuccess();
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Вход в систему</DialogTitle>
-      <DialogContent dividers>
-        <TextField
-          label="Логин"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={login}
-          onChange={(e) => setLogin(e.target.value)}
-          required
-        />
-        <TextField
-          label="Пароль"
-          variant="outlined"
-          type="password"
-          fullWidth
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {has2FA && (
+    <Dialog open={open} onClose={onClose} className="auth-dialog">
+      <DialogTitle className="auth-dialog__title">Авторизация</DialogTitle>
+      <DialogContent dividers className="auth-dialog__content">
+        <div className="auth-dialog__field">
+          <div className="auth-dialog__field-label">Логин или e-mail</div>
           <TextField
-            label="2FA код"
+            placeholder="Логин или e-mail"
             variant="outlined"
             fullWidth
             margin="normal"
-            value={twoFA}
-            onChange={(e) => setTwoFA(e.target.value)}
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            required
           />
-        )}
-
-        {/* Чекбокс для примера (захотим ли включать 2FA в следующий раз или определить, включено ли) */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={has2FA}
-              onChange={(e) => setHas2FA(e.target.checked)}
-              color="primary"
-            />
-          }
-          label="Включена двухфакторная аутентификация?"
-        />
+        </div>
+        <div className="auth-dialog__field">
+          <div className="auth-dialog__field-label">Пароль</div>
+          <TextField
+            placeholder="Пароль"
+            variant="outlined"
+            type="password"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Отмена</Button>
-        <Button variant="contained" onClick={handleSubmit}>
+      <DialogActions className="auth-dialog__actions">
+        {/* Убрали кнопку отмены, оставляем только "Войти" */}
+        <Button className="auth-dialog__footer-links">
+          <Link
+            component="button"
+            onClick={onRegisterClick}
+            className="auth-dialog__link"
+          >
+            Регистрация
+          </Link>
+          {/* Можно добавить также "Забыли пароль?" при необходимости */}
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          className="auth-dialog__submit-button"
+        >
           Войти
         </Button>
       </DialogActions>

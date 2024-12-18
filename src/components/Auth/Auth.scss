@@ -1,0 +1,104 @@
+.auth-dialog {
+    .MuiPaper-root {
+      background-color: #2f2f2f !important;
+      border-radius: 16px !important;
+      color: #fff;
+      padding: 20px;
+      width: 450px; // Сделаем шире по вашему запросу
+      max-width: 90%;
+      box-sizing: border-box;
+    }
+  
+    &__title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+  
+    &__content {
+      .MuiFormControl-root {
+        margin-top: 15px;
+  
+        .MuiOutlinedInput-root {
+          border-radius: 20px;
+  
+          // Цвет рамки по умолчанию
+          fieldset {
+            border-color: #444;
+          }
+  
+          // При ховере можно чуть подсветить
+          &:hover fieldset {
+            border-color: #666;
+          }
+  
+          // При фокусе желтая рамка
+          &.Mui-focused fieldset {
+            border-color: #ffcc00;
+          }
+  
+          input {
+            background: #fff;
+            border-radius: 16px;
+            color: #000;
+  
+            &::placeholder {
+              color: #cccccc; // цвет плейсхолдера
+              opacity: 1; // чтобы плейсхолдер был заметен
+            }
+          }
+        }
+  
+        // Цвет лейбла
+        .MuiInputLabel-root {
+          color: #ccc;
+  
+          &.Mui-focused {
+            color: #ffcc00; // при фокусе цвет лейбла
+          }
+        }
+      }
+    }
+  
+    &__checkbox-label {
+      color: #fff;
+      margin-top: 10px;
+      .MuiCheckbox-root {
+        color: #fff;
+      }
+    }
+  
+    &__actions {
+      display: flex;
+      justify-content: space-between !important;
+      padding: 20px 0 0 0;
+  
+      .auth-dialog__submit-button {
+        background-color: #ffcc00 !important;
+        color: #000 !important;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        &:hover {
+          background-color: #e6b800 !important;
+        }
+      }
+    }
+  
+    &__footer-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+  
+    &__link {
+      color: #ffcc00 !important;
+      cursor: pointer;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  

@@ -71,7 +71,7 @@
     border-radius: 6px;
     border: 1px solid #0056D3;
     // visibility: hidden;
-    @include respond-to(big) {
+    @include respond-to(small) {
       margin-right: 0;
     }
   }
