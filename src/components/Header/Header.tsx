@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Header.scss";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getExchangeRates } from "../../utils/api";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useSelector } from "react-redux";
@@ -22,8 +22,10 @@ export default function Header() {
   // Локальные стейты для контроля открытия/закрытия попапов
   const [isSignInOpen, setSignInOpen] = useState(false);
   const [isSignUpOpen, setSignUpOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const getHeaderRate = async () => {
     try {
@@ -43,13 +45,16 @@ export default function Header() {
       change: "Обмен",
       language: "RU",
       sign: "Вход",
+      signOut: "Выйти",
+      account: "Личный кабинет",
     },
     en: {
       change: "Change",
       language: "EN",
-      sign: "Sign in"
+      sign: "Sign in",
+      signOut: "Log out",
+      account: "Account",
     },
-    
   };
 
   const toggleLang = () => {
@@ -59,6 +64,7 @@ export default function Header() {
   // Callback при успешном логине
   const handleSignInSuccess = () => {
     setSignInOpen(false);
+    setIsAuthenticated(true);
     // Редирект на страницу account
     navigate("/account");
   };
@@ -70,6 +76,14 @@ export default function Header() {
     navigate("/account");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken"); // Удаляем токен
+    setIsAuthenticated(false); // Обновляем состояние
+    navigate("/"); // Редирект на главную
+  };
+
+  const isActive = (path: string) => location.pathname === path;
+
   useEffect(() => {
     getHeaderRate();
 
@@ -80,6 +94,12 @@ export default function Header() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Проверяем токен при загрузке и смене маршрута
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    setIsAuthenticated(!!token);
+  }, [location]);
 
   return (
     <header className="header">
@@ -103,12 +123,37 @@ export default function Header() {
           Coins Change
         </Link>
         <div className="header__links">
-          <button onClick={() => setSignInOpen(true)} className="header__link">
-            {translations[currentLanguage].sign}
-          </button>
-          {/* <button onClick={() => setSignUpOpen(true)} className="header__link">
-            Sign up
-          </button> */}
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/"
+                className={`header__link ${isActive("/") ? "active" : ""}`}
+              >
+                {translations[currentLanguage].change}
+              </Link>
+              <Link
+                to="/account"
+                className={`header__link ${
+                  isActive("/account") ? "active" : ""
+                }`}
+              >
+                {translations[currentLanguage].account}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="header__link header__logout"
+              >
+                {translations[currentLanguage].signOut}
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setSignInOpen(true)}
+              className="header__link"
+            >
+              {translations[currentLanguage].sign}
+            </button>
+          )}
           <button onClick={toggleLang} className="header__link">
             {translations[currentLanguage].language}
           </button>

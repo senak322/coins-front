@@ -57,7 +57,7 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
     <Dialog open={open} onClose={onClose} className="auth-dialog">
       <DialogTitle className="auth-dialog__title">Регистрация</DialogTitle>
       <DialogContent dividers className="auth-dialog__content">
-        {error && <div className="auth-dialog__error" style={{color: "red"}}>{error}</div>}
+        {error && <div className="auth-dialog__error">{error}</div>}
         <div className="auth-dialog__field">
           <div className="auth-dialog__field-label">Логин</div>
           <TextField

@@ -1,11 +1,22 @@
-import React from "react";
-import "./AccountPage.scss";
-
 export default function AccountPage() {
   return (
-    <div className="account-page">
+    <div>
       <h1>Личный кабинет</h1>
-      <p>Добро пожаловать в вашу учетную запись.</p>
+      <form>
+        <div>
+          <label>Логин:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>Фамилия:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>Имя:</label>
+          <input type="text" />
+        </div>
+        <button type="submit">Сохранить</button>
+      </form>
     </div>
   );
 }

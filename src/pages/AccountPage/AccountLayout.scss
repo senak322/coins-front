@@ -1,0 +1,46 @@
+.account-layout {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+  
+    &__sidebar {
+      flex: 0 0 250px;
+      background-color: #fff7e6;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+  
+      .account-layout__link {
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        color: #333;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+  
+        &:hover {
+          background-color: #ffe9c6;
+        }
+  
+        &.active {
+          background-color: #ffcc00;
+          color: #fff;
+        }
+      }
+    }
+  
+    &__content {
+      flex: 1;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+  

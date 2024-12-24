@@ -7,6 +7,9 @@ import AboutUs from "./pages/AboutUs/AboutUs";
 import Rules from "./pages/Rules/Rules";
 import AccountPage from "./pages/AccountPage/AccountPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AccountLayout from "./pages/AccountPage/AccountLayout";
+import SecuritySettings from "./pages/SecuritySettings/SecuritySettings";
+import UserAccounts from "./pages/UserAccounts/UserAccounts";
 
 function App() {
   return (
@@ -20,10 +23,14 @@ function App() {
           path="/account"
           element={
             <ProtectedRoute>
-              <AccountPage />
+              <AccountLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<AccountPage />} />
+          <Route path="security" element={<SecuritySettings />} />
+          <Route path="accounts" element={<UserAccounts />} />
+        </Route>
       </Routes>
       <Footer />
     </div>
