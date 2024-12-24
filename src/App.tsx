@@ -6,6 +6,7 @@ import MainExchange from "./components/Main/MainExchange";
 import AboutUs from "./pages/AboutUs/AboutUs";
 import Rules from "./pages/Rules/Rules";
 import AccountPage from "./pages/AccountPage/AccountPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -15,7 +16,14 @@ function App() {
         <Route path="/" element={<MainExchange />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/rules" element={<Rules />} />
-        <Route path="/account" element={<AccountPage />} />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       <Footer />
     </div>

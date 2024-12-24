@@ -9,6 +9,7 @@ import {
   Link,
 } from "@mui/material";
 import "./Auth.scss";
+import { login } from "../../services/authAPI";
 
 interface SignInModalProps {
   open: boolean;
@@ -23,22 +24,31 @@ export default function SignInModal({
   onSuccess,
   onRegisterClick,
 }: SignInModalProps) {
-  const [login, setLogin] = useState("");
+  const [loginInput, setLoginInput] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = () => {
-    if (!login.trim() || !password.trim()) {
-      alert("Логин и пароль обязательны.");
+  const handleSubmit = async () => {
+    if (!loginInput.trim() || !password.trim()) {
+      setError("Логин и пароль обязательны.");
       return;
     }
 
-    onSuccess();
+    try {
+      const { token, user } = await login(loginInput, password); // API запрос
+      localStorage.setItem("authToken", token); // Сохраняем токен
+      onSuccess();
+      onClose();
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Ошибка входа.");
+    }
   };
 
   return (
     <Dialog open={open} onClose={onClose} className="auth-dialog">
       <DialogTitle className="auth-dialog__title">Авторизация</DialogTitle>
       <DialogContent dividers className="auth-dialog__content">
+      {error && <div className="auth-dialog__error">{error}</div>}
         <div className="auth-dialog__field">
           <div className="auth-dialog__field-label">Логин или e-mail</div>
           <TextField
@@ -46,8 +56,8 @@ export default function SignInModal({
             variant="outlined"
             fullWidth
             margin="normal"
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
+            value={loginInput}
+            onChange={(e) => setLoginInput(e.target.value)}
             required
           />
         </div>
@@ -66,7 +76,6 @@ export default function SignInModal({
         </div>
       </DialogContent>
       <DialogActions className="auth-dialog__actions">
-        {/* Убрали кнопку отмены, оставляем только "Войти" */}
         <Button className="auth-dialog__footer-links">
           <Link
             component="button"

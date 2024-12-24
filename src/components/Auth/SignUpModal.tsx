@@ -8,8 +8,9 @@ import {
   Button,
   FormControlLabel,
   Checkbox,
-  Link
+  Link,
 } from "@mui/material";
+import { register } from "../../services/authAPI"; // Подключаем API
 import "./Auth.scss";
 
 interface SignUpModalProps {
@@ -24,30 +25,39 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [agreeRules, setAgreeRules] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!login.trim() || !email.trim() || !password.trim() || !confirm.trim()) {
-      alert("Все поля со звездочкой обязательны для заполнения.");
+      setError("Все поля обязательны для заполнения.");
       return;
     }
 
     if (password !== confirm) {
-      alert("Пароли не совпадают!");
+      setError("Пароли не совпадают.");
       return;
     }
 
     if (!agreeRules) {
-      alert("Необходимо согласиться с правилами сервиса.");
+      setError("Необходимо согласиться с правилами сервиса.");
       return;
     }
 
-    onSuccess();
+    try {
+      const { message } = await register(login, email, password); // API запрос
+      alert(message); // Уведомление о успешной регистрации
+      onSuccess();
+      onClose();
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Ошибка регистрации.");
+    }
   };
 
   return (
     <Dialog open={open} onClose={onClose} className="auth-dialog">
       <DialogTitle className="auth-dialog__title">Регистрация</DialogTitle>
       <DialogContent dividers className="auth-dialog__content">
+        {error && <div className="auth-dialog__error" style={{color: "red"}}>{error}</div>}
         <div className="auth-dialog__field">
           <div className="auth-dialog__field-label">Логин</div>
           <TextField
@@ -57,10 +67,8 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
             margin="normal"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
-            required
           />
         </div>
-
         <div className="auth-dialog__field">
           <div className="auth-dialog__field-label">E-mail</div>
           <TextField
@@ -71,10 +79,8 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
           />
         </div>
-
         <div className="auth-dialog__field">
           <div className="auth-dialog__field-label">Пароль</div>
           <TextField
@@ -85,10 +91,8 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
           />
         </div>
-
         <div className="auth-dialog__field">
           <div className="auth-dialog__field-label">Пароль снова</div>
           <TextField
@@ -99,10 +103,8 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
             margin="normal"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            required
           />
         </div>
-
         <FormControlLabel
           control={
             <Checkbox
@@ -113,10 +115,13 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
           }
           label={
             <>
-              С <Link href="/rules" target="_blank" className="auth-dialog__link">правилами сервиса</Link> ознакомлен и согласен.
+              С{" "}
+              <Link href="/rules" target="_blank" className="auth-dialog__link">
+                правилами сервиса
+              </Link>{" "}
+              ознакомлен и согласен.
             </>
           }
-          className="auth-dialog__checkbox-label"
         />
       </DialogContent>
       <DialogActions className="auth-dialog__actions">
