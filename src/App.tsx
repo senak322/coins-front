@@ -1,5 +1,5 @@
 import "./App.scss";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
 import MainExchange from "./components/Main/MainExchange";
@@ -27,7 +27,8 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<AccountPage />} />
+          <Route index element={<Navigate to="/account/data" />} />
+          <Route path="data" element={<AccountPage />} />
           <Route path="security" element={<SecuritySettings />} />
           <Route path="accounts" element={<UserAccounts />} />
         </Route>

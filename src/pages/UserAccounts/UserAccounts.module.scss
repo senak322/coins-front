@@ -1,0 +1,80 @@
+.userAccountsSelect {
+  background-color: #ffffff !important; /* Белый фон */
+  border-radius: 8px !important;
+
+  & .MuiSelect-select {
+    padding: 10px !important; /* Отступы внутри Select */
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px;
+  }
+
+  & .MuiOutlinedInput-notchedOutline {
+    border: 1px solid #ccc !important; /* Серый бордер */
+    border-radius: 8px !important;
+  }
+
+  &:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #ffcc00 !important; /* Жёлтый бордер при наведении */
+  }
+}
+
+.userAccountsMenuItem {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px !important;
+  font-size: 1rem !important;
+  color: #000000 !important; /* Чёрный текст */
+  background-color: #ffffff !important; /* Белый фон */
+
+  &:hover {
+    background-color: #f7f7f7 !important; /* Серый фон при наведении */
+  }
+}
+
+.userAccountsMenuPaper {
+  background-color: #ffffff !important; /* Белый фон выпадающего списка */
+  border-radius: 8px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.userAccounts__form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.userAccounts__addButton {
+  background-color: #ffcc00;
+  color: #000;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 10px 20px;
+  min-width: 25px;
+  &:hover {
+    background-color: #e6b800;
+  }
+}
+
+.userAccounts__table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #ffe9c6;
+    font-weight: bold;
+  }
+
+  td {
+    background-color: #fff;
+  }
+}

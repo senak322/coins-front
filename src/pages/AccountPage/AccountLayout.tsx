@@ -3,7 +3,7 @@ import "./AccountLayout.scss";
 
 export default function AccountLayout() {
   const navItems = [
-    { path: "/account", label: "Личный кабинет" },
+    { path: "/account/data", label: "Личные данные" },
     { path: "/account/security", label: "Настройки безопасности" },
     { path: "/account/accounts", label: "Ваши счета" },
     { path: "/account/operations", label: "Ваши операции" },
@@ -14,7 +14,10 @@ export default function AccountLayout() {
   ];
 
   return (
-    <div className="account-layout">
+    <main className="account-layout">
+      <div className="account-layout__content">
+        <Outlet /> {/* Контент текущего роута */}
+      </div>
       <aside className="account-layout__sidebar">
         <nav>
           {navItems.map((item) => (
@@ -30,9 +33,7 @@ export default function AccountLayout() {
           ))}
         </nav>
       </aside>
-      <main className="account-layout__content">
-        <Outlet /> {/* Контент текущего роута */}
-      </main>
-    </div>
+      
+    </main>
   );
 }
