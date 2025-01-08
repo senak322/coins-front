@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import store from "./store/store";
 import { BrowserRouter } from "react-router-dom";
+import { MantineProvider } from "@mantine/core";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -13,9 +14,17 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <MantineProvider
+        theme={{
+          primaryColor: "blue", // Или 'dark', в зависимости от ваших предпочтений
+          // globalStyles: true, // Включение глобальных стилей
+          // normalizeCSS: true, // Включение нормализации CSS
+        }}
+      >
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </MantineProvider>
     </Provider>
   </React.StrictMode>
 );

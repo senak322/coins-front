@@ -1,0 +1,99 @@
+.userAccounts {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff7e6;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &__title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  &__info {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+
+  &__form {
+    display: flex;
+    gap: 10px;
+    // flex-direction: column;
+    margin-bottom: 20px;
+  }
+
+  &__select {
+    flex: 2;
+    .mantine-Select-input {
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .mantine-Select-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      font-size: 14px;
+      background-color: #fff;
+    
+      &[data-hovered] {
+        background-color: #f7f7f7;
+      }
+    
+      &[data-disabled] {
+        color: #a0a0a0;
+        cursor: not-allowed;
+      }
+    }
+    .mantine-Select-dropdown {
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &__input {
+    flex: 3;
+    input {
+      border-radius: 8px;
+      padding: 10px;
+    }
+  }
+
+  &__addButton {
+    flex: 1;
+    background-color: #ffcc00;
+    color: #000;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px;
+    &:hover {
+      background-color: #e6b800;
+    }
+  }
+
+  &__table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #ffe9c6;
+      font-weight: bold;
+    }
+
+    td {
+      background-color: #fff;
+    }
+  }
+}

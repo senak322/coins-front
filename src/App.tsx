@@ -10,31 +10,34 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AccountLayout from "./pages/AccountPage/AccountLayout";
 import SecuritySettings from "./pages/SecuritySettings/SecuritySettings";
 import UserAccounts from "./pages/UserAccounts/UserAccounts";
+import { MantineProvider } from "@mantine/core";
 
 function App() {
   return (
-    <div className="App">
-      <Header />
-      <Routes>
-        <Route path="/" element={<MainExchange />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/rules" element={<Rules />} />
-        <Route
-          path="/account"
-          element={
-            <ProtectedRoute>
-              <AccountLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="/account/data" />} />
-          <Route path="data" element={<AccountPage />} />
-          <Route path="security" element={<SecuritySettings />} />
-          <Route path="accounts" element={<UserAccounts />} />
-        </Route>
-      </Routes>
-      <Footer />
-    </div>
+    <MantineProvider>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/" element={<MainExchange />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <AccountLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/account/data" />} />
+            <Route path="data" element={<AccountPage />} />
+            <Route path="security" element={<SecuritySettings />} />
+            <Route path="accounts" element={<UserAccounts />} />
+          </Route>
+        </Routes>
+        <Footer />
+      </div>
+    </MantineProvider>
   );
 }
 

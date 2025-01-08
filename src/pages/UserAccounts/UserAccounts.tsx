@@ -1,15 +1,31 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Box,
   Button,
-  MenuItem,
   Select,
-  TextField,
-  Typography,
-  SelectChangeEvent,
-} from "@mui/material";
+  TextInput,
+  Table,
+  Title,
+  Text,
+  Group,
+  Avatar,
+} from "@mantine/core";
 import { coins, banks } from "../../utils/config";
-import styles from "./UserAccounts.module.scss"; // Импорт CSS Modules
+import "./UserAccounts.scss";
+
+// Объявляем этот компонент либо рядом, либо в отдельном файле:
+import { forwardRef } from "react";
+
+const SelectItem = forwardRef<HTMLDivElement, any>(
+  ({ label, icon, ...others }, ref) => (
+    <div ref={ref} {...others}>
+      <Group >
+        {icon && <Avatar src={icon} size="sm" />}
+        <Text>{label}</Text>
+      </Group>
+    </div>
+  )
+);
 
 interface Account {
   system: string;
@@ -20,9 +36,30 @@ interface Account {
 
 export default function UserAccounts() {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [selectedSystem, setSelectedSystem] = useState<string>("");
+  const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [accountNumber, setAccountNumber] = useState<string>("");
   const [extraInfo, setExtraInfo] = useState<string>("");
+
+  const selectData = useMemo(() => {
+    return [
+      {
+        group: "Банки",
+        items: banks.map((bank) => ({
+          label: bank.symbol,
+          value: bank.symbol,
+          icon: bank.icon,
+        })),
+      },
+      {
+        group: "Монеты",
+        items: coins.map((coin) => ({
+          label: coin.symbol,
+          value: coin.symbol,
+          icon: coin.icon,
+        })),
+      },
+    ];
+  }, []);
 
   const handleAddAccount = () => {
     if (!selectedSystem || !accountNumber.trim() || !extraInfo.trim()) {
@@ -46,155 +83,93 @@ export default function UserAccounts() {
       icon: selectedItem.icon,
     };
 
-    setAccounts((prevAccounts) => [...prevAccounts, newAccount]);
-    setSelectedSystem("");
+    setAccounts((prev) => [...prev, newAccount]);
+    setSelectedSystem(null);
     setAccountNumber("");
     setExtraInfo("");
   };
 
-  const handleSystemChange = (event: SelectChangeEvent<string>) => {
-    setSelectedSystem(event.target.value);
-    setExtraInfo(""); // Сбрасываем "дополнительную информацию" при смене системы
-  };
-
+  // Проверяем, банк или монета
   const isBank = banks.some((bank) => bank.symbol === selectedSystem);
 
   return (
-    <Box className={styles.userAccounts}>
-      <Typography variant="h5" className={styles.userAccounts__title}>
+    <Box className="userAccounts">
+      <Title order={3} className="userAccounts__title">
         Ваши счета
-      </Typography>
-      <Typography variant="body2" className={styles.userAccounts__info}>
+      </Title>
+      <Text size="sm" className="userAccounts__info">
         Чтобы добавить счёт в платёжную систему, заполните форму ниже.
-      </Typography>
+      </Text>
 
-      <Box className={styles.userAccounts__form}>
+      <Group mb="md" className="userAccounts__form">
         <Select
+          data={selectData}
+          component={SelectItem} // используем кастомный компонент
+          placeholder="Выберите платёжную систему"
           value={selectedSystem}
-          onChange={handleSystemChange}
-          displayEmpty
-          fullWidth
-          className={styles.userAccountsSelect}
-          MenuProps={{
-            PaperProps: {
-              className: styles.userAccountsMenuPaper,
+          onChange={setSelectedSystem}
+          searchable
+          nothingFoundMessage="Ничего не найдено..."
+          maxDropdownHeight={200}
+          className="userAccounts__select"
+          styles={{
+            dropdown: {
+              backgroundColor: "#fff",
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            },
+            input: {
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              padding: "10px",
             },
           }}
-        >
-          <MenuItem value="" disabled sx={{ color: "#000" }}>
-            Выберите платёжную систему
-          </MenuItem>
-          <MenuItem disabled>
-            <Typography variant="subtitle2" sx={{ color: "#aaa" }}>
-              Банки
-            </Typography>
-          </MenuItem>
-          {banks.map((bank) => (
-            <MenuItem
-              key={bank.symbol}
-              value={bank.symbol}
-              className={styles.userAccountsMenuItem}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <img
-                  src={bank.icon}
-                  alt={bank.symbol}
-                  style={{ width: "20px", height: "20px", borderRadius: "4px" }}
-                />
-                {bank.symbol}
-              </Box>
-            </MenuItem>
-          ))}
-          <MenuItem disabled>
-            <Typography variant="subtitle2" sx={{ color: "#aaa" }}>
-              Монеты
-            </Typography>
-          </MenuItem>
-          {coins.map((coin) => (
-            <MenuItem
-              key={coin.symbol}
-              value={coin.symbol}
-              className={styles.userAccountsMenuItem}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <img
-                  src={coin.icon}
-                  alt={coin.symbol}
-                  style={{ width: "20px", height: "20px", borderRadius: "4px" }}
-                />
-                {coin.symbol}
-              </Box>
-            </MenuItem>
-          ))}
-        </Select>
+        />
 
-        <TextField
+        <TextInput
           placeholder="Номер счёта"
           value={accountNumber}
-          onChange={(e) => setAccountNumber(e.target.value)}
-          fullWidth
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "8px",
-            },
-          }}
+          onChange={(e) => setAccountNumber(e.currentTarget.value)}
+          className="userAccounts__input"
         />
 
-        <TextField
+        <TextInput
           placeholder={isBank ? "Получатель" : "Сеть"}
           value={extraInfo}
-          onChange={(e) => setExtraInfo(e.target.value)}
-          fullWidth
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "8px",
-            },
-          }}
+          onChange={(e) => setExtraInfo(e.currentTarget.value)}
+          className="userAccounts__input"
         />
 
-        <Button
-          variant="contained"
-          onClick={handleAddAccount}
-          className={styles.userAccounts__addButton}
-        >
-          Добавить
+        <Button onClick={handleAddAccount} className="userAccounts__addButton">
+          Добавить счёт
         </Button>
-      </Box>
+      </Group>
 
-      <Box className={styles.userAccounts__list}>
-        <Typography variant="h6" className={styles.userAccounts__listTitle}>
-          Добавленные счета:
-        </Typography>
-        <Box className={styles.userAccounts__table}>
-          <table>
-            <thead>
-              <tr>
-                <th>Платёжная система</th>
-                <th>Номер счёта</th>
-                <th>{isBank ? "Получатель" : "Сеть"}</th>
+      {accounts.length > 0 && (
+        <Table highlightOnHover className="userAccounts__table">
+          <thead>
+            <tr>
+              <th>Платёжная система</th>
+              <th>Номер счёта</th>
+              <th>{isBank ? "Получатель" : "Сеть"}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {accounts.map((account, index) => (
+              <tr key={index}>
+                <td>
+                  <Group>
+                    <Avatar src={account.icon} size="sm" />
+                    {account.system}
+                  </Group>
+                </td>
+                <td>{account.accountNumber}</td>
+                <td>{account.extraInfo}</td>
               </tr>
-            </thead>
-            <tbody>
-              {accounts.map((account, index) => (
-                <tr key={index}>
-                  <td>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <img
-                        src={account.icon}
-                        alt={account.system}
-                        style={{ width: "20px", height: "20px", borderRadius: "4px" }}
-                      />
-                      {account.system}
-                    </Box>
-                  </td>
-                  <td>{account.accountNumber}</td>
-                  <td>{account.extraInfo}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Box>
-      </Box>
+            ))}
+          </tbody>
+        </Table>
+      )}
     </Box>
   );
 }
