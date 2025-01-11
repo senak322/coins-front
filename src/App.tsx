@@ -1,4 +1,5 @@
 import "./App.scss";
+import '@mantine/core/styles.css';
 import { Routes, Route, Navigate } from "react-router-dom";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
@@ -11,6 +12,7 @@ import AccountLayout from "./pages/AccountPage/AccountLayout";
 import SecuritySettings from "./pages/SecuritySettings/SecuritySettings";
 import UserAccounts from "./pages/UserAccounts/UserAccounts";
 import { MantineProvider } from "@mantine/core";
+import UserOperations from "./pages/UserOperations/UserOperations";
 
 function App() {
   return (
@@ -33,6 +35,7 @@ function App() {
             <Route path="data" element={<AccountPage />} />
             <Route path="security" element={<SecuritySettings />} />
             <Route path="accounts" element={<UserAccounts />} />
+            <Route path="operations" element={<UserOperations />} />
           </Route>
         </Routes>
         <Footer />

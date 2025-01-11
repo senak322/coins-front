@@ -26,45 +26,22 @@
     margin-bottom: 20px;
   }
 
-  &__select {
-    flex: 2;
-    .mantine-Select-input {
-      padding: 10px;
-      border-radius: 8px;
-    }
-    .mantine-Select-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      font-size: 14px;
-      background-color: #fff;
-    
-      &[data-hovered] {
-        background-color: #f7f7f7;
-      }
-    
-      &[data-disabled] {
-        color: #a0a0a0;
-        cursor: not-allowed;
-      }
-    }
-    .mantine-Select-dropdown {
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+  &__img {
+    width: 25px;
+    height: 25px;
+    margin-left: .5rem;
   }
 
   &__input {
-    flex: 3;
+    // flex: 3;
     input {
-      border-radius: 8px;
+      border-radius: 5px;
       padding: 10px;
     }
   }
 
   &__addButton {
-    flex: 1;
+    // flex: 1;
     background-color: #ffcc00;
     color: #000;
     font-weight: bold;

@@ -1,31 +1,34 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
-  Select,
   TextInput,
   Table,
   Title,
   Text,
   Group,
-  Avatar,
+  useCombobox,
+  Combobox,
+  InputBase,
+  Input,
+  ScrollArea,
 } from "@mantine/core";
 import { coins, banks } from "../../utils/config";
 import "./UserAccounts.scss";
 
 // Объявляем этот компонент либо рядом, либо в отдельном файле:
-import { forwardRef } from "react";
+// import { forwardRef } from "react";
 
-const SelectItem = forwardRef<HTMLDivElement, any>(
-  ({ label, icon, ...others }, ref) => (
-    <div ref={ref} {...others}>
-      <Group >
-        {icon && <Avatar src={icon} size="sm" />}
-        <Text>{label}</Text>
-      </Group>
-    </div>
-  )
-);
+// const SelectItem = forwardRef<HTMLDivElement, any>(
+//   ({ label, icon, ...others }, ref) => (
+//     <div ref={ref} {...others}>
+//       <Group >
+//         {icon && <Avatar src={icon} size="sm" />}
+//         <Text>{label}</Text>
+//       </Group>
+//     </div>
+//   )
+// );
 
 interface Account {
   system: string;
@@ -39,37 +42,21 @@ export default function UserAccounts() {
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [accountNumber, setAccountNumber] = useState<string>("");
   const [extraInfo, setExtraInfo] = useState<string>("");
+  const [search, setSearch] = useState("");
 
-  const selectData = useMemo(() => {
-    return [
-      {
-        group: "Банки",
-        items: banks.map((bank) => ({
-          label: bank.symbol,
-          value: bank.symbol,
-          icon: bank.icon,
-        })),
-      },
-      {
-        group: "Монеты",
-        items: coins.map((coin) => ({
-          label: coin.symbol,
-          value: coin.symbol,
-          icon: coin.icon,
-        })),
-      },
-    ];
-  }, []);
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+  });
+
+  const selectedItem = [...banks, ...coins].find(
+    (item) => item.symbol === selectedSystem
+  );
 
   const handleAddAccount = () => {
     if (!selectedSystem || !accountNumber.trim() || !extraInfo.trim()) {
       alert("Пожалуйста, заполните все поля.");
       return;
     }
-
-    const selectedItem = [...banks, ...coins].find(
-      (item) => item.symbol === selectedSystem
-    );
 
     if (!selectedItem) {
       alert("Выберите платёжную систему.");
@@ -92,6 +79,30 @@ export default function UserAccounts() {
   // Проверяем, банк или монета
   const isBank = banks.some((bank) => bank.symbol === selectedSystem);
 
+  const options = [...banks, ...coins]
+    .filter((item) =>
+      item.symbol.toLowerCase().includes(search.toLowerCase().trim())
+    )
+    .map((item) => (
+      <Combobox.Option value={item.symbol} key={item.symbol}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          {item.symbol}
+
+          <img
+            src={item?.icon}
+            alt={item.symbol}
+            className="userAccounts__img"
+          />
+        </div>
+      </Combobox.Option>
+    ));
+
   return (
     <Box className="userAccounts">
       <Title order={3} className="userAccounts__title">
@@ -102,30 +113,109 @@ export default function UserAccounts() {
       </Text>
 
       <Group mb="md" className="userAccounts__form">
-        <Select
-          data={selectData}
-          component={SelectItem} // используем кастомный компонент
-          placeholder="Выберите платёжную систему"
-          value={selectedSystem}
-          onChange={setSelectedSystem}
-          searchable
-          nothingFoundMessage="Ничего не найдено..."
-          maxDropdownHeight={200}
-          className="userAccounts__select"
-          styles={{
-            dropdown: {
-              backgroundColor: "#fff",
-              borderRadius: "8px",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            },
-            input: {
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              padding: "10px",
-            },
+        <Combobox
+          store={combobox}
+          onOptionSubmit={(val) => {
+            setSelectedSystem(val);
+            combobox.closeDropdown();
           }}
-        />
+        >
+          <Combobox.Target>
+            <InputBase
+              component="button"
+              type="button"
+              pointer
+              rightSection={<Combobox.Chevron />}
+              rightSectionPointerEvents="none"
+              onClick={() => combobox.toggleDropdown()}
+              style={{
+                minWidth: "180px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                {selectedSystem || (
+                  <Input.Placeholder>Платёжная система</Input.Placeholder>
+                )}
+                {selectedSystem && (
+                  <img
+                    src={selectedItem?.icon}
+                    alt={selectedSystem}
+                    className="userAccounts__img"
+                  />
+                )}
+              </div>
+            </InputBase>
+          </Combobox.Target>
 
+          <Combobox.Dropdown>
+            <Combobox.Search
+              value={search}
+              onChange={(event) => setSearch(event.currentTarget.value)}
+              placeholder="Поиск"
+            />
+            <Combobox.Options>
+              <ScrollArea.Autosize type="scroll" mah={200}>
+                {options.length > 0 ? (
+                  options
+                ) : (
+                  <>
+                    <Combobox.Group label="Banks">
+                      {banks.map((el) => {
+                        return (
+                          <Combobox.Option
+                            key={el.symbol}
+                            value={el.symbol}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            {el.symbol}
+                            <img
+                              className="userAccounts__img"
+                              src={el.icon}
+                              alt={el.symbol}
+                            />{" "}
+                          </Combobox.Option>
+                        );
+                      })}
+                    </Combobox.Group>
+
+                    <Combobox.Group label="Coins">
+                      {coins.map((el) => {
+                        return (
+                          <Combobox.Option
+                            key={el.symbol}
+                            value={el.symbol}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            {el.symbol}
+                            <img
+                              className="userAccounts__img"
+                              src={el.icon}
+                              alt={el.symbol}
+                            />{" "}
+                          </Combobox.Option>
+                        );
+                      })}
+                    </Combobox.Group>
+                  </>
+                )}
+              </ScrollArea.Autosize>
+            </Combobox.Options>
+          </Combobox.Dropdown>
+        </Combobox>
         <TextInput
           placeholder="Номер счёта"
           value={accountNumber}
@@ -151,7 +241,7 @@ export default function UserAccounts() {
             <tr>
               <th>Платёжная система</th>
               <th>Номер счёта</th>
-              <th>{isBank ? "Получатель" : "Сеть"}</th>
+              <th>Доп. инфо</th>
             </tr>
           </thead>
           <tbody>
@@ -159,8 +249,12 @@ export default function UserAccounts() {
               <tr key={index}>
                 <td>
                   <Group>
-                    <Avatar src={account.icon} size="sm" />
                     {account.system}
+                    <img
+                      src={account.icon}
+                      alt={account.system}
+                      className="userAccounts__img"
+                    />
                   </Group>
                 </td>
                 <td>{account.accountNumber}</td>
