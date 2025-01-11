@@ -33,7 +33,7 @@ export default function UserOperations() {
           <div className="stats-label">Скачать архив операций</div>
           <div className="stats-value stats-download">
             {/* В реальном проекте логика скачивания/экспорта будет своя */}
-            <button className="download-button">Загрузить</button>
+            <button className="download-button">Скачать</button>
           </div>
         </div>
       </div>
@@ -45,7 +45,7 @@ export default function UserOperations() {
             <tr>
               <th>ID</th>
               <th>Дата</th>
-              <th>Курс</th>
+              {/* <th>Курс</th> */}
               <th>Отдаёте</th>
               <th>Получаете</th>
               <th>Статус</th>
@@ -63,7 +63,7 @@ export default function UserOperations() {
                 <tr key={deal.id}>
                   <td>{deal.id}</td>
                   <td>{deal.date}</td>
-                  <td>{deal.rate}</td>
+                  {/* <td>{deal.rate}</td> */}
                   <td>{deal.give}</td>
                   <td>{deal.receive}</td>
                   <td>{deal.status}</td>

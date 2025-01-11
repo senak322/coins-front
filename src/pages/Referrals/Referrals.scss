@@ -1,0 +1,51 @@
+.referrals {
+    margin: 20px 0;
+  
+    &__title {
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+    }
+  
+    &__table {
+      background-color: #fff4cc; /* Светло-жёлтый фон */
+      border-radius: 12px;
+      padding: 16px;
+  
+      .table-header {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+        background-color: #ffe9a3;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-bottom: 8px;
+  
+        .header-cell {
+          /* Доп. стили, если нужно */
+        }
+      }
+  
+      .table-body {
+        display: grid;
+        row-gap: 8px; /* Отступы между строками */
+  
+        .table-row {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          background-color: #ffe9a3;
+          padding: 12px;
+          border-radius: 8px;
+  
+          &.no-data {
+            text-align: center;
+            grid-column: 1 / -1; /* Растянуть на всю ширину */
+          }
+  
+          .cell {
+            /* Стили ячеек */
+          }
+        }
+      }
+    }
+  }
+  

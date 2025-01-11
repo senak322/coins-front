@@ -7,10 +7,10 @@ export default function AccountLayout() {
     { path: "/account/security", label: "Настройки безопасности" },
     { path: "/account/accounts", label: "Ваши счета" },
     { path: "/account/operations", label: "Ваши операции" },
-    { path: "/account/partner-account", label: "Партнёрский аккаунт" },
-    { path: "/account/partner-exchanges", label: "Партнёрские обмены" },
+    { path: "/account/partners", label: "Партнёрский аккаунт" },
+    { path: "/account/bonuses", label: "Партнёрские обмены" },
     { path: "/account/referrals", label: "Рефералы" },
-    { path: "/account/partner-withdrawals", label: "Вывод партнёрских средств" },
+    { path: "/account/withdraw", label: "Вывод партнёрских средств" },
   ];
 
   return (

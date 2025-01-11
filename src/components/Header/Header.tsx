@@ -11,6 +11,7 @@ import SignInModal from "../Auth/SignInModal";
 import SignUpModal from "../Auth/SignUpModal";
 
 export default function Header() {
+  const [tab, setTab] = useState('');
   const [rates, setRates] = useState<{
     [key: string]: { rub: number; usd: number };
   }>({});
@@ -101,6 +102,13 @@ export default function Header() {
     setIsAuthenticated(!!token);
   }, [location]);
 
+  useEffect(() => {
+    setTab(location.pathname.replace(/^\//, ''));
+    // console.log(location.pathname);
+    
+    
+}, [location]);
+
   return (
     <header className="header">
       <div className="header__coins-list">
@@ -134,7 +142,7 @@ export default function Header() {
               <Link
                 to="/account"
                 className={`header__link ${
-                  isActive("/account") ? "active" : ""
+                  tab.startsWith('account') ? "active" : ""
                 }`}
               >
                 {translations[currentLanguage].account}

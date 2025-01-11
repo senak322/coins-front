@@ -13,6 +13,10 @@ import SecuritySettings from "./pages/SecuritySettings/SecuritySettings";
 import UserAccounts from "./pages/UserAccounts/UserAccounts";
 import { MantineProvider } from "@mantine/core";
 import UserOperations from "./pages/UserOperations/UserOperations";
+import PartnerAccount from "./pages/PartnerAccount/PartnerAccount";
+import PartnerExchanges from "./pages/PartnerExchanges/PartnerExchanges";
+import Referrals from "./pages/Referrals/Referrals";
+import PartnerWithdraw from "./pages/PartnerWithdraw/PartnerWithdraw";
 
 function App() {
   return (
@@ -36,6 +40,10 @@ function App() {
             <Route path="security" element={<SecuritySettings />} />
             <Route path="accounts" element={<UserAccounts />} />
             <Route path="operations" element={<UserOperations />} />
+            <Route path="partners" element={<PartnerAccount />} />
+            <Route path="bonuses" element={<PartnerExchanges />} />
+            <Route path="referrals" element={<Referrals />} />
+            <Route path="withdraw" element={<PartnerWithdraw />} />
           </Route>
         </Routes>
         <Footer />

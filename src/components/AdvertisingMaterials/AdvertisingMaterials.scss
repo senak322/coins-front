@@ -1,0 +1,56 @@
+.advertising-materials {
+    background-color: #fff4cc; /* Светло-жёлтый фон */
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px; /* Если нужно отодвинуть блок от предыдущих элементов */
+  
+    &__title {
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+    }
+  
+    &__text {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin: 0 0 16px;
+    }
+  
+    &__block {
+      margin-bottom: 16px;
+  
+      /* Можно оформить как "подблок" с небольшим отступом/фоном:
+      background-color: #ffe9a3;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 20px;
+      */
+    }
+  
+    &__label {
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+  
+    &__input, &__textarea {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background-color: #fff;
+      resize: none; /* для textarea, если не хотим, чтобы пользователь менял размер */
+  
+      &:focus {
+        outline: none;
+        border-color: #ffc107; /* жёлтый оттенок при фокусе, к примеру */
+        box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.3);
+      }
+    }
+  
+    &__textarea {
+      /* textarea-specific styling */
+      height: 60px; /* на ваше усмотрение */
+    }
+  }
+  
