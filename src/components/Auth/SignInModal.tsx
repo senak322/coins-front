@@ -36,7 +36,7 @@ export default function SignInModal({
 
     try {
       const { token, user } = await login(loginInput, password); // API запрос
-      localStorage.setItem("authToken", token); // Сохраняем токен
+      localStorage.setItem("jwt", token); // Сохраняем токен
       onSuccess();
       onClose();
     } catch (err: any) {

@@ -1,6 +1,6 @@
 import "./App.scss";
 import '@mantine/core/styles.css';
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
 import MainExchange from "./components/Main/MainExchange";
@@ -17,8 +17,42 @@ import PartnerAccount from "./pages/PartnerAccount/PartnerAccount";
 import PartnerExchanges from "./pages/PartnerExchanges/PartnerExchanges";
 import Referrals from "./pages/Referrals/Referrals";
 import PartnerWithdraw from "./pages/PartnerWithdraw/PartnerWithdraw";
+import { useEffect } from "react";
+import { getMe } from "./utils/api";
 
 function App() {
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      console.log('No token in localStorage');
+      return;
+    }
+    
+    getMe(token)
+      .then((res) => {
+        console.log(!res!.ok);
+        
+        if (!res!.ok) {
+          // navigate('/');
+          // localStorage.removeItem('jwt');
+          throw new Error('Token verify failed');
+        }
+        return res!.json();
+      })
+      .then((data) => {
+        console.log('verify data:', data);
+        // Здесь ожидаем { message: 'Token is valid', user: { ... } }
+      })
+      .catch((error) => {
+        navigate('/');
+        localStorage.removeItem('jwt');
+        console.error(error);
+      });
+  }, []);
+
   return (
     <MantineProvider>
       <div className="App">

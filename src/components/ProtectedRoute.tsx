@@ -5,7 +5,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("jwt");
   if (!token) {
     return <Navigate to="/" />;
   }

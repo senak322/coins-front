@@ -78,7 +78,7 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Удаляем токен
+    localStorage.removeItem("jwt"); // Удаляем токен
     setIsAuthenticated(false); // Обновляем состояние
     navigate("/"); // Редирект на главную
   };
@@ -98,7 +98,7 @@ export default function Header() {
 
   // Проверяем токен при загрузке и смене маршрута
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("jwt");
     setIsAuthenticated(!!token);
   }, [location]);
 
