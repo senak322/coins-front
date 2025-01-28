@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import exchangeReducer from './exchangeSlice';
-import languageReducer from "./languageSlice"; 
+import languageReducer from "./languageSlice";
+import userReducer from './userSlice';
 
 const store = configureStore({
     reducer: {
       exchange: exchangeReducer,
       language: languageReducer, // срез языка
+      user: userReducer,
     },
   });
   

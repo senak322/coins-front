@@ -19,9 +19,11 @@ import Referrals from "./pages/Referrals/Referrals";
 import PartnerWithdraw from "./pages/PartnerWithdraw/PartnerWithdraw";
 import { useEffect } from "react";
 import { getMe } from "./utils/api";
+import { useAppDispatch } from "./hooks/useAppDispatch";
+import { clearUser, setUser } from "./store/userSlice";
 
 function App() {
-
+  const dispatch = useAppDispatch();
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -44,11 +46,13 @@ function App() {
       })
       .then((data) => {
         console.log('verify data:', data);
+        dispatch(setUser(data.user));
         // Здесь ожидаем { message: 'Token is valid', user: { ... } }
       })
       .catch((error) => {
         navigate('/');
         localStorage.removeItem('jwt');
+        dispatch(clearUser());
         console.error(error);
       });
   }, []);
