@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import "./Auth.scss";
 import { login } from "../../services/authAPI";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { setUser } from "../../store/userSlice";
 
 interface SignInModalProps {
   open: boolean;
@@ -27,6 +29,7 @@ export default function SignInModal({
   const [loginInput, setLoginInput] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async () => {
     if (!loginInput.trim() || !password.trim()) {
@@ -37,6 +40,7 @@ export default function SignInModal({
     try {
       const { token, user } = await login(loginInput, password); // API запрос
       localStorage.setItem("jwt", token); // Сохраняем токен
+      dispatch(setUser(user));
       onSuccess();
       onClose();
     } catch (err: any) {

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import "./SecuritySettings.scss";
 
 export default function SecuritySettings() {
+  const baseURL =
+    process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
   const [passwordData, setPasswordData] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -15,14 +17,46 @@ export default function SecuritySettings() {
     setPasswordData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       alert("Пароли не совпадают.");
       return;
     }
-    // Логика отправки нового пароля на сервер
-    console.log("Изменение пароля:", passwordData.newPassword);
+
+    // Берём токен из localStorage (или Redux)
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      alert("Нет токена – нужно войти заново");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${baseURL}/api/auth/change-password`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ newPassword: passwordData.newPassword }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Error changing password:", errorData);
+        alert(errorData.error || "Произошла ошибка при смене пароля");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Password updated:", data);
+      alert("Пароль успешно изменён!");
+      // Доп. логика: сбросить поля, диспатчить что-то в Redux и т.п.
+      setPasswordData({ newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      console.error("Request failed:", err);
+      alert("Ошибка при запросе к серверу");
+    }
   };
 
   const handle2FAToggle = () => {
@@ -65,10 +99,7 @@ export default function SecuritySettings() {
           />
         </div>
         <div className="security-settings__field">
-          <label
-            htmlFor="confirmPassword"
-            className="security-settings__label"
-          >
+          <label htmlFor="confirmPassword" className="security-settings__label">
             Новый пароль повторно:
           </label>
           <input
@@ -80,14 +111,23 @@ export default function SecuritySettings() {
             className="security-settings__input"
           />
         </div>
-        <button type="submit" className="security-settings__submit">
+        <button
+          type="submit"
+          className="security-settings__submit"
+          disabled={
+            passwordData.newPassword.trim() === "" ||
+            passwordData.confirmPassword.trim() === ""
+          }
+        >
           Сохранить
         </button>
       </form>
 
       {/* Двухфакторная аутентификация */}
       <div className="security-settings__section">
-        <h2 className="security-settings__subtitle">Двухфакторная аутентификация</h2>
+        <h2 className="security-settings__subtitle">
+          Двухфакторная аутентификация
+        </h2>
         <button
           className={`security-settings__button ${
             is2FAEnabled ? "disable" : "enable"
@@ -102,7 +142,9 @@ export default function SecuritySettings() {
 
       {/* Уведомление по e-mail */}
       <div className="security-settings__section">
-        <h2 className="security-settings__subtitle">Уведомления о входе в систему</h2>
+        <h2 className="security-settings__subtitle">
+          Уведомления о входе в систему
+        </h2>
         <button
           className={`security-settings__button ${
             isEmailNotificationEnabled ? "disable" : "enable"
