@@ -35,8 +35,6 @@ function App() {
     
     getMe(token)
       .then((res) => {
-        console.log(!res!.ok);
-        
         if (!res!.ok) {
           // navigate('/');
           // localStorage.removeItem('jwt');

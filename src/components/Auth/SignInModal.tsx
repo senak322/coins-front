@@ -26,6 +26,8 @@ export default function SignInModal({
   onSuccess,
   onRegisterClick,
 }: SignInModalProps) {
+  const baseURL =
+    process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
   const [loginInput, setLoginInput] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -38,12 +40,24 @@ export default function SignInModal({
     }
 
     try {
-      const { token, user } = await login(loginInput, password); // API запрос
+      const { user } = await login(loginInput, password); // API запрос
+      if (user.is2FAEnabled) {
+        // Показать модальное окно для ввода 2FA кода
+        const code = prompt('Enter your 2FA code');
+        const verifyResponse = await fetch(`${baseURL}/api/auth/2fa/verify`, {
+          method: 'POST',
+          body: JSON.stringify({ userId: user._id, token: code })
+        });
+        
+        if (!verifyResponse.ok) {
+          throw new Error('Invalid 2FA code')}
+        
+        const { token } = await verifyResponse.json();
       localStorage.setItem("jwt", token); // Сохраняем токен
       dispatch(setUser(user));
       onSuccess();
       onClose();
-    } catch (err: any) {
+    }}catch (err: any) {
       setError(err.response?.data?.error || "Ошибка входа.");
     }
   };

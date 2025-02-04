@@ -99,4 +99,22 @@
       }
     }
   }
+
+  .qr-code-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .error-message {
+    color: #ff4444;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .security-settings__button {
+    &.enable { background-color: #4CAF50; }
+    &.disable { background-color: #f44336; }
+  }
   

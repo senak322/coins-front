@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./SecuritySettings.scss";
+import QRCode from "qrcode.react";
+import { Button, Dialog, TextInput } from "@mantine/core";
 
 export default function SecuritySettings() {
   const baseURL =
@@ -9,6 +11,9 @@ export default function SecuritySettings() {
     confirmPassword: "",
   });
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [qrCodeData, setQrCodeData] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] =
     useState(false);
 
@@ -59,15 +64,40 @@ export default function SecuritySettings() {
     }
   };
 
-  const handle2FAToggle = () => {
-    if (is2FAEnabled) {
-      // Логика отключения 2FA
-      console.log("Отключение двухфакторной аутентификации");
-    } else {
-      // Логика подключения 2FA
-      console.log("Подключение двухфакторной аутентификации");
+  const handleEnable2FA = async () => {
+    try {
+      const token = localStorage.getItem("jwt");
+      const response = await fetch(`${baseURL}/api/auth/2fa/generate`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setQrCodeData(data.qrCode);
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error("Error generating 2FA:", error);
     }
-    setIs2FAEnabled(!is2FAEnabled);
+  };
+
+  const handleConfirm2FA = async () => {
+    try {
+      const token = localStorage.getItem("jwt");
+      const response = await fetch(`${baseURL}/api/auth/2fa/enable`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ token: verificationCode }),
+      });
+
+      if (response.ok) {
+        setIs2FAEnabled(true);
+        setIsDialogOpen(false);
+        alert("2FA enabled successfully!");
+      }
+    } catch (error) {
+      console.error("Error enabling 2FA:", error);
+    }
   };
 
   const handleEmailNotificationToggle = () => {
@@ -124,21 +154,32 @@ export default function SecuritySettings() {
       </form>
 
       {/* Двухфакторная аутентификация */}
-      <div className="security-settings__section">
-        <h2 className="security-settings__subtitle">
-          Двухфакторная аутентификация
-        </h2>
-        <button
-          className={`security-settings__button ${
-            is2FAEnabled ? "disable" : "enable"
-          }`}
-          onClick={handle2FAToggle}
-        >
-          {is2FAEnabled
-            ? "Отключить двухфакторную аутентификацию"
-            : "Подключить двухфакторную аутентификацию"}
-        </button>
-      </div>
+      <Dialog
+        opened={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        title="Setup Two-Factor Authentication"
+      >
+        {qrCodeData && (
+          <>
+            <QRCode
+              value={qrCodeData}
+              size={200}
+              bgColor="#ffffff"
+              fgColor="#000000"
+              level="H"
+            />
+            <TextInput
+              label="Enter verification code"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value)}
+              mt="md"
+            />
+            <Button onClick={handleConfirm2FA} fullWidth mt="md">
+              Confirm
+            </Button>
+          </>
+        )}
+      </Dialog>
 
       {/* Уведомление по e-mail */}
       <div className="security-settings__section">
