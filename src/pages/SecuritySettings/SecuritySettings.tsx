@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./SecuritySettings.scss";
-import QRCode from "qrcode.react";
+import {QRCodeSVG}  from "qrcode.react";
 import { Button, Dialog, TextInput } from "@mantine/core";
 
 export default function SecuritySettings() {
@@ -64,39 +64,68 @@ export default function SecuritySettings() {
     }
   };
 
+  // Запрос на генерацию секрета и QR-кода для включения 2FA
   const handleEnable2FA = async () => {
     try {
-      const token = localStorage.getItem("jwt");
+      const jwtToken = localStorage.getItem("jwt");
       const response = await fetch(`${baseURL}/api/auth/2fa/generate`, {
-        headers: { Authorization: `Bearer ${token}` },
+        method: "POST",
+        headers: { Authorization: `Bearer ${jwtToken}` },
       });
       const data = await response.json();
-      setQrCodeData(data.qrCode);
-      setIsDialogOpen(true);
+      if (data.qrCode) {
+        setQrCodeData(data.qrCode);
+        setIsDialogOpen(true);
+      } else {
+        alert("Ошибка при генерации QR-кода");
+      }
     } catch (error) {
       console.error("Error generating 2FA:", error);
     }
   };
 
+  // Подтверждение включения 2FA с введённым кодом
   const handleConfirm2FA = async () => {
     try {
-      const token = localStorage.getItem("jwt");
+      const jwtToken = localStorage.getItem("jwt");
       const response = await fetch(`${baseURL}/api/auth/2fa/enable`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${jwtToken}`,
         },
         body: JSON.stringify({ token: verificationCode }),
       });
-
+      const data = await response.json();
       if (response.ok) {
         setIs2FAEnabled(true);
         setIsDialogOpen(false);
-        alert("2FA enabled successfully!");
+        alert("Двухфакторная аутентификация успешно включена!");
+      } else {
+        alert(data.error || "Ошибка активации 2FA");
       }
     } catch (error) {
       console.error("Error enabling 2FA:", error);
+    }
+  };
+
+  // Отключение 2FA
+  const handleDisable2FA = async () => {
+    try {
+      const jwtToken = localStorage.getItem("jwt");
+      const response = await fetch(`${baseURL}/api/auth/2fa/disable`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setIs2FAEnabled(false);
+        alert("Двухфакторная аутентификация успешно отключена!");
+      } else {
+        alert(data.error || "Ошибка отключения 2FA");
+      }
+    } catch (error) {
+      console.error("Error disabling 2FA:", error);
     }
   };
 
@@ -152,30 +181,47 @@ export default function SecuritySettings() {
           Сохранить
         </button>
       </form>
+      {/* Двухфакторная аутентификация */}
+      <div className="security-settings__section">
+        <h2 className="security-settings__subtitle">
+          Двухфакторная аутентификация
+        </h2>
+        <button
+          className={`security-settings__button ${
+            is2FAEnabled ? "disable" : "enable"
+          }`}
+          onClick={is2FAEnabled ? handleDisable2FA : handleEnable2FA}
+        >
+          {is2FAEnabled
+            ? "Отключить двухфакторную аутентификацию"
+            : "Подключить двухфакторную аутентификацию"}
+        </button>
+      </div>
 
       {/* Двухфакторная аутентификация */}
       <Dialog
         opened={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        title="Setup Two-Factor Authentication"
+        title="Настройка двухфакторной аутентификации"
       >
         {qrCodeData && (
           <>
-            <QRCode
-              value={qrCodeData}
-              size={200}
-              bgColor="#ffffff"
-              fgColor="#000000"
-              level="H"
-            />
+            {/* <QRCodeSVG 
+              value={qrCodeData} 
+              size={200} 
+              bgColor="#ffffff" 
+              fgColor="#000000" 
+              level="H" 
+            /> */}
+            <img src={qrCodeData} alt="QR code" width="200" height="200" />
             <TextInput
-              label="Enter verification code"
+              label="Введите код из приложения"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value)}
               mt="md"
             />
             <Button onClick={handleConfirm2FA} fullWidth mt="md">
-              Confirm
+              Подтвердить
             </Button>
           </>
         )}
