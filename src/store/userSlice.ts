@@ -8,6 +8,7 @@ interface User {
   first_name?: string;
   phone?: string;
   tg?: string;
+  twoFA: boolean;
 }
 
 // Определяем структуру для стейта user
@@ -32,11 +33,14 @@ const userSlice = createSlice({
     clearUser(state) {
       state.user = null;
     },
+    setIs2FAEnabled(state, action: PayloadAction<boolean>) {
+      state.user!.twoFA = action.payload;
+    }
   },
 });
 
 // Экшены, которые будем диспатчить
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setIs2FAEnabled } = userSlice.actions;
 
 // Экспортируем редюсер, чтобы подключить в store
 export default userSlice.reducer;

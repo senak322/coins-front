@@ -47,10 +47,10 @@ export default function SignInModal({
 
     try {
       // API запрос на вход
-      const { user, token, twoFA } = await login(loginInput, password);
-      if (twoFA) {
+      const { user, token } = await login(loginInput, password);
+      if (user.twoFA) {
         // Сохраняем весь объект пользователя, а не только userId
-        setTempUser(user._id);
+        setTempUser(user);
         setIs2FADialogOpen(true);
       } else {
         // Если 2FA не требуется – сохраняем токен и обновляем состояние пользователя

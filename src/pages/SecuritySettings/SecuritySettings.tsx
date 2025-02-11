@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import "./SecuritySettings.scss";
-import {QRCodeSVG}  from "qrcode.react";
 import { Button, Dialog, TextInput } from "@mantine/core";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { setIs2FAEnabled } from "../../store/userSlice";
 
 export default function SecuritySettings() {
   const baseURL =
@@ -10,12 +13,18 @@ export default function SecuritySettings() {
     newPassword: "",
     confirmPassword: "",
   });
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  // const [is2FAEnabled, setIs2FAEnabled] = useState(false);
   const [qrCodeData, setQrCodeData] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] =
     useState(false);
+  
+    const dispatch = useAppDispatch();
+
+    const { user } = useSelector(
+      (state: RootState) => state.user
+    );
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -98,7 +107,7 @@ export default function SecuritySettings() {
       });
       const data = await response.json();
       if (response.ok) {
-        setIs2FAEnabled(true);
+        dispatch(setIs2FAEnabled(true));
         setIsDialogOpen(false);
         alert("Двухфакторная аутентификация успешно включена!");
       } else {
@@ -188,11 +197,11 @@ export default function SecuritySettings() {
         </h2>
         <button
           className={`security-settings__button ${
-            is2FAEnabled ? "disable" : "enable"
+            user?.twoFA ? "disable" : "enable"
           }`}
-          onClick={is2FAEnabled ? handleDisable2FA : handleEnable2FA}
+          onClick={user?.twoFA  ? handleDisable2FA : handleEnable2FA}
         >
-          {is2FAEnabled
+          {user?.twoFA 
             ? "Отключить двухфакторную аутентификацию"
             : "Подключить двухфакторную аутентификацию"}
         </button>
