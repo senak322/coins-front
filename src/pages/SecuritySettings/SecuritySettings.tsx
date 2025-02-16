@@ -128,7 +128,7 @@ export default function SecuritySettings() {
       });
       const data = await response.json();
       if (response.ok) {
-        setIs2FAEnabled(false);
+        dispatch(setIs2FAEnabled(false));
         alert("Двухфакторная аутентификация успешно отключена!");
       } else {
         alert(data.error || "Ошибка отключения 2FA");

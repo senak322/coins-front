@@ -37,6 +37,13 @@ import { makeStyles } from "@mui/styles";
 import { calculateExchange, getExchangeRates } from "../../utils/api";
 import { banks } from "../../utils/config";
 
+interface Account {
+  _id: string;
+  system: string; // например "BTC", "Сбер" и т.д.
+  accountNumber: string; // Например, номер счета или адрес кошелька
+  extraInfo: string;
+}
+
 const useStyles = makeStyles({
   dialogPaper: {
     backgroundColor: "#3a3a3a",
@@ -111,6 +118,10 @@ export default function ExchangeWidget() {
   const [selectedNetworkReceive, setSelectedNetworkReceive] = useState("");
   const [networkError, setNetworkError] = useState("");
 
+  const [savedAccounts, setSavedAccounts] = useState<Account[]>([]);
+  const [selectedAccountId, setSelectedAccountId] = useState("");
+  const [selectedAccountData, setSelectedAccountData] = useState<Account | undefined>(undefined);
+
   const dispatch = useAppDispatch();
   const { instances, sumGive, sumReceive, lastChangedInput } = useSelector(
     (state: RootState) => state.exchange
@@ -119,6 +130,8 @@ export default function ExchangeWidget() {
   const currentLanguage = useSelector(
     (state: RootState) => state.language.currentLanguage
   );
+
+  const user = useSelector((state: RootState) => state.user); 
 
   const isRuble = (currency: string) => {
     const rubCurrencies = [
@@ -180,14 +193,19 @@ export default function ExchangeWidget() {
   const handleClickOpen = () => {
     if (Number(sumGive) > 0 && Number(sumReceive) > 0) {
       setOpen(true);
+      // Если пользователь авторизован, загружаем его сохранённые счета
+      if (user) {
+        fetchSavedAccounts();
+      }
     }
-    return;
   };
 
   const handleClose = () => {
     setOpen(false);
     setOrderCreated(false);
     setOrderId(null);
+    setSelectedAccountId("");
+    setSelectedAccountData(undefined);
   };
 
   const handleContactOperator = () => {
@@ -199,11 +217,40 @@ export default function ExchangeWidget() {
           selectedNetworkGive || selectedNetworkReceive
             ? `Сеть: ${selectedNetworkGive || selectedNetworkReceive}`
             : ""
-        }`
+        }\n` +
+        `${selectedAccountId ? `Выбранный счёт: ${selectedAccountData?.system} ${selectedAccountData?.accountNumber} ${selectedAccountData?.extraInfo}` : ""}`
     );
     const telegramUsername = "Coins_change"; // замените на имя пользователя оператора
     window.open(`https://t.me/${telegramUsername}?text=${message}`, "_blank");
   };
+
+  const fetchSavedAccounts = async () => {
+    try {
+      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const token = localStorage.getItem("jwt");
+      const response = await fetch(`${baseURL}/api/accounts`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+      
+      if (response.ok && data) {
+        setSavedAccounts(data);
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки сохранённых счетов:", error);
+    }
+  };
+
+  const handleAccountSelect = (event: SelectChangeEvent<string>) => {
+    const account = savedAccounts.find(el => el._id === event.target.value)
+    setSelectedAccountId(event.target.value);
+    setSelectedAccountData(account);
+  };
+
 
   const handleCreateOrder = async () => {
     // Проверяем, что ник заполнен
@@ -231,6 +278,8 @@ export default function ExchangeWidget() {
       currencyReceive: instances.receive.selectedCurrency,
       telegramNickname: telegramNickname.trim(), // Добавляем ник в данные заявки
       networkGive: selectedNetworkGive || selectedNetworkReceive, // Добавляем выбранную сеть в заявку
+      accountId: selectedAccountId || undefined,
+      // accountData: selectedAccountData?.system
     };
 
     try {
@@ -405,6 +454,11 @@ export default function ExchangeWidget() {
     },
   };
 
+  const receivingAccounts = savedAccounts.filter(
+    (account) => account.system.toLowerCase() === instances.receive.selectedCurrency.toLowerCase()
+  );
+
+
   return (
     <div className={"container"} id="widget">
       <div className={"exchange-block"}>
@@ -478,7 +532,11 @@ export default function ExchangeWidget() {
                 <strong>Вы получаете:</strong> {sumReceive}{" "}
                 {instances.receive.selectedCurrency}
               </div>
-              
+              {selectedAccountId && (
+                <div className={classes.exchangeData}>
+                  <strong>Выбранный счёт:</strong> {`${selectedAccountData?.system} ${selectedAccountData?.accountNumber} ${selectedAccountData?.extraInfo}`}
+                </div>
+              )}
             </div>
           ) : (
             // Первоначальное отображение подтверждения обмена
@@ -524,7 +582,24 @@ export default function ExchangeWidget() {
                   )}
                 </div>
               )}
-
+              {receivingAccounts.length > 0 && (
+                <div className={classes.exchangeData}>
+                  <strong style={{ marginBottom: "10px" }}>Выберите счет для получения:</strong>
+                  <Select
+                    value={selectedAccountId}
+                    onChange={handleAccountSelect}
+                    fullWidth
+                    variant="outlined"
+                    sx={{ color: "#fff", ".MuiSelect-icon": { color: "#fff" } }}
+                  >
+                    {receivingAccounts.map((account) => (
+                      <MenuItem key={account._id} value={account._id} sx={{ color: "#fff" }}>
+                        {`${account.accountNumber} ${account.extraInfo}`}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
+              )}
               {/* Добавляем выбор сети для получаемой валюты */}
               {networkOptions[instances.receive.selectedCurrency] && (
                 <div className={classes.exchangeData}>
