@@ -1,19 +1,57 @@
+import { useEffect, useState } from "react";
 import "./UserOperations.scss";
 
-interface Deal {
-  id: number;
-  date: string;
-  rate: string;
-  give: string;
-  receive: string;
-  status: string;
+interface OrderData {
+  orderId: string;
+  amountGive: number;
+  currencyGive: string;
+  amountReceive: number;
+  currencyReceive: string;
+  telegramNickname: string;
+  networkGive?: string;
+  status: "new" | "completed" | "in_progress" | "cancelled";
+  accountId?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function UserOperations() {
-  // Здесь вы можете загрузить реальную статистику и список сделок из API
-  const totalExchanges = 0;
-  const totalAmount = 0;
-  const deals: Deal[] = []; // Пусть пока пустой список
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      // Здесь можно использовать endpoint "/api/order/all" или "/api/order/my" в зависимости от задачи
+      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const response = await fetch(`${baseURL}/api/order/my`, {
+        headers: {
+          "Content-Type": "application/json",
+          // Если требуется, добавьте JWT в заголовке:
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok && data.orders) {
+        setOrders(data.orders);
+      } else {
+        console.error("Ошибка получения заказов:", data.message);
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки заявок:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  // Пример расчёта статистики:
+  const totalExchanges = orders.length;
+  // Здесь для примера суммируем amountGive, предположим, что они в USD или уже сконвертированы
+  const totalAmount = orders.reduce((sum, order) => sum + order.amountGive, 0);
 
   return (
     <div className="operations-container">
@@ -25,14 +63,14 @@ export default function UserOperations() {
           <div className="stats-label">Обменов</div>
           <div className="stats-value">{totalExchanges}</div>
         </div>
-        <div className="stats-row">
+        {/* <div className="stats-row">
           <div className="stats-label">Сумма обменов</div>
           <div className="stats-value">{totalAmount} USD</div>
-        </div>
+        </div> */}
         <div className="stats-row">
           <div className="stats-label">Скачать архив операций</div>
           <div className="stats-value stats-download">
-            {/* В реальном проекте логика скачивания/экспорта будет своя */}
+            {/* Здесь можно реализовать скачивание архива */}
             <button className="download-button">Скачать</button>
           </div>
         </div>
@@ -40,38 +78,38 @@ export default function UserOperations() {
 
       {/* Таблица сделок */}
       <div className="operations-table">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Дата</th>
-              {/* <th>Курс</th> */}
-              <th>Отдаёте</th>
-              <th>Получаете</th>
-              <th>Статус</th>
-            </tr>
-          </thead>
-          <tbody>
-            {deals.length === 0 ? (
+        {isLoading ? (
+          <p>Загрузка...</p>
+        ) : orders.length === 0 ? (
+          <p className="no-data">Данных нет</p>
+        ) : (
+          <table>
+            <thead>
               <tr>
-                <td colSpan={6} className="no-data">
-                  Данных нет
-                </td>
+                <th>ID</th>
+                <th>Дата</th>
+                <th>Отдаёте</th>
+                <th>Получаете</th>
+                <th>Статус</th>
               </tr>
-            ) : (
-              deals.map((deal) => (
-                <tr key={deal.id}>
-                  <td>{deal.id}</td>
-                  <td>{deal.date}</td>
-                  {/* <td>{deal.rate}</td> */}
-                  <td>{deal.give}</td>
-                  <td>{deal.receive}</td>
-                  <td>{deal.status}</td>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.orderId}>
+                  <td>{order.orderId}</td>
+                  <td>{new Date(order.createdAt).toLocaleString()}</td>
+                  <td>
+                    {order.amountGive} {order.currencyGive}
+                  </td>
+                  <td>
+                    {order.amountReceive} {order.currencyReceive}
+                  </td>
+                  <td>{order.status}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

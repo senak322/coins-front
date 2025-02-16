@@ -1,112 +1,144 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./PartnerAccount.scss";
 import AdvertisingMaterials from "../../components/AdvertisingMaterials/AdvertisingMaterials";
 
+interface PartnerInfo {
+  accountId: string;
+  registrationDate: string;
+  email: string;
+  partnerPercent: number;
+  referralCount: number;
+  visitors: number;
+  exchangesCount: number;
+  totalExchangesSum: number;
+  ctrValue: string;
+  earnedAllTime: number;
+  pendingPayout: number;
+  totalPaid: number;
+  currentBalance: number;
+  availableForPayout: number;
+}
+
 export default function PartnerAccount() {
-  // Первая таблица (как у вас уже было)
-  const accountId = 1337;
-  const registrationDate = "09.11.2024";
-  const email = "samplemail@mail.com";
-  const partnerPercent = 0;
+  const [partnerInfo, setPartnerInfo] = useState<PartnerInfo | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Вторая таблица — примерные данные
-  const visitors = 1337;
-  const referralCount = 42;
-  const exchangesCount = 0;
-  const totalExchangesSum = "0 USD";
-  const ctrValue = "—"; // или можно вывести число в %
-  const earnedAllTime = "—";
-  const pendingPayout = "—";
-  const totalPaid = "—";
-  const currentBalance = "—";
-  const availableForPayout = "—";
-
-  const handleDownloadArchive = () => {
-    // Логика скачивания архива
-    alert("Загружаем архив...");
+  const fetchPartnerInfo = async () => {
+    setLoading(true);
+    try {
+      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const response = await fetch(`${baseURL}/api/partner/info`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setPartnerInfo(data);
+      } else {
+        setError(data.error || "Ошибка получения данных");
+      }
+    } catch (err) {
+      setError("Ошибка получения данных");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchPartnerInfo();
+  }, []);
+
+  if (loading) {
+    return <p>Загрузка...</p>;
+  }
+
+  if (error) {
+    return <p style={{ color: "red" }}>{error}</p>;
+  }
+
+  if (!partnerInfo) {
+    return <p>Нет данных</p>;
+  }
 
   return (
     <div className="partner-account">
       <h2 className="partner-account__title">Партнёрский аккаунт</h2>
-
-      <div style={{display: "flex", gap: "1rem"}}>
+      <div style={{ display: "flex", gap: "1rem" }}>
         {/* Первая таблица */}
         <div className="partner-account__table">
           <div className="stats-row">
             <div className="stats-label">ID</div>
-            <div className="stats-value">{accountId}</div>
+            <div className="stats-value">{partnerInfo.accountId}</div>
           </div>
           <div className="stats-row">
             <div className="stats-label">Дата регистрации</div>
-            <div className="stats-value">{registrationDate}</div>
+            <div className="stats-value">{new Date(partnerInfo.registrationDate).toLocaleDateString()}</div>
           </div>
           <div className="stats-row">
             <div className="stats-label">E-mail</div>
-            <div className="stats-value">{email}</div>
+            <div className="stats-value">{partnerInfo.email}</div>
           </div>
           <div className="stats-row">
             <div className="stats-label">Ваш парт. процент</div>
-            <div className="stats-value">{partnerPercent} %</div>
+            <div className="stats-value">{partnerInfo.partnerPercent} %</div>
           </div>
           <div className="stats-row">
             <div className="stats-label">Скачать архив операций</div>
             <div className="stats-value">
-              <button
-                onClick={handleDownloadArchive}
-                className="download-button"
-              >
+              <button onClick={() => alert("Загружаем архив...")} className="download-button">
                 Загрузить
               </button>
             </div>
           </div>
         </div>
-
         {/* Вторая таблица */}
         <div className="partner-account__table partner-account__table--second">
           <div className="stats-row">
             <div className="stats-label">Посетителей</div>
-            <div className="stats-value">{visitors}</div>
+            <div className="stats-value">{partnerInfo.visitors}</div>
           </div>
           <div className="stats-row">
             <div className="stats-label">Количество рефералов</div>
-            <div className="stats-value">{referralCount}</div>
+            <div className="stats-value">{partnerInfo.referralCount}</div>
           </div>
           <div className="stats-row">
             <div className="stats-label">Обменов</div>
-            <div className="stats-value">{exchangesCount}</div>
+            <div className="stats-value">{partnerInfo.exchangesCount}</div>
           </div>
           <div className="stats-row">
-            <div className="stats-label">Сумма обменов</div>
-            <div className="stats-value">{totalExchangesSum}</div>
+            <div className="stats-label">Сумма обменов (RUB)</div>
+            <div className="stats-value">{partnerInfo.totalExchangesSum.toFixed(2)} RUB</div>
           </div>
           <div className="stats-row">
             <div className="stats-label">CTR</div>
-            <div className="stats-value">{ctrValue}</div>
+            <div className="stats-value">{partnerInfo.ctrValue}</div>
           </div>
           <div className="stats-row">
-            <div className="stats-label">Заработано за все время</div>
-            <div className="stats-value">{earnedAllTime}</div>
+            <div className="stats-label">Заработано за все время (RUB)</div>
+            <div className="stats-value">{partnerInfo.earnedAllTime.toFixed(2)} RUB</div>
           </div>
           <div className="stats-row">
-            <div className="stats-label">Ожидают выплаты</div>
-            <div className="stats-value">{pendingPayout}</div>
+            <div className="stats-label">Ожидают выплаты (RUB)</div>
+            <div className="stats-value">{partnerInfo.pendingPayout.toFixed(2)} RUB</div>
           </div>
           <div className="stats-row">
-            <div className="stats-label">Выплачено</div>
-            <div className="stats-value">{totalPaid}</div>
+            <div className="stats-label">Выплачено (RUB)</div>
+            <div className="stats-value">{partnerInfo.totalPaid.toFixed(2)} RUB</div>
           </div>
           <div className="stats-row">
-            <div className="stats-label">Текущий баланс</div>
-            <div className="stats-value">{currentBalance}</div>
+            <div className="stats-label">Текущий баланс (RUB)</div>
+            <div className="stats-value">{partnerInfo.currentBalance.toFixed(2)} RUB</div>
           </div>
           <div className="stats-row">
-            <div className="stats-label">Доступно для выплаты</div>
-            <div className="stats-value">{availableForPayout}</div>
+            <div className="stats-label">Доступно для выплаты (RUB)</div>
+            <div className="stats-value">{partnerInfo.availableForPayout.toFixed(2)} RUB</div>
           </div>
         </div>
       </div>
-      <AdvertisingMaterials />
+      <AdvertisingMaterials  referralCode={partnerInfo.accountId} />
     </div>
   );
 }

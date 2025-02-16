@@ -21,10 +21,12 @@ import { useEffect } from "react";
 import { getMe } from "./utils/api";
 import { useAppDispatch } from "./hooks/useAppDispatch";
 import { clearUser, setUser } from "./store/userSlice";
+import useReferralCode from "./hooks/useReferralCode";
 
 function App() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate()
+  useReferralCode();
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
@@ -54,6 +56,8 @@ function App() {
         console.error(error);
       });
   }, []);
+
+  
 
   return (
     <MantineProvider>

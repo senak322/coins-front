@@ -103,6 +103,7 @@ const networkOptions: { [key: string]: string[] } = {
 };
 
 export default function ExchangeWidget() {
+  const user = useSelector((state: RootState) => state.user); 
   const classes = useStyles();
   const [rates, setRates] = useState<{
     [key: string]: { rub: number; usd: number };
@@ -112,7 +113,7 @@ export default function ExchangeWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [orderCreated, setOrderCreated] = useState(false);
-  const [telegramNickname, setTelegramNickname] = useState("");
+  const [telegramNickname, setTelegramNickname] = useState(user.user?.tg || "");
   const [nicknameError, setNicknameError] = useState("");
   const [selectedNetworkGive, setSelectedNetworkGive] = useState("");
   const [selectedNetworkReceive, setSelectedNetworkReceive] = useState("");
@@ -131,7 +132,6 @@ export default function ExchangeWidget() {
     (state: RootState) => state.language.currentLanguage
   );
 
-  const user = useSelector((state: RootState) => state.user); 
 
   const isRuble = (currency: string) => {
     const rubCurrencies = [
@@ -283,12 +283,14 @@ export default function ExchangeWidget() {
     };
 
     try {
+      const token = localStorage.getItem("jwt");
       const baseURL =
         process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
       const response = await fetch(`${baseURL}/api/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(orderData),
       });

@@ -42,9 +42,11 @@ export default function SignUpModal({ open, onClose, onSuccess }: SignUpModalPro
       setError("Необходимо согласиться с правилами сервиса.");
       return;
     }
+    // Извлекаем реферальный код из sessionStorage, если он там есть
+    const referralCode = sessionStorage.getItem("referralCode") || "";
 
     try {
-      const { message } = await register(login, email, password); // API запрос
+      const { message } = await register(login, email, password, referralCode ); // API запрос
       alert(message); // Уведомление о успешной регистрации
       onSuccess();
       onClose();
