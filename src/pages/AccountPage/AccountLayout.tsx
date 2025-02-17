@@ -1,7 +1,10 @@
 import { NavLink, Outlet } from "react-router-dom";
 import "./AccountLayout.scss";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 export default function AccountLayout() {
+  const user = useSelector((state: RootState) => state.user);
   const navItems = [
     { path: "/account/data", label: "Личные данные" },
     { path: "/account/security", label: "Настройки безопасности" },
@@ -12,6 +15,10 @@ export default function AccountLayout() {
     { path: "/account/referrals", label: "Рефералы" },
     { path: "/account/withdraw", label: "Вывод партнёрских средств" },
   ];
+
+  if (user && user.user && user.user.role_id === 2) {
+    navItems.push({ path: "/admin/orders", label: "Админ панель" });
+  }
 
   return (
     <main className="account-layout">
@@ -25,7 +32,9 @@ export default function AccountLayout() {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                isActive ? "account-layout__link active" : "account-layout__link"
+                isActive
+                  ? "account-layout__link active"
+                  : "account-layout__link"
               }
             >
               {item.label}
@@ -33,7 +42,6 @@ export default function AccountLayout() {
           ))}
         </nav>
       </aside>
-      
     </main>
   );
 }

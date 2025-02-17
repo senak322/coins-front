@@ -1,5 +1,5 @@
 import "./App.scss";
-import '@mantine/core/styles.css';
+import "@mantine/core/styles.css";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
@@ -22,42 +22,44 @@ import { getMe } from "./utils/api";
 import { useAppDispatch } from "./hooks/useAppDispatch";
 import { clearUser, setUser } from "./store/userSlice";
 import useReferralCode from "./hooks/useReferralCode";
+import AdminProtectedRoute from "./components/AdminProtectedRoute.";
+import AdminPanel from "./pages/AdminPanel/AdminPanel";
+import AdminOrders from "./pages/AdminOrders/AdminOrders";
+import AdminSettings from "./pages/AdminSettings/AdminSettings";
 
 function App() {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   useReferralCode();
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt');
+    const token = localStorage.getItem("jwt");
     if (!token) {
-      console.log('No token in localStorage');
+      console.log("No token in localStorage");
       return;
     }
-    
+
     getMe(token)
       .then((res) => {
         if (!res!.ok) {
           // navigate('/');
           // localStorage.removeItem('jwt');
-          throw new Error('Token verify failed');
+          throw new Error("Token verify failed");
         }
         return res!.json();
       })
       .then((data) => {
-        console.log('verify data:', data);
+        console.log("verify data:", data);
         dispatch(setUser(data.user));
         // Здесь ожидаем { message: 'Token is valid', user: { ... } }
       })
       .catch((error) => {
-        navigate('/');
-        localStorage.removeItem('jwt');
+        navigate("/");
+        localStorage.removeItem("jwt");
         dispatch(clearUser());
         console.error(error);
       });
   }, []);
-
-  
 
   return (
     <MantineProvider>
@@ -84,6 +86,19 @@ function App() {
             <Route path="bonuses" element={<PartnerExchanges />} />
             <Route path="referrals" element={<Referrals />} />
             <Route path="withdraw" element={<PartnerWithdraw />} />
+            
+          </Route>
+          <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute>
+                <AdminPanel />
+              </AdminProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="orders" />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>
         <Footer />

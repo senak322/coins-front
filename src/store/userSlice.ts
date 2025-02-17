@@ -9,6 +9,7 @@ interface User {
   phone?: string;
   tg?: string;
   twoFA: boolean;
+  role_id: 1 | 2;
 }
 
 // Определяем структуру для стейта user
