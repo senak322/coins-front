@@ -1,0 +1,44 @@
+.admin-panel {
+    display: flex;
+    gap: 20px;
+    background-color: #f5f5f5;
+  
+    &__sidebar {
+      width: 250px;
+      background-color: #2d2d2d;
+      padding: 20px;
+      border-radius: 8px;
+  
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  
+    &__link {
+      padding: 10px 15px;
+      border-radius: 4px;
+      color: #ccc;
+      text-decoration: none;
+      transition: background-color 0.2s, color 0.2s;
+  
+      &.active {
+        background-color: #ffb300;
+        color: #fff;
+      }
+  
+      &:hover {
+        background-color: #444;
+        color: #fff;
+      }
+    }
+  
+    &__content {
+      flex: 1;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+    }
+  }
+  

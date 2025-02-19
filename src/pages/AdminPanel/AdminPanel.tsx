@@ -1,15 +1,20 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { Paper, Title } from "@mantine/core";
 import "./AdminPanel.scss";
 
 export default function AdminPanel() {
-    const adminNavItems = [
-        { path: "orders", label: "Заявки" },
-        { path: "settings", label: "Настройки" },
-      ];
+  const adminNavItems = [
+    { path: "orders", label: "Заявки" },
+    { path: "settings", label: "Настройки" },
+  ];
 
   return (
-    <div className="admin-panel">
+    <Paper className="admin-panel" shadow="md" radius="md" p="xl">
+      <main className="admin-panel__content">
+        <Title order={3} mb="md">Админ панель</Title>
+        <Outlet />
+      </main>
       <aside className="admin-panel__sidebar">
         <nav>
           {adminNavItems.map((item) => (
@@ -25,9 +30,7 @@ export default function AdminPanel() {
           ))}
         </nav>
       </aside>
-      <main className="admin-panel__content">
-        <Outlet /> {/* Здесь будут отрисовываться вложенные маршруты, например, список заявок */}
-      </main>
-    </div>
+      
+    </Paper>
   );
 }

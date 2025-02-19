@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Select, MenuItem, Button } from "@mui/material";
+import { Select, Text, Loader, Group } from "@mantine/core";
 import "./AdminOrders.scss";
 
 interface OrderData {
@@ -23,8 +23,7 @@ export default function AdminOrders() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const baseURL =
-        process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
       let url = `${baseURL}/api/admin/orders`;
       if (filterStatus) {
         url += `?status=${filterStatus}`;
@@ -54,8 +53,7 @@ export default function AdminOrders() {
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      const baseURL =
-        process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
       const response = await fetch(`${baseURL}/api/admin/orders/${orderId}/status`, {
         method: "PATCH",
         headers: {
@@ -66,7 +64,6 @@ export default function AdminOrders() {
       });
       const data = await response.json();
       if (response.ok) {
-        // Обновляем список заявок
         fetchOrders();
       } else {
         alert(data.message || "Ошибка обновления статуса");
@@ -78,26 +75,29 @@ export default function AdminOrders() {
 
   return (
     <div className="admin-orders">
-      <h2>Админ панель: Заявки</h2>
-      <div className="filter">
-        <label>Фильтр по статусу:</label>
+      <h2>Заявки</h2>
+      <Group mb="md">
+        <Text>Фильтр по статусу:</Text>
         <Select
           value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as string)}
-        >
-          <MenuItem value="">Все</MenuItem>
-          <MenuItem value="new">Новые</MenuItem>
-          <MenuItem value="in_progress">В работе</MenuItem>
-          <MenuItem value="completed">Завершенные</MenuItem>
-          <MenuItem value="cancelled">Отмененные</MenuItem>
-        </Select>
-      </div>
+          onChange={(value) => setFilterStatus(value as string)}
+          data={[
+            { value: "", label: "Все" },
+            { value: "new", label: "Новые" },
+            { value: "in_progress", label: "В работе" },
+            { value: "completed", label: "Завершенные" },
+            { value: "cancelled", label: "Отмененные" },
+          ]}
+          placeholder="Выберите статус"
+          style={{ width: 200 }}
+        />
+      </Group>
       {loading ? (
-        <p>Загрузка...</p>
+        <Loader />
       ) : error ? (
-        <p style={{ color: "red" }}>{error}</p>
+        <Text color="red">{error}</Text>
       ) : orders.length === 0 ? (
-        <p>Нет заявок для отображения</p>
+        <Text>Нет заявок для отображения</Text>
       ) : (
         <table className="orders-table">
           <thead>
@@ -127,15 +127,14 @@ export default function AdminOrders() {
                 <td>
                   <Select
                     value={order.status}
-                    onChange={(e) =>
-                      handleStatusChange(order.orderId, e.target.value as string)
-                    }
-                  >
-                    <MenuItem value="new">Новый</MenuItem>
-                    <MenuItem value="in_progress">В работе</MenuItem>
-                    <MenuItem value="completed">Завершен</MenuItem>
-                    <MenuItem value="cancelled">Отменен</MenuItem>
-                  </Select>
+                    onChange={(value) => handleStatusChange(order.orderId, value!)}
+                    data={[
+                      { value: "new", label: "Новый" },
+                      { value: "in_progress", label: "В работе" },
+                      { value: "completed", label: "Завершен" },
+                      { value: "cancelled", label: "Отменен" },
+                    ]}
+                  />
                 </td>
               </tr>
             ))}
