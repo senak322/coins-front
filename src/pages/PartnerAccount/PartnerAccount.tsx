@@ -86,21 +86,9 @@ export default function PartnerAccount() {
             <div className="stats-label">Ваш парт. процент</div>
             <div className="stats-value">{partnerInfo.partnerPercent} %</div>
           </div>
-          <div className="stats-row">
-            <div className="stats-label">Скачать архив операций</div>
-            <div className="stats-value">
-              <button onClick={() => alert("Загружаем архив...")} className="download-button">
-                Загрузить
-              </button>
-            </div>
-          </div>
         </div>
         {/* Вторая таблица */}
         <div className="partner-account__table partner-account__table--second">
-          {/* <div className="stats-row">
-            <div className="stats-label">Посетителей</div>
-            <div className="stats-value">{partnerInfo.visitors}</div>
-          </div> */}
           <div className="stats-row">
             <div className="stats-label">Количество рефералов</div>
             <div className="stats-value">{partnerInfo.referralCount}</div>
@@ -113,10 +101,6 @@ export default function PartnerAccount() {
             <div className="stats-label">Сумма обменов (RUB)</div>
             <div className="stats-value">{partnerInfo.totalExchangesSum.toFixed(2)} RUB</div>
           </div>
-          {/* <div className="stats-row">
-            <div className="stats-label">CTR</div>
-            <div className="stats-value">{partnerInfo.ctrValue}</div>
-          </div> */}
           <div className="stats-row">
             <div className="stats-label">Заработано за все время (RUB)</div>
             <div className="stats-value">{partnerInfo.earnedAllTime.toFixed(2)} RUB</div>
@@ -133,10 +117,10 @@ export default function PartnerAccount() {
             <div className="stats-label">Текущий баланс (RUB)</div>
             <div className="stats-value">{partnerInfo.currentBalance.toFixed(2)} RUB</div>
           </div>
-          <div className="stats-row">
+          {/* <div className="stats-row">
             <div className="stats-label">Доступно для выплаты (RUB)</div>
             <div className="stats-value">{partnerInfo.availableForPayout.toFixed(2)} RUB</div>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="partner-account__withdrawals">

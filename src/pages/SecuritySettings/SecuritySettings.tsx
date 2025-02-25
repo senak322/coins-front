@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./SecuritySettings.scss";
-import { Button, Dialog, TextInput } from "@mantine/core";
+import { Button, Dialog, Modal, TextInput } from "@mantine/core";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
@@ -208,7 +208,8 @@ export default function SecuritySettings() {
       </div>
 
       {/* Двухфакторная аутентификация */}
-      <Dialog
+      <Modal
+        centered
         opened={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         title="Настройка двухфакторной аутентификации"
@@ -234,7 +235,7 @@ export default function SecuritySettings() {
             </Button>
           </>
         )}
-      </Dialog>
+      </Modal>
 
       {/* Уведомление по e-mail */}
       <div className="security-settings__section">

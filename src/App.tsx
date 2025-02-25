@@ -26,6 +26,7 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute.";
 import AdminPanel from "./pages/AdminPanel/AdminPanel";
 import AdminOrders from "./pages/AdminOrders/AdminOrders";
 import AdminSettings from "./pages/AdminSettings/AdminSettings";
+import AdminWithdrawals from "./pages/AdminWithdrawals/AdminWithdrawals";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -98,6 +99,7 @@ function App() {
           >
             <Route index element={<Navigate to="orders" />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="withdrawals" element={<AdminWithdrawals />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

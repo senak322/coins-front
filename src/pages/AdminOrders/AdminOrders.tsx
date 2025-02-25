@@ -54,7 +54,7 @@ export default function AdminOrders() {
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
       const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
-      const response = await fetch(`${baseURL}/api/admin/orders/${orderId}/status`, {
+      const response = await fetch(`${baseURL}/api/order/${orderId}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

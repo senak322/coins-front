@@ -3,7 +3,7 @@ import { TextInput, Button, Alert, Group, Title, Loader, Flex } from "@mantine/c
 import "./PartnerWithdraw.scss";
 
 interface PartnerInfo {
-  availableForPayout: number; // доступно для вывода, в рублях
+  currentBalance: number; // доступно для вывода, в рублях
 }
 
 export default function PartnerWithdraw() {
@@ -29,8 +29,8 @@ export default function PartnerWithdraw() {
         },
       });
       const data = await response.json();
-      if (response.ok && data.availableForPayout !== undefined) {
-        setPartnerInfo({ availableForPayout: data.availableForPayout });
+      if (response.ok && data.currentBalance !== undefined) {
+        setPartnerInfo({ currentBalance: data.currentBalance });
       } else {
         setError(data.error || "Ошибка получения данных партнёра");
       }
@@ -57,7 +57,7 @@ export default function PartnerWithdraw() {
       setError("Минимальная сумма вывода - 1000 рублей");
       return;
     }
-    if (partnerInfo && amountNumber > partnerInfo.availableForPayout) {
+    if (partnerInfo && amountNumber > partnerInfo.currentBalance) {
       setError("Запрошенная сумма превышает доступный баланс");
       return;
     }
@@ -101,7 +101,7 @@ export default function PartnerWithdraw() {
       </Title>
       <Alert color="blue" mb="md">
         Минимальная сумма вывода – 1000 рублей. Доступно для вывода:{" "}
-        {partnerInfo ? partnerInfo.availableForPayout + " RUB" : <Loader size="xs" />}
+        {partnerInfo ? partnerInfo.currentBalance + " RUB" : <Loader size="xs" />}
       </Alert>
       <Flex direction="column">
         <TextInput

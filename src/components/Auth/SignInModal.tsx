@@ -56,6 +56,8 @@ export default function SignInModal({
         // Если 2FA не требуется – сохраняем токен и обновляем состояние пользователя
         localStorage.setItem("jwt", token);
         dispatch(setUser(user));
+        setLoginInput("");
+        setPassword("")
         onSuccess();
         onClose();
       }
@@ -85,6 +87,8 @@ export default function SignInModal({
       onSuccess();
       onClose();
       setIs2FADialogOpen(false);
+      setLoginInput("")
+      setPassword("")
     } catch (err: any) {
       setError(
         err.response?.data?.error || "Ошибка двухфакторной аутентификации."

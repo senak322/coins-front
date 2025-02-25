@@ -6,7 +6,9 @@ import "./AdminPanel.scss";
 export default function AdminPanel() {
   const adminNavItems = [
     { path: "orders", label: "Заявки" },
+    { path: "withdrawals", label: "Выводы" },
     { path: "settings", label: "Настройки" },
+    
   ];
 
   return (
