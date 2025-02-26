@@ -80,6 +80,7 @@
         padding: 10px 20px;
         border-radius: 20px;
         font-weight: bold;
+        align-self: flex-end;
         &:hover {
           background-color: #e6b800 !important;
         }
@@ -103,6 +104,26 @@
 
     &__error {
       color: red;
+    }
+  }
+
+  .twofa {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 20px;
+    justify-content: center;
+    padding: 0.5rem;
+    font-size: 1.4rem;
+    width: 150px;
+    font-weight: 500;
+    height: 4rem;
+    align-self: center;
+    margin-bottom: 1rem;
+    div div > input {
+      font-size: 1.8rem;
+      line-height: 3rem;
+      font-weight: 600;
     }
   }
   

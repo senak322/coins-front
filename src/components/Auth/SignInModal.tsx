@@ -12,6 +12,7 @@ import "./Auth.scss";
 import { login } from "../../services/authAPI";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { setUser } from "../../store/userSlice";
+import { NumberInput } from "@mantine/core";
 
 interface SignInModalProps {
   open: boolean;
@@ -33,7 +34,7 @@ export default function SignInModal({
   const [error, setError] = useState("");
   // Состояния для 2FA
   const [is2FADialogOpen, setIs2FADialogOpen] = useState(false);
-  const [twoFACode, setTwoFACode] = useState("");
+  const [twoFACode, setTwoFACode] = useState<number | string>("");
   // Сохраняем временно данные пользователя для прохождения 2FA
   const [tempUser, setTempUser] = useState<any>(null);
 
@@ -67,7 +68,7 @@ export default function SignInModal({
   };
 
   const handle2FASubmit = async () => {
-    if (!twoFACode.trim() || !tempUser) {
+    if (!twoFACode || !tempUser) {
       setError("Введите код двухфакторной аутентификации.");
       return;
     }
@@ -157,16 +158,17 @@ export default function SignInModal({
         <DialogTitle className="auth-dialog__title">
           Двухфакторная аутентификация
         </DialogTitle>
-        <DialogContent dividers className="auth-dialog__content">
-          <TextField
-            placeholder="Введите 2FA код"
+        <div className="twofa">
+          <NumberInput
+            placeholder="2FA код"
             variant="outlined"
-            fullWidth
-            margin="normal"
+            thousandSeparator=" "
+            hideControls
             value={twoFACode}
-            onChange={(e) => setTwoFACode(e.target.value)}
+            onChange={setTwoFACode}
+            style={{textAlign: "center", fontSize: "2rem"}}
           />
-        </DialogContent>
+        </div>
         <DialogActions className="auth-dialog__actions">
           <Button
             variant="contained"

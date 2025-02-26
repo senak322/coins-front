@@ -66,7 +66,6 @@ export default function AccountPage() {
       const data = await res.json();
       console.log("User updated:", data.user);
 
-      // Сохраняем в Redux
       dispatch(setUser(data.user));
 
       // Опционально уведомляем/перенаправляем

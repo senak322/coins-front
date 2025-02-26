@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./UserOperations.scss";
 
 interface OrderData {
@@ -22,12 +22,11 @@ export default function UserOperations() {
   const fetchOrders = async () => {
     setIsLoading(true);
     try {
-      // Здесь можно использовать endpoint "/api/order/all" или "/api/order/my" в зависимости от задачи
-      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const baseURL =
+        process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
       const response = await fetch(`${baseURL}/api/order/my`, {
         headers: {
           "Content-Type": "application/json",
-          // Если требуется, добавьте JWT в заголовке:
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       });
@@ -48,35 +47,65 @@ export default function UserOperations() {
     fetchOrders();
   }, []);
 
+  // Функция для экспорта данных в CSV
+  const exportToCSV = () => {
+    // Определяем заголовок CSV
+    const header = [
+      "ID",
+      "Дата",
+      "Время",
+      "Отдаёте",
+      "Получаете",
+      "Статус",
+      "Телеграм",
+      "Сеть",
+    ];
+    // Преобразуем данные заказов в массив строк
+    const rows = orders.map((order) => [
+      order.orderId,
+      `${new Date(order.createdAt).toLocaleString()}`,
+      `${order.amountGive} ${order.currencyGive}`,
+      `${order.amountReceive} ${order.currencyReceive}`,
+      order.status,
+      order.telegramNickname,
+      order.networkGive || "",
+    ]);
+
+    // Объединяем заголовок и строки в один CSV‑контент
+    const csvContent = [header, ...rows].map((row) => row.join(",")).join("\n");
+
+    // Создаем Blob и инициируем скачивание
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "orders_archive.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Пример расчёта статистики:
   const totalExchanges = orders.length;
-  // Здесь для примера суммируем amountGive, предположим, что они в USD или уже сконвертированы
-  const totalAmount = orders.reduce((sum, order) => sum + order.amountGive, 0);
+  // const totalAmount = orders.reduce((sum, order) => sum + order.amountGive, 0);
 
   return (
     <div className="operations-container">
       <h2 className="operations-title">Ваши операции</h2>
-
-      {/* Блок со статистикой */}
       <div className="operations-stats">
         <div className="stats-row">
           <div className="stats-label">Обменов</div>
           <div className="stats-value">{totalExchanges}</div>
         </div>
-        {/* <div className="stats-row">
-          <div className="stats-label">Сумма обменов</div>
-          <div className="stats-value">{totalAmount} USD</div>
-        </div> */}
         <div className="stats-row">
           <div className="stats-label">Скачать архив операций</div>
           <div className="stats-value stats-download">
-            {/* Здесь можно реализовать скачивание архива */}
-            <button className="download-button">Скачать</button>
+            <button className="download-button" onClick={exportToCSV}>
+              Скачать
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Таблица сделок */}
       <div className="operations-table">
         {isLoading ? (
           <p>Загрузка...</p>
