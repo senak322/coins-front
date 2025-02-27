@@ -138,13 +138,30 @@ export default function SecuritySettings() {
     }
   };
 
-  const handleEmailNotificationToggle = () => {
-    if (isEmailNotificationEnabled) {
-      console.log("Отключение уведомлений по e-mail");
-    } else {
-      console.log("Подключение уведомлений по e-mail");
+  const handleEmailNotificationToggle = async () => {
+    try {
+      const newValue = !isEmailNotificationEnabled;
+      // Отправляем запрос на сервер для обновления настроек уведомлений
+      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const response = await fetch(`${baseURL}/api/users/notifications`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+        body: JSON.stringify({ emailNotificationsEnabled: newValue }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setIsEmailNotificationEnabled(newValue);
+        console.log("Уведомления обновлены:", data.emailNotificationsEnabled);
+      } else {
+        alert(data.error || "Ошибка обновления настроек уведомлений");
+      }
+    } catch (error) {
+      console.error("Error updating email notification settings:", error);
+      alert("Ошибка обновления настроек уведомлений");
     }
-    setIsEmailNotificationEnabled(!isEmailNotificationEnabled);
   };
 
   return (
@@ -216,13 +233,7 @@ export default function SecuritySettings() {
       >
         {qrCodeData && (
           <>
-            {/* <QRCodeSVG 
-              value={qrCodeData} 
-              size={200} 
-              bgColor="#ffffff" 
-              fgColor="#000000" 
-              level="H" 
-            /> */}
+            
             <img src={qrCodeData} alt="QR code" width="200" height="200" />
             <TextInput
               label="Введите код из приложения"
@@ -240,7 +251,7 @@ export default function SecuritySettings() {
       {/* Уведомление по e-mail */}
       <div className="security-settings__section">
         <h2 className="security-settings__subtitle">
-          Уведомления о входе в систему
+          Уведомления о заявках
         </h2>
         <button
           className={`security-settings__button ${
