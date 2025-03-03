@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import "./ExchangeWidget.scss";
 import { RootState } from "../../store/store";
+import { SmartCaptcha } from '@yandex/smart-captcha';
 
 import {
   setCurrency,
@@ -122,6 +123,7 @@ export default function ExchangeWidget() {
   const [savedAccounts, setSavedAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState("");
   const [selectedAccountData, setSelectedAccountData] = useState<Account | undefined>(undefined);
+  const [captchaToken, setCaptchaToken] = useState('');
 
   const dispatch = useAppDispatch();
   const { instances, sumGive, sumReceive, lastChangedInput } = useSelector(
@@ -131,6 +133,14 @@ export default function ExchangeWidget() {
   const currentLanguage = useSelector(
     (state: RootState) => state.language.currentLanguage
   );
+
+  const handleCaptchaSuccess = useCallback((token: string) => {
+    setCaptchaToken(token);
+  }, []);
+
+  const handleTokenExpired = useCallback(() => {
+    setCaptchaToken('');
+  }, []);
 
 
   const isRuble = (currency: string) => {
@@ -154,6 +164,7 @@ export default function ExchangeWidget() {
     ];
     return rubCurrencies.includes(currency);
   };
+
 
   const isFiatCurrency = (currency: string) => {
     return banks.some((bank) => bank.symbol === currency);
@@ -269,6 +280,11 @@ export default function ExchangeWidget() {
       return;
     }
 
+    if (!captchaToken) {
+      alert("Пожалуйста, пройдите капчу");
+      return;
+    }
+
     setIsLoading(true); // Показать лоадер
 
     const orderData = {
@@ -279,7 +295,7 @@ export default function ExchangeWidget() {
       telegramNickname: telegramNickname.trim(), // Добавляем ник в данные заявки
       networkGive: selectedNetworkGive || selectedNetworkReceive, // Добавляем выбранную сеть в заявку
       accountId: selectedAccountId || undefined,
-      // accountData: selectedAccountData?.system
+      captchaToken,
     };
 
     try {
@@ -301,7 +317,7 @@ export default function ExchangeWidget() {
         setOrderId(data.orderId);
         setOrderCreated(true);
         setNetworkError(""); // Очистить ошибку при выборе сети
-        // Здесь отправить письмо админу, вызвав соответствующую функцию на сервере
+        setCaptchaToken("");
       } else {
         console.error("Ошибка при создании заявки:", data.message);
       }
@@ -652,6 +668,14 @@ export default function ExchangeWidget() {
                   ".MuiFormHelperText-root": { color: "#fff" },
                 }}
               />
+              {!orderCreated && (
+                <SmartCaptcha
+                  sitekey={process.env.REACT_APP_CAPTCHA_SITEKEY!}
+                  onSuccess={handleCaptchaSuccess}
+                  onTokenExpired={handleTokenExpired}
+                  // test={process.env.NODE_ENV === 'development'}
+                />
+              )}
             </div>
           )}
         </DialogContent>

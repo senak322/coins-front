@@ -1,8 +1,13 @@
+@import "../../styles/mixins";
+
 .account-layout {
     display: flex;
     gap: 20px;
     padding: 20px;
-  
+    @include respond-to(big) {
+      gap: 1rem;
+      padding: 0.5rem;
+    }
     &__sidebar {
       flex: 0 0 250px;
       background-color: #fff7e6;
@@ -10,7 +15,9 @@
       border-radius: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       height: fit-content;
-  
+      @include respond-to(big) {
+        padding: 10px;
+      }
       nav {
         display: flex;
         flex-direction: column;
@@ -24,7 +31,9 @@
         color: #333;
         font-weight: bold;
         transition: background-color 0.3s ease;
-  
+        @include respond-to(big) {
+          padding: 8px;
+        }
         &:hover {
           background-color: #ffe9c6;
         }
@@ -42,6 +51,72 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      @include respond-to(big) {
+        padding: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      position: relative;
+      flex-direction: column;
+  
+      .burger-btn {
+        position: fixed;
+        top: 30%;
+        right: 3px;
+        z-index: 1100;
+        background: none;
+        border: none;
+        background-color: #fff7e6;
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        padding: 0.5rem;
+        cursor: pointer;
+        svg {
+          width: 32px;
+          height: 32px;
+        }
+      }
+  
+      .account-layout__sidebar.mobile {
+        position: fixed;
+        top: 35%;
+        right: 0;
+        height: 500px;
+        background-color: #fff7e6;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: transform 0.3s ease, width 0.3s ease;
+        overflow: hidden;
+  
+        // В свернутом состоянии показываем только кнопку-бургер (минимальная ширина)
+        &.closed {
+          width: 50px;
+          transform: translateX(0);
+          // Можно скрыть навигацию
+          nav {
+            opacity: 0;
+            pointer-events: none;
+          }
+        }
+  
+        // В развернутом состоянии меню выезжает и занимает полную ширину (например, 250px)
+        &.open {
+          width: 250px;
+          transform: translateX(0);
+          nav {
+            opacity: 1;
+            pointer-events: auto;
+          }
+        }
+      }
+  
+      // Скрываем стандартное расположение контента, если меню выезжает
+      .account-layout__content {
+        margin-top: 60px; // чтобы не перекрывалось бургером
+        width: calc(100% - 50px);
+      }
     }
   }
   

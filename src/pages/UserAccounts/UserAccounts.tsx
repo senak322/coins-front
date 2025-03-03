@@ -400,8 +400,10 @@ export default function UserAccounts() {
         </Button>
       </Group>
 
+      
       {/* Таблица аккаунтов, если они есть */}
       {accounts.length > 0 && (
+        <ScrollArea>
         <Table highlightOnHover className="userAccounts__table">
           <thead>
             <tr>
@@ -516,6 +518,7 @@ export default function UserAccounts() {
             })}
           </tbody>
         </Table>
+        </ScrollArea>
       )}
     </Box>
   );

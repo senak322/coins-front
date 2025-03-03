@@ -2,9 +2,19 @@ import { NavLink, Outlet } from "react-router-dom";
 import "./AccountLayout.scss";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import useWindowWidth from "../../hooks/useWindowWidth";
+import { IconMenu2 } from '@tabler/icons-react';
+import { useState } from "react";
 
 export default function AccountLayout() {
   const user = useSelector((state: RootState) => state.user);
+  const width = useWindowWidth();
+  const [isMenuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen((prev) => !prev);
+  };
+
   const navItems = [
     { path: "/account/data", label: "Личные данные" },
     { path: "/account/security", label: "Настройки безопасности" },
@@ -25,7 +35,14 @@ export default function AccountLayout() {
       <div className="account-layout__content">
         <Outlet /> {/* Контент текущего роута */}
       </div>
-      <aside className="account-layout__sidebar">
+      {width < 768 && (
+        <button className="burger-btn" onClick={toggleMenu}>
+          <IconMenu2 />
+        </button>
+      )}
+      <aside className={`account-layout__sidebar ${
+          width < 768 ? "mobile" : ""
+        } ${isMenuOpen ? "open" : "closed"}`}>
         <nav>
           {navItems.map((item) => (
             <NavLink

@@ -18,6 +18,7 @@
     @include respond-to(big) {
         flex-direction: column;
         width: 100%;
+        align-items: center;
       }
   }
   &__li {
