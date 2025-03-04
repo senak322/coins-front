@@ -1,14 +1,24 @@
+@import "../../styles/mixins";
+
 .admin-panel {
     display: flex;
     gap: 20px;
     background-color: #f5f5f5;
+    @include respond-to(big) {
+      padding: 0 !important;
+    }
   
     &__sidebar {
       width: 250px;
       background-color: #2d2d2d;
       padding: 20px;
       border-radius: 8px;
-  
+      @include respond-to(big) {
+        width: 150px;
+        padding: 5px; 
+        position: fixed;
+        right: 0;
+      }
       nav {
         display: flex;
         flex-direction: column;
@@ -22,7 +32,9 @@
       color: #ccc;
       text-decoration: none;
       transition: background-color 0.2s, color 0.2s;
-  
+      @include respond-to(big) {
+        padding: 5px 10px;
+      }
       &.active {
         background-color: #ffb300;
         color: #fff;
@@ -39,6 +51,9 @@
       padding: 20px;
       background-color: #fff;
       border-radius: 8px;
+      @include respond-to(big) {
+        padding: 0 !important;
+      }
     }
   }
   

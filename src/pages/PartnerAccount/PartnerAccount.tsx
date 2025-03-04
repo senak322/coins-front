@@ -67,7 +67,7 @@ export default function PartnerAccount() {
   return (
     <div className="partner-account">
       <h2 className="partner-account__title">Партнёрский аккаунт</h2>
-      <div style={{ display: "flex", gap: "1rem" }}>
+      <div className="partner-account__info" style={{ display: "flex", gap: "1rem" }}>
         {/* Первая таблица */}
         <div className="partner-account__table">
           <div className="stats-row">

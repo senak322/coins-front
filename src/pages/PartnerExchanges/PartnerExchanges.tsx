@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./PartnerExchanges.scss";
+import { ScrollArea, Table } from "@mantine/core";
 
 interface Exchange {
   id: string;
@@ -56,24 +57,28 @@ export default function PartnerExchanges() {
       {!loading && !error && exchanges.length === 0 ? (
         <div className="table-row no-data">Нет данных для отображения</div>
       ) : (
-        <div className="partner-exchanges__table">
-          <div className="table-header">
-            <div className="header-cell">ID обмена</div>
-            <div className="header-cell">Дата</div>
-            <div className="header-cell">Пользователь</div>
-            <div className="header-cell">Вознаграждение</div>
-          </div>
-          <div className="table-body">
-            {exchanges.map((item) => (
-              <div className="table-row" key={item.id}>
-                <div className="cell">{item.id}</div>
-                <div className="cell">{item.date}</div>
-                <div className="cell">{item.user}</div>
-                <div className="cell">{item.reward}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ScrollArea>
+          <Table striped className="partner-exchanges__table">
+            <Table.Thead className="table-header">
+              <Table.Tr>
+                <Table.Th className="header-cell">ID обмена</Table.Th>
+                <Table.Th className="header-cell">Дата</Table.Th>
+                <Table.Th className="header-cell">Пользователь</Table.Th>
+                <Table.Th className="header-cell">Вознаграждение</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody className="table-body">
+              {exchanges.map((item) => (
+                <Table.Tr className="table-row" key={item.id}>
+                  <Table.Td className="cell">{item.id}</Table.Td>
+                  <Table.Td className="cell">{item.date}</Table.Td>
+                  <Table.Td className="cell">{item.user}</Table.Td>
+                  <Table.Td className="cell">{item.reward}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </ScrollArea>
       )}
     </div>
   );

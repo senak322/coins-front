@@ -48,6 +48,10 @@ export default function AccountLayout() {
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={(e) => {
+                // e.preventDefault();
+                setMenuOpen(false);
+              }}
               className={({ isActive }) =>
                 isActive
                   ? "account-layout__link active"

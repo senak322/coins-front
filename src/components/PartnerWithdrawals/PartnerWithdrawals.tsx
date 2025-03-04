@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Title, Loader, Alert } from "@mantine/core";
+import { Table, Title, Loader, Alert, ScrollArea } from "@mantine/core";
 import "./PartnerWithdrawals.scss";
 
 interface Withdrawal {
@@ -54,28 +54,32 @@ export default function PartnerWithdrawals() {
         <p>Нет заявок на вывод средств</p>
       )}
       {!loading && !error && withdrawals.length > 0 && (
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Номер заявки</Table.Th>
-              <Table.Th>Дата</Table.Th>
-              <Table.Th>Сумма (RUB)</Table.Th>
-              <Table.Th>Контакт</Table.Th>
-              <Table.Th>Статус</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {withdrawals.map((item) => (
-              <Table.Tr key={item.withdrawalId}>
-                <Table.Td>{item.withdrawalId}</Table.Td>
-                <Table.Td>{new Date(item.createdAt).toLocaleDateString()}</Table.Td>
-                <Table.Td>{item.amount}</Table.Td>
-                <Table.Td>{item.contact}</Table.Td>
-                <Table.Td>{item.status}</Table.Td>
+        <ScrollArea>
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Номер заявки</Table.Th>
+                <Table.Th>Дата</Table.Th>
+                <Table.Th>Сумма (RUB)</Table.Th>
+                <Table.Th>Контакт</Table.Th>
+                <Table.Th>Статус</Table.Th>
               </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+            </Table.Thead>
+            <Table.Tbody>
+              {withdrawals.map((item) => (
+                <Table.Tr key={item.withdrawalId}>
+                  <Table.Td>{item.withdrawalId}</Table.Td>
+                  <Table.Td>
+                    {new Date(item.createdAt).toLocaleDateString()}
+                  </Table.Td>
+                  <Table.Td>{item.amount}</Table.Td>
+                  <Table.Td>{item.contact}</Table.Td>
+                  <Table.Td>{item.status}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </ScrollArea>
       )}
     </div>
   );

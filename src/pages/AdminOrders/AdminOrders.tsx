@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Select, Text, Loader, Group } from "@mantine/core";
+import { Select, Text, Loader, Group, ScrollArea } from "@mantine/core";
 import "./AdminOrders.scss";
 
 interface OrderData {
@@ -23,7 +23,8 @@ export default function AdminOrders() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const baseURL =
+        process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
       let url = `${baseURL}/api/admin/orders`;
       if (filterStatus) {
         url += `?status=${filterStatus}`;
@@ -53,7 +54,8 @@ export default function AdminOrders() {
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+      const baseURL =
+        process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
       const response = await fetch(`${baseURL}/api/order/${orderId}/status`, {
         method: "PATCH",
         headers: {
@@ -76,7 +78,7 @@ export default function AdminOrders() {
   return (
     <div className="admin-orders">
       <h2>Заявки</h2>
-      <Group mb="md">
+      <div className="admin-orders__filter">
         <Text>Фильтр по статусу:</Text>
         <Select
           value={filterStatus}
@@ -91,7 +93,7 @@ export default function AdminOrders() {
           placeholder="Выберите статус"
           style={{ width: 200 }}
         />
-      </Group>
+      </div>
       {loading ? (
         <Loader />
       ) : error ? (
@@ -99,47 +101,51 @@ export default function AdminOrders() {
       ) : orders.length === 0 ? (
         <Text>Нет заявок для отображения</Text>
       ) : (
-        <table className="orders-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Дата</th>
-              <th>Пользователь</th>
-              <th>Отдаёте</th>
-              <th>Получаете</th>
-              <th>Статус</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.orderId}>
-                <td>{order.orderId}</td>
-                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                <td>{order.telegramNickname}</td>
-                <td>
-                  {order.amountGive} {order.currencyGive}
-                </td>
-                <td>
-                  {order.amountReceive} {order.currencyReceive}
-                </td>
-                <td>{order.status}</td>
-                <td>
-                  <Select
-                    value={order.status}
-                    onChange={(value) => handleStatusChange(order.orderId, value!)}
-                    data={[
-                      { value: "new", label: "Новый" },
-                      { value: "in_progress", label: "В работе" },
-                      { value: "completed", label: "Завершен" },
-                      { value: "cancelled", label: "Отменен" },
-                    ]}
-                  />
-                </td>
+        <ScrollArea maw={"100vw"}>
+          <table className="orders-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Дата</th>
+                <th>Пользователь</th>
+                <th>Отдаёте</th>
+                <th>Получаете</th>
+                <th>Статус</th>
+                <th>Действия</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.orderId}>
+                  <td>{order.orderId}</td>
+                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td>{order.telegramNickname}</td>
+                  <td>
+                    {order.amountGive} {order.currencyGive}
+                  </td>
+                  <td>
+                    {order.amountReceive} {order.currencyReceive}
+                  </td>
+                  <td>{order.status}</td>
+                  <td>
+                    <Select
+                      value={order.status}
+                      onChange={(value) =>
+                        handleStatusChange(order.orderId, value!)
+                      }
+                      data={[
+                        { value: "new", label: "Новый" },
+                        { value: "in_progress", label: "В работе" },
+                        { value: "completed", label: "Завершен" },
+                        { value: "cancelled", label: "Отменен" },
+                      ]}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollArea>
       )}
     </div>
   );

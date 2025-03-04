@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./UserOperations.scss";
+import { ScrollArea } from "@mantine/core";
 
 interface OrderData {
   orderId: string;
@@ -112,6 +113,7 @@ export default function UserOperations() {
         ) : orders.length === 0 ? (
           <p className="no-data">Данных нет</p>
         ) : (
+         < ScrollArea>
           <table>
             <thead>
               <tr>
@@ -138,6 +140,7 @@ export default function UserOperations() {
               ))}
             </tbody>
           </table>
+          </ScrollArea>
         )}
       </div>
     </div>

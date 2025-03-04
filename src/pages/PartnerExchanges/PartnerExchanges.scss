@@ -3,7 +3,7 @@
   
     &__title {
       font-size: 1.3rem;
-      margin-bottom: 16px;
+      margin: 1rem;
     }
   
     &__table {
@@ -12,8 +12,6 @@
       padding: 16px;
   
       .table-header {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
         padding: 12px;
         border-radius: 8px;
         font-weight: 600;
@@ -25,19 +23,16 @@
       }
   
       .table-body {
-        display: grid;
+
         row-gap: 8px; /* Отступы между строками */
   
         .table-row {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
           background-color: #ffe9a3;
           padding: 12px;
           border-radius: 8px;
   
           &.no-data {
             text-align: center;
-            grid-column: 1 / -1; /* Растянуть на всю ширину */
           }
   
           .cell {

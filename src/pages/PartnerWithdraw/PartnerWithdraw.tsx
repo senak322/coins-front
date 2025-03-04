@@ -100,7 +100,7 @@ export default function PartnerWithdraw() {
         Вывод партнёрских средств
       </Title>
       <Alert color="blue" mb="md">
-        Минимальная сумма вывода – 1000 рублей. Доступно для вывода:{" "}
+        Минимальная сумма вывода – 1000 RUB. Доступно для вывода:{" "}
         {partnerInfo ? partnerInfo.currentBalance + " RUB" : <Loader size="xs" />}
       </Alert>
       <Flex direction="column">

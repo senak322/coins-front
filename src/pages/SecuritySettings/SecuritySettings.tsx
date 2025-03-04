@@ -4,7 +4,7 @@ import { Button, Dialog, Modal, TextInput } from "@mantine/core";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { setIs2FAEnabled } from "../../store/userSlice";
+import { setIs2FAEnabled, setEmailNotificationsEnabled } from "../../store/userSlice";
 
 export default function SecuritySettings() {
   const baseURL =
@@ -17,8 +17,7 @@ export default function SecuritySettings() {
   const [qrCodeData, setQrCodeData] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] =
-    useState(false);
+  
   
     const dispatch = useAppDispatch();
 
@@ -140,7 +139,8 @@ export default function SecuritySettings() {
 
   const handleEmailNotificationToggle = async () => {
     try {
-      const newValue = !isEmailNotificationEnabled;
+      const newValue = !user?.emailNotificationsEnabled;
+      
       // Отправляем запрос на сервер для обновления настроек уведомлений
       const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
       const response = await fetch(`${baseURL}/api/users/notifications`, {
@@ -153,7 +153,7 @@ export default function SecuritySettings() {
       });
       const data = await response.json();
       if (response.ok) {
-        setIsEmailNotificationEnabled(newValue);
+        dispatch(setEmailNotificationsEnabled(newValue));
         console.log("Уведомления обновлены:", data.emailNotificationsEnabled);
       } else {
         alert(data.error || "Ошибка обновления настроек уведомлений");
@@ -255,11 +255,11 @@ export default function SecuritySettings() {
         </h2>
         <button
           className={`security-settings__button ${
-            isEmailNotificationEnabled ? "disable" : "enable"
+            user?.emailNotificationsEnabled ? "disable" : "enable"
           }`}
           onClick={handleEmailNotificationToggle}
         >
-          {isEmailNotificationEnabled
+          {user?.emailNotificationsEnabled === true 
             ? "Отключить уведомления по e-mail"
             : "Подключить уведомления по e-mail"}
         </button>

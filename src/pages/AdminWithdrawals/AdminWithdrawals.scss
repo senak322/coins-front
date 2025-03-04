@@ -1,6 +1,14 @@
+@import "../../styles/mixins";
 .admin-withdrawals {
     padding: 20px;
-  
+    @include respond-to(big) {
+      padding: 0 !important;
+    }
+    h4 {
+      @include respond-to(big) {
+        margin-left: 1rem;
+      }
+    }
     p {
       margin-top: 10px;
     }

@@ -10,6 +10,7 @@ interface User {
   tg?: string;
   twoFA: boolean;
   role_id: 1 | 2;
+  emailNotificationsEnabled: boolean;
 }
 
 // Определяем структуру для стейта user
@@ -36,12 +37,15 @@ const userSlice = createSlice({
     },
     setIs2FAEnabled(state, action: PayloadAction<boolean>) {
       state.user!.twoFA = action.payload;
+    },
+    setEmailNotificationsEnabled(state, action: PayloadAction<boolean>) {
+      state.user!.emailNotificationsEnabled = action.payload;
     }
   },
 });
 
 // Экшены, которые будем диспатчить
-export const { setUser, clearUser, setIs2FAEnabled } = userSlice.actions;
+export const { setUser, clearUser, setIs2FAEnabled, setEmailNotificationsEnabled } = userSlice.actions;
 
 // Экспортируем редюсер, чтобы подключить в store
 export default userSlice.reducer;

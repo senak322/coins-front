@@ -14,7 +14,7 @@ export default function AdminPanel() {
   return (
     <Paper className="admin-panel" shadow="md" radius="md" p="xl">
       <main className="admin-panel__content">
-        <Title order={3} mb="md">Админ панель</Title>
+        <Title order={3} mb="md" ml={"md"}>Админ панель</Title>
         <Outlet />
       </main>
       <aside className="admin-panel__sidebar">
